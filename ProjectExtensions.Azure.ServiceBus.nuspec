@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>ProjectExtensions.Azure.ServiceBus</id>
+    <title>ProjectExtensions.Azure.ServiceBus</title>
+    <version>0.1.0.0</version>
+    <authors>ProjectExtensions, Joe Feser</authors>
+    <owners>ProjectExtensions, Joe Feser</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>TODO description</description>
+    <summary>Azure ServiceBus Wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt; (Debug)</summary>
+    <dependencies>
+    </dependencies>
+    <tags>Azure, ServiceBus</tags>
+  </metadata>
+  <files>
+    <file src="BuildOutput\bin\ProjectExtensions.Azure.ServiceBus.dll" target="lib\net40-full" />
+    <file src="BuildOutput\bin\ProjectExtensions.Azure.ServiceBus.pdb" target="lib\net40-full" />
+    <file src="BuildOutput\src\*.cs" target="src" />
+    <file src="BuildOutput\src\ProjectExtensions.Azure.ServiceBus\**\*.cs" target="src\ProjectExtensions.Azure.ServiceBus" />
+  </files>
+</package>

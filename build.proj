@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets ="Dist" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- See https://onpointondemand.fogbugz.com/default.asp?W695 for documentation -->
+  <Import Project="$(MSBuildProjectDirectory)\Tools\MSBuild\BuildSupport\Onpoint.Targets.properties"/>
+
+  <!-- Version Information -->
+  <PropertyGroup>
+    <AppVersion>0.1.0</AppVersion>
+    <SchemaVersion>0</SchemaVersion>
+  </PropertyGroup>
+
+  <!-- Project name and description -->
+  <PropertyGroup>
+    <ProductName>ProjectExtensions.Azure.ServiceBus</ProductName>
+    <ProductDescription>Azure ServiceBus Wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;</ProductDescription>
+  </PropertyGroup>
+
+  <!-- NUnit Tests -->
+  <ItemGroup>
+    <NUnitTestItem Include="ProjectExtensions.Azure.ServiceBus.Tests.Unit"/>
+    <NUnitTestItem Include="ProjectExtensions.Azure.ServiceBus.Tests.Integration"/>
+  </ItemGroup>
+
+  <!-- Binary files to publish -->
+  <PropertyGroup>
+    <BinInclude>
+      src\ProjectExtensions.Azure.ServiceBus\bin\$(Configuration)\*.*;
+    </BinInclude>
+  </PropertyGroup>
+
+  <!-- Source files to publish -->
+  <PropertyGroup>
+    <SrcInclude>
+      src\**\*.cs;
+    </SrcInclude>
+  </PropertyGroup>
+
+  <!-- Source files to ignore -->
+  <PropertyGroup>
+    <SrcExclude>
+      src\Tests\**\*.cs;
+    </SrcExclude>
+  </PropertyGroup>
+
+  <!-- Nuget v2 -->
+  <ItemGroup>
+    <NugetItem Include="ProjectExtensions.Azure.ServiceBus">
+        <NugetPackageSummary>Azure ServiceBus Wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;</NugetPackageSummary>
+        <NugetPackageId>ProjectExtensions.Azure.ServiceBus</NugetPackageId>
+        <NugetPushUrl>http://go.microsoft.com/fwlink/?LinkID=207106</NugetPushUrl>
+        <NugetPublishSymbols>true</NugetPublishSymbols>
+    </NugetItem>
+  </ItemGroup>
+
+  <Import Project="$(MSBuildProjectDirectory)\Tools\MSBuild\BuildSupport\Onpoint.Targets"/>
+</Project>
