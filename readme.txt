@@ -3,10 +3,14 @@ ProjectExtensions.Azure.ServiceBus
 =============================================
 Use ClickToBuild.bat to build.
 
+==Nuget==
+The Nuget package is ProjectExtensions.Azure.ServiceBus
+
 ==Getting Started==
 
 1. Create a console application
 2. Add a reference to ProjectExtensions.Azure.ServiceBus
+    Using NuGet, install the package ProjectExtensions.Azure.ServiceBus
 3. Optionally Add a reference to NLog
 4. Create a Message Class that you wish to handle:
 
