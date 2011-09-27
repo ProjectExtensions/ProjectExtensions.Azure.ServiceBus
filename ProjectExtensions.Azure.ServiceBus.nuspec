@@ -2,13 +2,13 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>ProjectExtensions.Azure.ServiceBus</id>
-    <title>ProjectExtensions.Azure.ServiceBus</title>
+    <title>Azure AppFabric ServiceBus IHandleMessage&lt;T&gt; wrapper by Project Extensions</title>
     <version>0.5.0.0</version>
     <authors>Project Extensions, Joe Feser</authors>
     <owners>Project Extensions, Joe Feser</owners>
     <projectUrl>https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Azure ServiceBus Wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;</description>
+    <description>Azure AppFabric ServiceBus wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;</description>
     <summary>Azure ServiceBus Wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt; (Debug)</summary>
     <dependencies>
       <dependency id="Autofac" version="2.5.2.830" />
@@ -16,7 +16,7 @@
       <dependency id="NLog" version="2.0.0.2000" />
       <dependency id="WindowsAzure.ServiceBus" version="1.5.0.0" />
     </dependencies>
-    <tags>Azure, ServiceBus</tags>
+    <tags>Azure, AppFabric, ServiceBus</tags>
   </metadata>
   <files>
     <file src="BuildOutput\bin\ProjectExtensions.Azure.ServiceBus.dll" target="lib\net40-full" />
