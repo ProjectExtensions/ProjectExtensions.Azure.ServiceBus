@@ -5,8 +5,9 @@
 
   <!-- Version Information -->
   <PropertyGroup>
-    <AppVersion>0.1.0</AppVersion>
+    <AppVersion>0.5.0</AppVersion>
     <SchemaVersion>0</SchemaVersion>
+    <CompanyName>Project Extensions</CompanyName>
   </PropertyGroup>
 
   <!-- Project name and description -->

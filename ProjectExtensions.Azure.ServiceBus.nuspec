@@ -3,11 +3,12 @@
   <metadata>
     <id>ProjectExtensions.Azure.ServiceBus</id>
     <title>ProjectExtensions.Azure.ServiceBus</title>
-    <version>0.1.0.0</version>
-    <authors>ProjectExtensions, Joe Feser</authors>
-    <owners>ProjectExtensions, Joe Feser</owners>
+    <version>0.5.0.0</version>
+    <authors>Project Extensions, Joe Feser</authors>
+    <owners>Project Extensions, Joe Feser</owners>
+    <projectUrl>https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>TODO description</description>
+    <description>Azure ServiceBus Wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;</description>
     <summary>Azure ServiceBus Wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt; (Debug)</summary>
     <dependencies>
     </dependencies>
