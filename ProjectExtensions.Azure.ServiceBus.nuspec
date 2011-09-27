@@ -6,6 +6,7 @@
     <version>0.5.0.0</version>
     <authors>Project Extensions, Joe Feser</authors>
     <owners>Project Extensions, Joe Feser</owners>
+    <copyrights>Copyright (C) Project Extensions and Joe Feser 2011</copyrights>
     <projectUrl>https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Azure AppFabric ServiceBus wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;</description>
