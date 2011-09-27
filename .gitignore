@@ -29,4 +29,4 @@ _ReSharper*/
 [Tt]est[Rr]esult*
 .hg/
 BuildOutput/*
-packages/**
+packages/*
