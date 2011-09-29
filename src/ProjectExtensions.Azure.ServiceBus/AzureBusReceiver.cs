@@ -115,9 +115,12 @@ namespace ProjectExtensions.Azure.ServiceBus {
             logger.Log(LogLevel.Info, "ProcessMessagesForSubscription Message Start {0} Declared {1} MessageTytpe {2}, IsReusable {3}", data.EndPointData.SubscriptionName,
                 data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
 
+            //TODO create a cache for object creation.
+            var gt = typeof(IReceivedMessage<>).MakeGenericType(data.EndPointData.MessageType);
+
             //set up the methodinfo
             var methodInfo = data.EndPointData.DeclaredType.GetMethod("Handle",
-                new Type[] { data.EndPointData.MessageType, typeof(IDictionary<string, object>) });
+                new Type[] { gt, typeof(IDictionary<string, object>) });
 
             var serializer = BusConfiguration.Container.Resolve<IServiceBusSerializer>();
 
@@ -148,48 +151,56 @@ namespace ProjectExtensions.Azure.ServiceBus {
             logger.Log(LogLevel.Info, "ProcessMessage Start received new message={0} Thread={1} MessageId={2}",
                 state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
 
-            try {
+            using (var usingMesssage = state.Message) {
+                try {
 
-                IDictionary<string, object> values = new Dictionary<string, object>();
+                    IDictionary<string, object> values = new Dictionary<string, object>();
 
-                if (state.Message.Properties != null) {
-                    foreach (var item in state.Message.Properties) {
-                        if (item.Key != AzureSenderReceiverBase.TYPE_HEADER_NAME) {
-                            values.Add(item);
+                    if (state.Message.Properties != null) {
+                        foreach (var item in state.Message.Properties) {
+                            if (item.Key != AzureSenderReceiverBase.TYPE_HEADER_NAME) {
+                                values.Add(item);
+                            }
                         }
                     }
-                }
 
-                using (var serial = state.Serializer.Create()) {
-                    var stream = state.Message.GetBody<Stream>();
-                    stream.Position = 0;
-                    object msg = serial.Deserialize(stream, state.Data.EndPointData.MessageType);
+                    using (var serial = state.Serializer.Create()) {
+                        var stream = state.Message.GetBody<Stream>();
+                        stream.Position = 0;
+                        object msg = serial.Deserialize(stream, state.Data.EndPointData.MessageType);
 
-                    logger.Log(LogLevel.Info, "ProcessMessage invoke callback message start message={0} Thread={1} MessageId={2}", state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
+                        //TODO create a cache for object creation.
+                        var gt = typeof(ReceivedMessage<>).MakeGenericType(state.Data.EndPointData.MessageType);
 
-                    if (state.Data.EndPointData.IsReusable && state.Data.EndPointData.StaticInstance != null) {
-                        state.MethodInfo.Invoke(state.Data.EndPointData.StaticInstance, new object[] { msg, values });
+                        object receivedMessage = Activator.CreateInstance(gt, new object[] { state.Message, msg });
+
+                        logger.Log(LogLevel.Info, "ProcessMessage invoke callback message start message={0} Thread={1} MessageId={2}", state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
+
+                        if (state.Data.EndPointData.IsReusable && state.Data.EndPointData.StaticInstance != null) {
+                            state.MethodInfo.Invoke(state.Data.EndPointData.StaticInstance, new object[] { receivedMessage, values });
+                        }
+                        else {
+                            var obj = Activator.CreateInstance(state.Data.EndPointData.DeclaredType);
+                            state.MethodInfo.Invoke(obj, new object[] { receivedMessage, values });
+                        }
+
+                        logger.Log(LogLevel.Info, "ProcessMessage invoke callback message end message={0} Thread={1} MessageId={2}", state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
                     }
-                    else {
-                        var obj = Activator.CreateInstance(state.Data.EndPointData.DeclaredType);
-                        state.MethodInfo.Invoke(state.Data.EndPointData.StaticInstance, new object[] { msg, values });
+                    state.Message.Complete();
+                }
+                catch (Exception ex) {
+                    logger.Log(LogLevel.Error, "ProcessMessage invoke callback message failed message={0} Thread={1} MessageId={2} Exception={3}", state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId, ex.ToString());
+                    //TODO remove hard code dead letter value
+                    if (state.Message.DeliveryCount == 5) {
+                        Helpers.Execute(() => state.Message.DeadLetter(ex.ToString(), "Died"));
                     }
-
-                    logger.Log(LogLevel.Info, "ProcessMessage invoke callback message end message={0} Thread={1} MessageId={2}", state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
                 }
-                state.Message.Complete();
-            }
-            catch (Exception ex) {
-                logger.Log(LogLevel.Error, "ProcessMessage invoke callback message failed message={0} Thread={1} MessageId={2} Exception={3}", state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId, ex.ToString());
-                //TODO remove hard code dead letter value
-                if (state.Message.DeliveryCount == 5) {
-                    Helpers.Execute(() => state.Message.DeadLetter(ex.ToString(), "Died"));
-                }
-            }
+                
+                logger.Log(LogLevel.Info, "ProcessMessage End received new message={0} Thread={1} MessageId={2}",
+                    state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
 
-            logger.Log(LogLevel.Info, "ProcessMessage End received new message={0} Thread={1} MessageId={2}",
-                state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
-
+                usingMesssage.Dispose();
+            }
         }
 
         private class AzureReceiveState {

@@ -26,7 +26,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <remarks>
         /// Every message received by the bus with this message type will call this method.
         /// </remarks>
-        void Handle(T message, IDictionary<string, object> metadata);
+        void Handle(IReceivedMessage<T> message, IDictionary<string, object> metadata);
 
     }
 
