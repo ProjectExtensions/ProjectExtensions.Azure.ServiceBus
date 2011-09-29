@@ -128,12 +128,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
             while (!data.Cancel) {
                 while ((message = data.Client.Receive(TimeSpan.FromSeconds(55))) != null) {
                     logger.Log(LogLevel.Info, "ProcessMessagesForSubscription Start received new message: {0}", data.EndPointData.SubscriptionName);
-                    var receiveState = new AzureReceiveState() {
-                        Data = data,
-                        Message = message,
-                        MethodInfo = methodInfo,
-                        Serializer = serializer
-                    };
+                    var receiveState = new AzureReceiveState(data, methodInfo, serializer, message);
                     ProcessMessage(receiveState);
                     logger.Log(LogLevel.Info, "ProcessMessagesForSubscription End received new message: {0}", data.EndPointData.SubscriptionName);
                 }
@@ -164,7 +159,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                         }
                     }
 
-                    using (var serial = state.Serializer.Create()) {
+                    using (var serial = state.CreateSerializer()) {
                         var stream = state.Message.GetBody<Stream>();
                         stream.Position = 0;
                         object msg = serial.Deserialize(stream, state.Data.EndPointData.MessageType);
@@ -195,7 +190,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                         Helpers.Execute(() => state.Message.DeadLetter(ex.ToString(), "Died"));
                     }
                 }
-                
+
                 logger.Log(LogLevel.Info, "ProcessMessage End received new message={0} Thread={1} MessageId={2}",
                     state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
 
@@ -204,6 +199,15 @@ namespace ProjectExtensions.Azure.ServiceBus {
         }
 
         private class AzureReceiveState {
+
+            public AzureReceiveState(AzureBusReceiverState data, MethodInfo methodInfo,
+                IServiceBusSerializer serializer, BrokeredMessage message) {
+                this.Data = data;
+                this.MethodInfo = methodInfo;
+                this.Serializer = serializer;
+                this.Message = message;
+            }
+
             public AzureBusReceiverState Data {
                 get;
                 set;
@@ -212,7 +216,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 get;
                 set;
             }
-            public IServiceBusSerializer Serializer {
+            private IServiceBusSerializer Serializer {
                 get;
                 set;
             }
@@ -220,6 +224,20 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 get;
                 set;
             }
+
+            public IServiceBusSerializer CreateSerializer() {
+                return Serializer.Create();
+            }
+            /*
+
+               //TODO create a cache for object creation.
+            var gt = typeof(IReceivedMessage<>).MakeGenericType(data.EndPointData.MessageType);
+
+            //set up the methodinfo
+            var methodInfo = data.EndPointData.DeclaredType.GetMethod("Handle",
+                new Type[] { gt, typeof(IDictionary<string, object>) });
+             
+             */
         }
 
         /// <summary>

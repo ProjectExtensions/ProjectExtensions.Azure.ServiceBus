@@ -5,6 +5,7 @@ using System.Text;
 using System.Reflection;
 using Autofac;
 using NLog;
+using System.Linq.Expressions;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 
@@ -140,8 +141,11 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
             subscribedTypes.Add(type);
 
+            ConstructorInfo ctor = type.GetConstructors().Where(item => item.GetParameters().Count() == 0).First();
+            var activator = ReflectionHelper.GetActivator(ctor);
+
             //non generic types only for now.
-            var instance = Activator.CreateInstance(type);
+            var instance = activator(new object[] { null });
             var castProperty = instance.GetType().GetProperty("IsReusable");
             var canReuse = (bool)castProperty.GetGetMethod().Invoke(instance, null);
 
