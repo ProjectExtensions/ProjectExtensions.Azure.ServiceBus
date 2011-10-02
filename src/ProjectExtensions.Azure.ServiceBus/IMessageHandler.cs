@@ -9,15 +9,8 @@ namespace ProjectExtensions.Azure.ServiceBus {
     /// Basic message Handler
     /// </summary>
     /// <typeparam name="T">The type of message to be handled.</typeparam>
+    /// <remarks>A new handler will be instantiated for each message unless you decorate your handler class with [SingletonMessageHandler]</remarks>
     public interface IMessageHandler<T> {
-
-        /// <summary>
-        /// Is your handler thread safe.
-        /// </summary>
-        bool IsReusable {
-            get;
-        }
-
         /// <summary>
         /// Process a Message with the given signature.
         /// </summary>
@@ -34,6 +27,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
     /// Interface that needs to be implemented if you wish to register a subscription.
     /// </summary>
     /// <typeparam name="T"></typeparam>
+    /// <remarks>A new handler will be instantiated for each message unless you decorate your handler class with [SingletonMessageHandler]</remarks>
     public interface IHandleMessages<T> : IMessageHandler<T> {
 
     }
@@ -43,6 +37,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
     /// </summary>
     /// <remarks>This implementation will allow the Topic to scale out, allowing multiple subscibers to handle the messages sent.</remarks>
     /// <typeparam name="T"></typeparam>
+    /// <remarks>A new handler will be instantiated for each message unless you decorate your handler class with [SingletonMessageHandler]</remarks>
     public interface IHandleCompetingMessages<T> : IMessageHandler<T> {
 
     }

@@ -15,6 +15,11 @@ namespace ProjectExtensions.Azure.ServiceBus {
             set;
         }
 
+        public Type ServiceType {
+            get;
+            set;
+        }
+
         public string SubscriptionName {
             get;
             set;
@@ -34,15 +39,6 @@ namespace ProjectExtensions.Azure.ServiceBus {
         public Type MessageType {
             get;
             set;
-        }
-
-        /// <summary>
-        /// If the Item is IsReusable, this value will be set.
-        /// </summary>
-        public object StaticInstance {
-            get;
-            set;
-        }
-       
+        }       
     }
 }

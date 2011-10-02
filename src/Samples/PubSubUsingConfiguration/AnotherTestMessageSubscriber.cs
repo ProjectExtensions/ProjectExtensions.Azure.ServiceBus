@@ -11,12 +11,6 @@ namespace PubSubUsingConfiguration {
 
         static Logger logger = LogManager.GetCurrentClassLogger();
 
-        public bool IsReusable {
-            get {
-                return true;
-            }
-        }
-
         public void Handle(IReceivedMessage<AnotherTestMessage> message, IDictionary<string, object> metadata) {
             logger.Log(LogLevel.Info, "Message received: {0} {1}", message.Message.Value, message.Message.MessageId);
         }
