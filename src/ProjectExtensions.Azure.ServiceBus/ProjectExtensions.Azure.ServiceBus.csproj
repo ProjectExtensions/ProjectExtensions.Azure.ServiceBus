@@ -85,6 +85,7 @@
     <Compile Include="Serialization\ServiceBusSerializerBase.cs" />
     <Compile Include="Serialization\XmlServiceBusSerializer.cs" />
     <Compile Include="ServiceBusEnpointData.cs" />
+    <Compile Include="SingletonMessageHandlerAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
