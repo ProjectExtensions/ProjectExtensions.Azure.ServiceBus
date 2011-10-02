@@ -64,7 +64,6 @@ ProjectExtensions.Azure.ServiceBus.BusConfiguration.WithSettings()
 Otherwise, you can configure everything in code:
 
 ProjectExtensions.Azure.ServiceBus.BusConfiguration.WithSettings()
-    .ReadFromConfigFile()
     .ServiceBusApplicationId("AppName")
     .ServiceBusIssuerKey("[sb password]")
     .ServiceBusIssuerName("owner")
