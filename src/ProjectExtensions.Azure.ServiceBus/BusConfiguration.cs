@@ -23,9 +23,10 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <summary>
         /// ctor
         /// </summary>
-        internal BusConfiguration() {
+        internal BusConfiguration(IContainer container = null) {
             MaxThreads = 1;
             TopicName = "pro_ext_topic";
+            this.container = container;
         }
 
         /// <summary>
@@ -149,36 +150,39 @@ namespace ProjectExtensions.Azure.ServiceBus {
             builder.RegisterType<AzureBusReceiver>().As<IAzureBusReceiver>().SingleInstance();
             builder.RegisterType<AzureBusSender>().As<IAzureBusSender>().SingleInstance();
 
-            container = builder.Build();
+            if (container == null) {
+                container = builder.Build();
+            } else {
+                builder.Update(container);
+            }
 
             //Set the Bus property so that the receiver will register the end points
             var prime = this.Bus;
         }
 
         /// <summary>
-        /// Get the settings builder
+        /// Get the settings builder optionally passing in your existing IOC Container
         /// </summary>
+        /// <param name="container">Your optional existing IOC container.</param>
         /// <returns></returns>
         public static BusConfigurationBuilder WithSettings() {
-            return WithSettings(new Autofac.ContainerBuilder());
+            return WithSettings(null);
         }
 
         /// <summary>
-        /// Get the settings build while passing in your IOC Container
+        /// Get the settings builder optionally passing in your existing IOC Container
         /// </summary>
-        /// <param name="builder">Your IOC container</param>
+        /// <param name="container">Your optional existing IOC container. Use <see cref="WithSettings()"/> if you do not have an existing container.</param>
         /// <returns></returns>
-        public static BusConfigurationBuilder WithSettings(Autofac.ContainerBuilder builder) {
-            if (builder == null) {
-                throw new ArgumentNullException("builder");
-            }
+        public static BusConfigurationBuilder WithSettings(IContainer container) {
             if (configuration == null) {
                 lock (lockObject) {
                     if (configuration == null) {
-                        configuration = new BusConfiguration();
+                        configuration = new BusConfiguration(container);
                     }
                 }
             }
+            var builder = new ContainerBuilder();
             //last one in wins so if one is registered it will be called.
             builder.RegisterType<JsonServiceBusSerializer>().As<IServiceBusSerializer>().SingleInstance();
             return new BusConfigurationBuilder(builder, configuration);
