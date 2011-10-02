@@ -141,34 +141,41 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
             subscribedTypes.Add(type);
 
-            ConstructorInfo ctor = type.GetConstructors().Where(item => item.GetParameters().Count() == 0).First();
-            var activator = ReflectionHelper.GetActivator(ctor);
-
-            //non generic types only for now.
-            var instance = activator(new object[] { null });
-            var castProperty = instance.GetType().GetProperty("IsReusable");
-            var canReuse = (bool)castProperty.GetGetMethod().Invoke(instance, null);
+            var builder = new ContainerBuilder();
 
             //for each interface we find, we need to register it with the bus.
             foreach (var foundInterface in interfaces) {
 
-                var implementedType = foundInterface.GetGenericArguments()[0];
+                var implementedMessageType = foundInterface.GetGenericArguments()[0];
                 //due to the limits of 50 chars we will take the name and a MD5 for the name.
-                var hashName = implementedType.FullName + "|" + type.FullName;
+                var hashName = implementedMessageType.FullName + "|" + type.FullName;
 
                 var hash = Helpers.CalculateMD5(hashName);
                 var fullName = (IsCompetingHandler(foundInterface) ? "C_" : config.ServiceBusApplicationId + "_") + hash;
 
                 var info = new ServiceBusEnpointData() {
                     DeclaredType = type,
-                    IsReusable = canReuse,
-                    MessageType = implementedType,
-                    StaticInstance = instance,
-                    SubscriptionName = fullName
+                    MessageType = implementedMessageType,
+                    SubscriptionName = fullName,
+                    ServiceType = foundInterface,
+                    IsReusable = (type.GetCustomAttributes(typeof(SingletonMessageHandlerAttribute), false).Count() > 0)
                 };
+
+
+                if (!BusConfiguration.Container.IsRegistered(type)) {
+                    if (info.IsReusable) {
+                        builder.RegisterType(type).SingleInstance();
+                    }
+                    else {
+                        builder.RegisterType(type).InstancePerDependency();
+                    }
+                }
+
 
                 callback(info);
             }
+
+            builder.Update(BusConfiguration.Container);
         }
     }
 }

@@ -171,14 +171,8 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
                         logger.Log(LogLevel.Info, "ProcessMessage invoke callback message start message={0} Thread={1} MessageId={2}", state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
 
-                        if (state.Data.EndPointData.IsReusable && state.Data.EndPointData.StaticInstance != null) {
-                            state.MethodInfo.Invoke(state.Data.EndPointData.StaticInstance, new object[] { receivedMessage, values });
-                        }
-                        else {
-                            var obj = Activator.CreateInstance(state.Data.EndPointData.DeclaredType);
-                            state.MethodInfo.Invoke(obj, new object[] { receivedMessage, values });
-                        }
-
+                        var handler = BusConfiguration.Container.Resolve(state.Data.EndPointData.DeclaredType);
+                        state.MethodInfo.Invoke(handler, new object[] {receivedMessage, values});
                         logger.Log(LogLevel.Info, "ProcessMessage invoke callback message end message={0} Thread={1} MessageId={2}", state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
                     }
                     state.Message.Complete();

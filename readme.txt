@@ -36,13 +36,6 @@ public class TestMessageSubscriber : IHandleMessages<TestMessage> {
     public void Handle(TestMessage message, IDictionary<string, object> metadata) {
         logger.Log(LogLevel.Info, "Message received: {0} {1}", message.Value, message.MessageId);
     }
-
-    public bool IsReusable {
-        get {
-            return false;
-        }
-    }
-
 }
 
 
