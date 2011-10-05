@@ -179,6 +179,9 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 }
                 catch (Exception ex) {
                     logger.Log(LogLevel.Error, "ProcessMessage invoke callback message failed message={0} Thread={1} MessageId={2} Exception={3}", state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId, ex.ToString());
+                    
+                    usingMesssage.Abandon();
+                    
                     //TODO remove hard code dead letter value
                     if (state.Message.DeliveryCount == 5) {
                         Helpers.Execute(() => state.Message.DeadLetter(ex.ToString(), "Died"));
