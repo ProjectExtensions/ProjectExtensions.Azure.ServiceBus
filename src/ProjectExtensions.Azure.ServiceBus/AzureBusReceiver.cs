@@ -73,12 +73,12 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
             subscription.Cancel = true;
 
-            Task t = new Task(() => {
+            Task t = Task.Factory.StartNew(() => {
                 //HACK find better way to wait for a cancel request so we are not blocking.
                 logger.Info("CancelSubscription Deleting {0}", value.SubscriptionName);
                 for (int i = 0; i < 100; i++) {
                     if (!subscription.Cancelled) {
-                        Thread.Sleep(3000);
+                        Thread.Sleep(1000);
                     }
                     else {
                         break;
@@ -93,7 +93,8 @@ namespace ProjectExtensions.Azure.ServiceBus {
                     logger.Info("CancelSubscription Deleted {0}", value.SubscriptionName);
                 }
             });
-            t.Start();
+
+            Task.WaitAny(t);
         }
 
         public override void Dispose(bool disposing) {
