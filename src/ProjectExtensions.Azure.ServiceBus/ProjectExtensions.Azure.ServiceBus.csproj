@@ -99,13 +99,6 @@
     <Compile Include="TransientFaultHandling\Configuration\RetryPolicyInfo.cs" />
     <Compile Include="TransientFaultHandling\ExtensionMethods.cs" />
     <Compile Include="TransientFaultHandling\Guard.cs" />
-    <Compile Include="TransientFaultHandling\Instrumentation\DebugTraceEventProvider.cs" />
-    <Compile Include="TransientFaultHandling\Instrumentation\ExceptionTextFormatter.cs" />
-    <Compile Include="TransientFaultHandling\Instrumentation\HighResolutionTimer.cs" />
-    <Compile Include="TransientFaultHandling\Instrumentation\InstrumentationUtility.cs" />
-    <Compile Include="TransientFaultHandling\Instrumentation\ITraceEventProvider.cs" />
-    <Compile Include="TransientFaultHandling\Instrumentation\TraceManager.cs" />
-    <Compile Include="TransientFaultHandling\Instrumentation\WellKnownTraceCategory.cs" />
     <Compile Include="TransientFaultHandling\ITransientErrorDetectionStrategy.cs" />
     <Compile Include="Properties\ExceptionMessages.Designer.cs" />
     <Compile Include="Properties\Resources.Designer.cs" />
