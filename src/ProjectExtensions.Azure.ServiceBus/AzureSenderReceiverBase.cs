@@ -56,7 +56,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
             bool createNew = false;
 
             try {
-                logger.Log(LogLevel.Info, "EnsureTopic Try {0} ", topicName);
+                logger.Info("EnsureTopic Try {0} ", topicName);
                 // First, let's see if a topic with the specified name already exists.
                 topic = retryPolicy.ExecuteAction<TopicDescription>(() => {
                     return namespaceManager.GetTopic(topicName);
@@ -65,7 +65,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 createNew = (topic == null);
             }
             catch (MessagingEntityNotFoundException) {
-                logger.Log(LogLevel.Info, "EnsureTopic Does Not Exist {0} ", topicName);
+                logger.Info("EnsureTopic Does Not Exist {0} ", topicName);
                 // Looks like the topic does not exist. We should create a new one.
                 createNew = true;
             }
@@ -73,7 +73,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
             // If a topic with the specified name doesn't exist, it will be auto-created.
             if (createNew) {
                 try {
-                    logger.Log(LogLevel.Info, "EnsureTopic CreateTopic {0} ", topicName);
+                    logger.Info("EnsureTopic CreateTopic {0} ", topicName);
                     var newTopic = new TopicDescription(topicName);
 
                     topic = retryPolicy.ExecuteAction<TopicDescription>(() => {
@@ -81,7 +81,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                     });
                 }
                 catch (MessagingEntityAlreadyExistsException) {
-                    logger.Log(LogLevel.Info, "EnsureTopic GetTopic {0} ", topicName);
+                    logger.Info("EnsureTopic GetTopic {0} ", topicName);
                     // A topic under the same name was already created by someone else, perhaps by another instance. Let's just use it.
                     topic = retryPolicy.ExecuteAction<TopicDescription>(() => {
                         return namespaceManager.GetTopic(topicName);

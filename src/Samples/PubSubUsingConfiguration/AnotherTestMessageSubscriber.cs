@@ -12,7 +12,7 @@ namespace PubSubUsingConfiguration {
         static Logger logger = LogManager.GetCurrentClassLogger();
 
         public void Handle(IReceivedMessage<AnotherTestMessage> message, IDictionary<string, object> metadata) {
-            logger.Log(LogLevel.Info, "AnotherTestMessageSubscriber Message received: {0} {1}", message.Message.Value, message.Message.MessageId);
+            logger.Info("AnotherTestMessageSubscriber Message received: {0} {1}", message.Message.Value, message.Message.MessageId);
         }
     }
 }

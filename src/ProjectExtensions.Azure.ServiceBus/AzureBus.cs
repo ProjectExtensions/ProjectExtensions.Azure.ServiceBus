@@ -42,7 +42,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
             if (assembly == null) {
                 throw new ArgumentNullException("assembly");
             }
-            logger.Log(LogLevel.Info, "RegisterAssembly={0}", assembly.FullName);
+            logger.Info("RegisterAssembly={0}", assembly.FullName);
 
             foreach (var type in assembly.GetTypes()) {
                 var interfaces = type.GetInterfaces()
@@ -61,7 +61,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <param name="message">The message to publish.</param>
         /// <param name="metadata">Metadata to sent with the message.</param>
         public void Publish<T>(T message, IDictionary<string, object> metadata) {
-            logger.Log(LogLevel.Info, "Publish={0}", message.GetType().FullName);
+            logger.Info("Publish={0}", message.GetType().FullName);
             sender.Send<T>(message, metadata);
         }
 
@@ -81,7 +81,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <typeparam name="T">The type of message to subscribe to.</typeparam>
         /// <param name="type">The type to subscribe</param>
         public void Subscribe(Type type) {
-            logger.Log(LogLevel.Info, "Subscribe={0}", type.FullName);
+            logger.Info("Subscribe={0}", type.FullName);
             SubscribeOrUnsubscribeType(type, receiver.CreateSubscription);
         }
 
@@ -98,7 +98,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// </summary>
         /// <param name="type">The type of message to unsubscribe from</param>
         public void Unsubscribe(Type type) {
-            logger.Log(LogLevel.Info, "Unsubscribe={0}", type.FullName);
+            logger.Info("Unsubscribe={0}", type.FullName);
 
             if (subscribedTypes.Contains(type)) {
                 subscribedTypes.Remove(type);
@@ -130,7 +130,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         }
 
         void SubscribeOrUnsubscribeType(Type type, Action<ServiceBusEnpointData> callback) {
-            logger.Log(LogLevel.Info, "SubscribeOrUnsubscribeType={0}", type.FullName);
+            logger.Info("SubscribeOrUnsubscribeType={0}", type.FullName);
             var interfaces = type.GetInterfaces()
                             .Where(i => i.IsGenericType && (i.GetGenericTypeDefinition() == typeof(IHandleMessages<>) || i.GetGenericTypeDefinition() == typeof(IHandleCompetingMessages<>)))
                             .ToList();

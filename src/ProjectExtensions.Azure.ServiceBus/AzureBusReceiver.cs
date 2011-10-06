@@ -27,14 +27,14 @@ namespace ProjectExtensions.Azure.ServiceBus {
         public void CreateSubscription(ServiceBusEnpointData value) {
             //TODO determine how we can change the filters for an existing registered item
 
-            logger.Log(LogLevel.Info, "CreateSubscription {0} Declared {1} MessageTytpe {2}, IsReusable {3}", value.SubscriptionName, value.DeclaredType.ToString(), value.MessageType.ToString(), value.IsReusable);
+            logger.Info("CreateSubscription {0} Declared {1} MessageTytpe {2}, IsReusable {3}", value.SubscriptionName, value.DeclaredType.ToString(), value.MessageType.ToString(), value.IsReusable);
 
             SubscriptionDescription desc = null;
 
             var data = value.MessageType.FullName;
 
             if (!namespaceManager.SubscriptionExists(topic.Path, value.SubscriptionName)) {
-                logger.Log(LogLevel.Info, "CreateSubscription Creating {0}", value.SubscriptionName);
+                logger.Info("CreateSubscription Creating {0}", value.SubscriptionName);
 
                 var filter = new SqlFilter(string.Format(TYPE_HEADER_NAME + " = '{0}'", value.MessageType.FullName.Replace('.', '_')));
                 Helpers.Execute(() => {
@@ -42,7 +42,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 });
             }
             else {
-                logger.Log(LogLevel.Info, "CreateSubscription Exists {0}", value.SubscriptionName);
+                logger.Info("CreateSubscription Exists {0}", value.SubscriptionName);
                 desc = namespaceManager.GetSubscription(topic.Path, value.SubscriptionName);
             }
 
@@ -62,12 +62,12 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
         public void CancelSubscription(ServiceBusEnpointData value) {
 
-            logger.Log(LogLevel.Info, "CancelSubscription {0} Declared {1} MessageTytpe {2}, IsReusable {3}", value.SubscriptionName, value.DeclaredType.ToString(), value.MessageType.ToString(), value.IsReusable);
+            logger.Info("CancelSubscription {0} Declared {1} MessageTytpe {2}, IsReusable {3}", value.SubscriptionName, value.DeclaredType.ToString(), value.MessageType.ToString(), value.IsReusable);
 
             var subscription = mappings.FirstOrDefault(item => item.EndPointData.SubscriptionName.Equals(value.SubscriptionName, StringComparison.OrdinalIgnoreCase));
 
             if (subscription == null) {
-                logger.Log(LogLevel.Info, "CancelSubscription Does not exist {0}", value.SubscriptionName);
+                logger.Info("CancelSubscription Does not exist {0}", value.SubscriptionName);
                 return;
             }
 
@@ -75,7 +75,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
             Task t = new Task(() => {
                 //HACK find better way to wait for a cancel request so we are not blocking.
-                logger.Log(LogLevel.Info, "CancelSubscription Deleting {0}", value.SubscriptionName);
+                logger.Info("CancelSubscription Deleting {0}", value.SubscriptionName);
                 for (int i = 0; i < 100; i++) {
                     if (!subscription.Cancelled) {
                         Thread.Sleep(3000);
@@ -90,7 +90,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                     Helpers.Execute(() => {
                         namespaceManager.DeleteSubscription(topic.Path, value.SubscriptionName);
                     });
-                    logger.Log(LogLevel.Info, "CancelSubscription Deleted {0}", value.SubscriptionName);
+                    logger.Info("CancelSubscription Deleted {0}", value.SubscriptionName);
                 }
             });
             t.Start();
@@ -107,7 +107,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
         void ProcessMessagesForSubscription(AzureBusReceiverState data) {
 
-            logger.Log(LogLevel.Info, "ProcessMessagesForSubscription Message Start {0} Declared {1} MessageTytpe {2}, IsReusable {3}", data.EndPointData.SubscriptionName,
+            logger.Info("ProcessMessagesForSubscription Message Start {0} Declared {1} MessageTytpe {2}, IsReusable {3}", data.EndPointData.SubscriptionName,
                     data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
 
             //TODO create a cache for object creation.
@@ -157,10 +157,10 @@ namespace ProjectExtensions.Azure.ServiceBus {
                                     try {
                                         // Process the received message.
 
-                                        logger.Log(LogLevel.Info, "ProcessMessagesForSubscription Start received new message: {0}", data.EndPointData.SubscriptionName);
+                                        logger.Info("ProcessMessagesForSubscription Start received new message: {0}", data.EndPointData.SubscriptionName);
                                         var receiveState = new AzureReceiveState(data, methodInfo, serializer, msg);
                                         processMessage(receiveState);
-                                        logger.Log(LogLevel.Info, "ProcessMessagesForSubscription End received new message: {0}", data.EndPointData.SubscriptionName);
+                                        logger.Info("ProcessMessagesForSubscription End received new message: {0}", data.EndPointData.SubscriptionName);
 
                                         // With PeekLock mode, we should mark the processed message as completed.
                                         if (client.Mode == ReceiveMode.PeekLock) {
@@ -211,7 +211,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 }
                 data.Cancelled = true;
 
-                logger.Log(LogLevel.Info, "ProcessMessagesForSubscription Message Complete={0} Declared={1} MessageTytpe={2} IsReusable={3}", data.EndPointData.SubscriptionName,
+                logger.Info("ProcessMessagesForSubscription Message Complete={0} Declared={1} MessageTytpe={2} IsReusable={3}", data.EndPointData.SubscriptionName,
                     data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
             });
 
@@ -232,7 +232,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 }
                 data.Cancelled = true;
                 
-                logger.Log(LogLevel.Info, "ProcessMessagesForSubscription Message Complete={0} Declared={1} MessageTytpe={2} IsReusable={3}", data.EndPointData.SubscriptionName,
+                logger.Info("ProcessMessagesForSubscription Message Complete={0} Declared={1} MessageTytpe={2} IsReusable={3}", data.EndPointData.SubscriptionName,
                     data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
             });
 
@@ -242,7 +242,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
         static void ProcessMessageCallBack(AzureReceiveState state) {
 
-            logger.Log(LogLevel.Info, "ProcessMessage Start received new message={0} Thread={1} MessageId={2}",
+            logger.Info("ProcessMessage Start received new message={0} Thread={1} MessageId={2}",
                 state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
 
             try {
@@ -267,11 +267,11 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
                     object receivedMessage = Activator.CreateInstance(gt, new object[] { state.Message, msg });
 
-                    logger.Log(LogLevel.Info, "ProcessMessage invoke callback message start message={0} Thread={1} MessageId={2}", state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
+                    logger.Info("ProcessMessage invoke callback message start message={0} Thread={1} MessageId={2}", state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
 
                     var handler = BusConfiguration.Container.Resolve(state.Data.EndPointData.DeclaredType);
                     state.MethodInfo.Invoke(handler, new object[] { receivedMessage, values });
-                    logger.Log(LogLevel.Info, "ProcessMessage invoke callback message end message={0} Thread={1} MessageId={2}", state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
+                    logger.Info("ProcessMessage invoke callback message end message={0} Thread={1} MessageId={2}", state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
                 }
             }
             catch (Exception ex) {
@@ -284,7 +284,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 throw;
             }
 
-            logger.Log(LogLevel.Info, "ProcessMessage End received new message={0} Thread={1} MessageId={2}",
+            logger.Info("ProcessMessage End received new message={0} Thread={1} MessageId={2}",
                 state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
         }
 

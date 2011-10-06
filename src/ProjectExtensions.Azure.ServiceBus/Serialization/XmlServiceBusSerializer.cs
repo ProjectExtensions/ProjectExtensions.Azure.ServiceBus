@@ -36,7 +36,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Serialization {
             }
 
             serializedStream.Position = 0; //make sure you always set the stream position to where you want to serialize.
-            logger.Log(LogLevel.Info, "Serialize {0} at Bytes={1}", obj.GetType(), serializedStream.Length);
+            logger.Info("Serialize {0} at Bytes={1}", obj.GetType(), serializedStream.Length);
             return serializedStream;
         }
 
@@ -48,7 +48,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Serialization {
         /// <returns></returns>
         public override object Deserialize(Stream stream, Type type) {
             var serial = new XmlSerializer(type);
-            logger.Log(LogLevel.Info, "Deserialize {0} at {1} bytes", type, stream.Length);
+            logger.Info("Deserialize {0} at {1} bytes", type, stream.Length);
             using (var reader = XmlDictionaryReader.CreateBinaryReader(stream, XmlDictionaryReaderQuotas.Max)) {
                 return serial.Deserialize(reader);
             }

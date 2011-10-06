@@ -64,7 +64,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                         }
                     }
 
-                    logger.Log(LogLevel.Info, "Send Type={0} Serializer={1} MessageId={2}", obj.GetType().FullName, serializer.GetType().FullName, message.MessageId);
+                    logger.Info("Send Type={0} Serializer={1} MessageId={2}", obj.GetType().FullName, serializer.GetType().FullName, message.MessageId);
 
                     // Send the event asynchronously.
                     client.BeginSend(message, cb, null);

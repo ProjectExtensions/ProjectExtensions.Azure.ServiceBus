@@ -39,7 +39,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Serialization {
             jw.Flush();
             serializedStream.Position = 0; //make sure you always set the stream position to where you want to serialize.
 
-            logger.Log(LogLevel.Info, "Serialize {0} at {1} bytes", obj.GetType(), serializedStream.Length);
+            logger.Info("Serialize {0} at {1} bytes", obj.GetType(), serializedStream.Length);
 
             return serializedStream;
         }
@@ -51,7 +51,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Serialization {
         /// <param name="type"></param>
         /// <returns></returns>
         public override object Deserialize(Stream stream, Type type) {
-            logger.Log(LogLevel.Info, "Deserialize {0} at {1} bytes", type, stream.Length);
+            logger.Info("Deserialize {0} at {1} bytes", type, stream.Length);
 
             JsonSerializer serializer = new JsonSerializer();
             //serializer.Converters.Add(new JavaScriptDateTimeConverter());
