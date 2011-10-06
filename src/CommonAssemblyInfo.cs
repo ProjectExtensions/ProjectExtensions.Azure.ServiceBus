@@ -20,6 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyright("Copyright (C) Project Extensions 2011")]
 [assembly: AssemblyConfiguration("Debug")]
 [assembly: AssemblyCompany("Project Extensions")]
-[assembly: AssemblyProduct("Azure ServiceBus Wrapper modeled after the NServiceBus pattern of IHandleMessage<T> (Debug DB: 0)")]
+[assembly: AssemblyProduct("Azure ServiceBus Wrapper modeled after the NServiceBus pattern of IHandleMessage<" +
+    "T> (Debug DB: 0)")]
 
 
