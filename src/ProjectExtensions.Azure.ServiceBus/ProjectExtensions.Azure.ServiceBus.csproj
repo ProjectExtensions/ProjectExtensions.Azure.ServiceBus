@@ -41,6 +41,9 @@
       <Private>True</Private>
       <HintPath>..\..\packages\WindowsAzure.ServiceBus.1.5.0.0\lib\net40-full\Microsoft.ServiceBus.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.WindowsAzure.StorageClient, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\lib\Microsoft.WindowsAzure.StorageClient.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=4.0.3.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Newtonsoft.Json.4.0.3\lib\net40\Newtonsoft.Json.dll</HintPath>
@@ -51,8 +54,12 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Data.Services.Client" />
+    <Reference Include="System.IdentityModel" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -87,11 +94,47 @@
     <Compile Include="Serialization\XmlServiceBusSerializer.cs" />
     <Compile Include="ServiceBusEnpointData.cs" />
     <Compile Include="SingletonMessageHandlerAttribute.cs" />
+    <Compile Include="TransientFaultHandling\AzureStorage\StorageTransientErrorDetectionStrategy.cs" />
+    <Compile Include="TransientFaultHandling\Configuration\ApplicationConfiguration.cs" />
+    <Compile Include="TransientFaultHandling\Configuration\RetryPolicyCollection.cs" />
+    <Compile Include="TransientFaultHandling\Configuration\RetryPolicyConfigurationSettings.cs" />
+    <Compile Include="TransientFaultHandling\Configuration\RetryPolicyInfo.cs" />
+    <Compile Include="TransientFaultHandling\ExtensionMethods.cs" />
+    <Compile Include="TransientFaultHandling\Guard.cs" />
+    <Compile Include="TransientFaultHandling\Instrumentation\DebugTraceEventProvider.cs" />
+    <Compile Include="TransientFaultHandling\Instrumentation\ExceptionTextFormatter.cs" />
+    <Compile Include="TransientFaultHandling\Instrumentation\HighResolutionTimer.cs" />
+    <Compile Include="TransientFaultHandling\Instrumentation\InstrumentationUtility.cs" />
+    <Compile Include="TransientFaultHandling\Instrumentation\ITraceEventProvider.cs" />
+    <Compile Include="TransientFaultHandling\Instrumentation\TraceManager.cs" />
+    <Compile Include="TransientFaultHandling\Instrumentation\WellKnownTraceCategory.cs" />
+    <Compile Include="TransientFaultHandling\ITransientErrorDetectionStrategy.cs" />
+    <Compile Include="Properties\ExceptionMessages.Designer.cs" />
+    <Compile Include="Properties\Resources.Designer.cs" />
+    <Compile Include="Properties\SqlCommandResources.Designer.cs" />
+    <Compile Include="TransientFaultHandling\RetryLimitExceededException.cs" />
+    <Compile Include="TransientFaultHandling\RetryPolicy.cs" />
+    <Compile Include="TransientFaultHandling\RetryPolicyFactory.cs" />
+    <Compile Include="TransientFaultHandling\ServiceBus\ServiceBusTransientErrorDetectionStrategy.cs" />
+    <Compile Include="TransientFaultHandling\SqlAzure\ReliableSqlConnection.cs" />
+    <Compile Include="TransientFaultHandling\SqlAzure\SqlAzureTransientErrorDetectionStrategy.cs" />
+    <Compile Include="TransientFaultHandling\SqlAzure\SqlCommandExtensions.cs" />
+    <Compile Include="TransientFaultHandling\SqlAzure\SqlCommandFactory.cs" />
+    <Compile Include="TransientFaultHandling\SqlAzure\SqlConnectionExtensions.cs" />
+    <Compile Include="TransientFaultHandling\SqlAzure\SqlXmlReader.cs" />
+    <Compile Include="TransientFaultHandling\SqlAzure\ThrottlingCondition.cs" />
+    <Compile Include="TransientFaultHandling\SqlAzure\TransactionRetryScope.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\ExceptionMessages.resx" />
+    <EmbeddedResource Include="Properties\Resources.resx" />
+    <EmbeddedResource Include="Properties\SqlCommandResources.resx" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
