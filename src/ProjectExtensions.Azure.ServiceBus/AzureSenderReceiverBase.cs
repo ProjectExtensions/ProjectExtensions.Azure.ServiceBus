@@ -5,6 +5,8 @@ using System.Text;
 using Microsoft.ServiceBus.Messaging;
 using Microsoft.ServiceBus;
 using NLog;
+using Microsoft.AzureCAT.Samples.TransientFaultHandling;
+using Microsoft.AzureCAT.Samples.TransientFaultHandling.ServiceBus;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 
@@ -19,6 +21,8 @@ namespace ProjectExtensions.Azure.ServiceBus {
         protected BusConfiguration configuration;
         protected MessagingFactory factory;
         protected NamespaceManager namespaceManager;
+        protected RetryPolicy<ServiceBusTransientErrorDetectionStrategy> retryPolicy
+            = new RetryPolicy<ServiceBusTransientErrorDetectionStrategy>(RetryPolicy.DefaultClientRetryCount);
         protected TokenProvider tokenProvider;
         protected TopicDescription topic;
         protected Uri serviceUri;
@@ -44,18 +48,47 @@ namespace ProjectExtensions.Azure.ServiceBus {
             serviceUri = ServiceBusEnvironment.CreateServiceUri("sb", configuration.ServiceBusNamespace, servicePath);
             factory = MessagingFactory.Create(serviceUri, tokenProvider);
             namespaceManager = new NamespaceManager(serviceUri, tokenProvider);
-            Helpers.Execute(() => EnsureTopic(configuration.TopicName));
+            EnsureTopic(configuration.TopicName);
         }
 
         protected void EnsureTopic(string topicName) {
-            if (!namespaceManager.TopicExists(topicName)) {
-                topic = namespaceManager.CreateTopic(topicName);
-                logger.Log(LogLevel.Info, "EnsureTopic Create {0} ", topicName);
+
+            bool createNew = false;
+
+            try {
+                logger.Log(LogLevel.Info, "EnsureTopic Try {0} ", topicName);
+                // First, let's see if a topic with the specified name already exists.
+                topic = retryPolicy.ExecuteAction<TopicDescription>(() => {
+                    return namespaceManager.GetTopic(topicName);
+                });
+
+                createNew = (topic == null);
             }
-            else {
-                topic = namespaceManager.GetTopic(topicName);
-                logger.Log(LogLevel.Info, "EnsureTopic Exists {0} ", topicName);
+            catch (MessagingEntityNotFoundException) {
+                logger.Log(LogLevel.Info, "EnsureTopic Does Not Exist {0} ", topicName);
+                // Looks like the topic does not exist. We should create a new one.
+                createNew = true;
             }
+
+            // If a topic with the specified name doesn't exist, it will be auto-created.
+            if (createNew) {
+                try {
+                    logger.Log(LogLevel.Info, "EnsureTopic CreateTopic {0} ", topicName);
+                    var newTopic = new TopicDescription(topicName);
+
+                    topic = retryPolicy.ExecuteAction<TopicDescription>(() => {
+                        return namespaceManager.CreateTopic(newTopic);
+                    });
+                }
+                catch (MessagingEntityAlreadyExistsException) {
+                    logger.Log(LogLevel.Info, "EnsureTopic GetTopic {0} ", topicName);
+                    // A topic under the same name was already created by someone else, perhaps by another instance. Let's just use it.
+                    topic = retryPolicy.ExecuteAction<TopicDescription>(() => {
+                        return namespaceManager.GetTopic(topicName);
+                    });
+                }
+            }
+
         }
 
         public void Dispose() {

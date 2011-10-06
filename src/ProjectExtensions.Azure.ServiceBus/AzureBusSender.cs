@@ -19,8 +19,6 @@ namespace ProjectExtensions.Azure.ServiceBus {
     class AzureBusSender : AzureSenderReceiverBase, IAzureBusSender {
         static Logger logger = LogManager.GetCurrentClassLogger();
         TopicClient client;
-        RetryPolicy<ServiceBusTransientErrorDetectionStrategy> retryPolicy
-            = new RetryPolicy<ServiceBusTransientErrorDetectionStrategy>(RetryPolicy.DefaultClientRetryCount);
 
         public AzureBusSender(BusConfiguration configuration)
             : base(configuration) {
