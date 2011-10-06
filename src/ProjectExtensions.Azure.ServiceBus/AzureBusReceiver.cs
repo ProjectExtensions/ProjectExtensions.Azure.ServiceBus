@@ -93,7 +93,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 return;
             }
 
-            subscription.Cancel = true;
+            subscription.Cancel();
 
             Task t = Task.Factory.StartNew(() => {
                 //HACK find better way to wait for a cancel request so we are not blocking.
@@ -406,14 +406,6 @@ namespace ProjectExtensions.Azure.ServiceBus {
             }
 
             /// <summary>
-            /// Set to true to have the thread clean itself up
-            /// </summary>
-            public bool Cancel {
-                get;
-                set;
-            }
-
-            /// <summary>
             /// Once the item has stopped running, it marks the state as cancelled.
             /// </summary>
             public bool Cancelled {
@@ -434,6 +426,11 @@ namespace ProjectExtensions.Azure.ServiceBus {
             public SubscriptionDescription Subscription {
                 get;
                 set;
+            }
+
+            public void Cancel() {
+                // Stop the message receive loop gracefully.
+                cancelToken.Cancel();
             }
         }
 
