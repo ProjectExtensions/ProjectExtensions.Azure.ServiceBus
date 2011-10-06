@@ -33,7 +33,7 @@ namespace PubSubUsingConfiguration {
                 .RegisterAssembly(typeof(TestMessageSubscriber).Assembly)
                 .Configure();
 
-            for (int i = 0; i < 1; i++) {
+            for (int i = 0; i < 20; i++) {
                 var message1 = new TestMessage() {
                     Value = i,
                     MessageId = DateTime.Now.ToString()
