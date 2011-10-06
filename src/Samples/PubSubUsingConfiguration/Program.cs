@@ -38,7 +38,9 @@ namespace PubSubUsingConfiguration {
                     Value = i,
                     MessageId = DateTime.Now.ToString()
                 };
-                BusConfiguration.Instance.Bus.Publish(message1, null);
+                BusConfiguration.Instance.Bus.PublishAsync(message1, (result) => {
+                    Console.WriteLine(result.TimeSpent);
+                }, null);
             }
 
             var message2 = new AnotherTestMessage() {

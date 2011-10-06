@@ -82,7 +82,9 @@
     <Compile Include="IBusConfiguration.cs" />
     <Compile Include="IMessageHandler.cs" />
     <Compile Include="IBus.cs" />
+    <Compile Include="IMessageSentResult.cs" />
     <Compile Include="IReceivedMessage.cs" />
+    <Compile Include="MessageSentResult.cs" />
     <Compile Include="ReflectionHelper.cs" />
     <Compile Include="ReceivedMessage.cs" />
     <Compile Include="Serialization\IServiceBusSerializer.cs" />

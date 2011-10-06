@@ -34,11 +34,15 @@ namespace ProjectExtensions.Azure.ServiceBus {
             }
         }
 
-        public void Send<T>(T obj, IDictionary<string, object> metadata) {
-            Send<T>(obj, metadata, configuration.DefaultSerializer.Create());
+        public void Send<T>(T obj) {
+            Send<T>(obj, null);
         }
 
-        public void Send<T>(T obj, IDictionary<string, object> metadata, IServiceBusSerializer serializer) {
+        public void Send<T>(T obj, IDictionary<string, object> metadata) {
+            Send<T>(obj, configuration.DefaultSerializer.Create(), metadata);
+        }
+
+        public void Send<T>(T obj, IServiceBusSerializer serializer = null, IDictionary<string, object> metadata = null) {
 
             // Declare a wait object that will be used for synchronization.
             var waitObject = new ManualResetEvent(false);
@@ -47,7 +51,43 @@ namespace ProjectExtensions.Azure.ServiceBus {
             var sentTimeout = TimeSpan.FromMinutes(2);
 
             Exception failureException = null;
+
+            SendAsync<T>(obj, (result) => {
+                waitObject.Set();
+                failureException = result.ThrownException;
+            });
+
+            // Wait until the messaging operations are completed.
+            bool completed = waitObject.WaitOne(sentTimeout);
+            waitObject.Dispose();
+
+            if (completed) {
+                //DO Nothing
+            }
+            else {
+                if (failureException != null) {
+                    throw failureException;
+                }
+                throw new Exception("Failed to Send Message for Unknown Reason.");
+            }
+        }
+
+        public void SendAsync<T>(T obj, Action<IMessageSentResult<T>> resultCallBack) {
+            SendAsync<T>(obj, resultCallBack, configuration.DefaultSerializer.Create());
+        }
+
+        public void SendAsync<T>(T obj, Action<IMessageSentResult<T>> resultCallBack, IDictionary<string, object> metadata) {
+            SendAsync<T>(obj, resultCallBack, configuration.DefaultSerializer.Create(), metadata);
+        }
+
+        public void SendAsync<T>(T obj, Action<IMessageSentResult<T>> resultCallBack, IServiceBusSerializer serializer = null, IDictionary<string, object> metadata = null) {
+
+            serializer = serializer ?? configuration.DefaultSerializer.Create();
+
+            Exception failureException = null;
             BrokeredMessage message = null;
+            var sw = new Stopwatch();
+            sw.Start();
 
             // Use a retry policy to execute the Send action in an asynchronous and reliable fashion.
             retryPolicy.ExecuteAction
@@ -86,7 +126,12 @@ namespace ProjectExtensions.Azure.ServiceBus {
                             serializer.Dispose();
                             serializer = null;
                         }
-                        waitObject.Set();
+                        sw.Stop();
+                        resultCallBack(new MessageSentResult<T>() {
+                            IsSuccess = true,
+                            Message = obj,
+                            TimeSpent = sw.Elapsed
+                        });
                     }
                 },
                 (ex) => {
@@ -105,23 +150,19 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 }
             );
 
-            // Wait until the messaging operations are completed.
-            bool completed = waitObject.WaitOne(sentTimeout);
-            waitObject.Dispose();
+            sw.Stop();
+            resultCallBack(new MessageSentResult<T>() {
+                IsSuccess = true,
+                Message = obj,
+                ThrownException = failureException,
+                TimeSpent = sw.Elapsed
+            });
 
-            if (completed) {
-                //DO Nothing
-            }
-            else {
-                if (failureException != null) {
-                    throw failureException;
-                }
-                throw new Exception("Failed to Send Message for Unknown Reason.");
-            }
         }
 
         public override void Dispose(bool disposing) {
             Close();
         }
+
     }
 }

@@ -26,6 +26,15 @@ namespace ProjectExtensions.Azure.ServiceBus {
         void Publish<T>(T message, IDictionary<string, object> metadata);
 
         /// <summary>
+        /// Publish a Message with the given signature.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="message">The message to publish.</param>
+        /// <param name="resultCallBack">The callback when the message is complete</param>
+        /// <param name="metadata">Metadata to sent with the message.</param>
+        void PublishAsync<T>(T message, Action<IMessageSentResult<T>> resultCallBack, IDictionary<string, object> metadata);
+
+        /// <summary>
         /// Subscribes to recieve published messages of type T.
         /// This method is only necessary if you turned off auto-subscribe.
         /// </summary>
