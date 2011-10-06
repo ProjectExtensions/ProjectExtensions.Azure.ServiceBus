@@ -55,8 +55,9 @@ namespace ProjectExtensions.Azure.ServiceBus {
             };
             mappings.Add(state);
 
-            Task t = new Task(ProcessMessagesForSubscription, state);
-            t.Start();
+            //Task t = new Task(ProcessMessagesForSubscription, state);
+            //t.Start();
+            ProcessMessagesForSubscription(state);
         }
 
         public void CancelSubscription(ServiceBusEnpointData value) {
@@ -104,16 +105,10 @@ namespace ProjectExtensions.Azure.ServiceBus {
             }
         }
 
-        static void ProcessMessagesForSubscription(object state) {
-
-            var data = state as AzureBusReceiverState;
-
-            if (data == null) {
-                throw new ArgumentNullException("state");
-            }
+        void ProcessMessagesForSubscription(AzureBusReceiverState data) {
 
             logger.Log(LogLevel.Info, "ProcessMessagesForSubscription Message Start {0} Declared {1} MessageTytpe {2}, IsReusable {3}", data.EndPointData.SubscriptionName,
-                data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
+                    data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
 
             //TODO create a cache for object creation.
             var gt = typeof(IReceivedMessage<>).MakeGenericType(data.EndPointData.MessageType);
@@ -124,75 +119,214 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
             var serializer = BusConfiguration.Container.Resolve<IServiceBusSerializer>();
 
-            BrokeredMessage message;
-            while (!data.Cancel) {
-                while ((message = data.Client.Receive(TimeSpan.FromSeconds(55))) != null) {
-                    logger.Log(LogLevel.Info, "ProcessMessagesForSubscription Start received new message: {0}", data.EndPointData.SubscriptionName);
-                    var receiveState = new AzureReceiveState(data, methodInfo, serializer, message);
-                    ProcessMessage(receiveState);
-                    logger.Log(LogLevel.Info, "ProcessMessagesForSubscription End received new message: {0}", data.EndPointData.SubscriptionName);
+            var waitTimeout = TimeSpan.FromSeconds(30);
+
+            // Declare an action acting as a callback whenever a message arrives on a queue.
+            AsyncCallback completeReceive = null;
+
+            // Declare an action acting as a callback whenever a non-transient exception occurs while receiving or processing messages.
+            Action<Exception> recoverReceive = null;
+
+            // Declare an action implementing the main processing logic for received messages.
+            Action<AzureReceiveState> processMessage = ((receiveState) => {
+                // Put your custom processing logic here. DO NOT swallow any exceptions.
+                ProcessMessageCallBack(receiveState);
+            });
+
+            var client = data.Client;
+
+            // Declare an action responsible for the core operations in the message receive loop.
+            Action receiveMessage = (() => {
+                // Use a retry policy to execute the Receive action in an asynchronous and reliable fashion.
+                retryPolicy.ExecuteAction
+                (
+                    (cb) => {
+                        // Start receiving a new message asynchronously.
+                        client.BeginReceive(waitTimeout, cb, null);
+                    },
+                    (ar) => {
+                        // Make sure we are not told to stop receiving while we were waiting for a new message.
+                        if (!data.CancelToken.IsCancellationRequested) {
+                            // Complete the asynchronous operation. This may throw an exception that will be handled internally by retry policy.
+                            BrokeredMessage msg = client.EndReceive(ar);
+
+                            // Check if we actually received any messages.
+                            if (msg != null) {
+                                // Make sure we are not told to stop receiving while we were waiting for a new message.
+                                if (!data.CancelToken.IsCancellationRequested) {
+                                    try {
+                                        // Process the received message.
+
+                                        logger.Log(LogLevel.Info, "ProcessMessagesForSubscription Start received new message: {0}", data.EndPointData.SubscriptionName);
+                                        var receiveState = new AzureReceiveState(data, methodInfo, serializer, msg);
+                                        processMessage(receiveState);
+                                        logger.Log(LogLevel.Info, "ProcessMessagesForSubscription End received new message: {0}", data.EndPointData.SubscriptionName);
+
+                                        // With PeekLock mode, we should mark the processed message as completed.
+                                        if (client.Mode == ReceiveMode.PeekLock) {
+                                            // Mark brokered message as completed at which point it's removed from the queue.
+                                            SafeComplete(msg);
+                                        }
+                                    }
+                                    catch {
+                                        // With PeekLock mode, we should mark the failed message as abandoned.
+                                        if (client.Mode == ReceiveMode.PeekLock) {
+                                            // Abandons a brokered message. This will cause Service Bus to unlock the message and make it available 
+                                            // to be received again, either by the same consumer or by another completing consumer.
+                                            SafeAbandon(msg);
+                                        }
+
+                                        // Re-throw the exception so that we can report it in the fault handler.
+                                        throw;
+                                    }
+                                    finally {
+                                        // Ensure that any resources allocated by a BrokeredMessage instance are released.
+                                        msg.Dispose();
+                                    }
+                                }
+                                else {
+                                    // If we were told to stop processing, the current message needs to be unlocked and return back to the queue.
+                                    if (client.Mode == ReceiveMode.PeekLock) {
+                                        SafeAbandon(msg);
+                                    }
+                                }
+                            }
+                        }
+
+                        // Invoke a custom callback method to indicate that we have completed an iteration in the message receive loop.
+                        completeReceive(ar);
+                    },
+                    (ex) => {
+                        // Invoke a custom action to indicate that we have encountered an exception and
+                        // need further decision as to whether to continue receiving messages.
+                        recoverReceive(ex);
+                    });
+            });
+
+            // Initialize a custom action acting as a callback whenever a message arrives on a queue.
+            completeReceive = ((ar) => {
+                if (!data.CancelToken.IsCancellationRequested) {
+                    // Continue receiving and processing new messages until we are told to stop.
+                    receiveMessage();
                 }
-                logger.Log(LogLevel.Info, "ProcessMessagesForSubscription No Messages Received in past 55 seconds: {0}", data.EndPointData.SubscriptionName);
-            }
+                data.Cancelled = true;
 
-            data.Cancelled = true;
+                logger.Log(LogLevel.Info, "ProcessMessagesForSubscription Message Complete={0} Declared={1} MessageTytpe={2} IsReusable={3}", data.EndPointData.SubscriptionName,
+                    data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
+            });
 
-            logger.Log(LogLevel.Info, "ProcessMessagesForSubscription Message Complete={0} Declared={1} MessageTytpe={2} IsReusable={3}", data.EndPointData.SubscriptionName,
-                data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
+            // Initialize a custom action acting as a callback whenever a non-transient exception occurs while receiving or processing messages.
+            recoverReceive = ((ex) => {
+                // Just log an exception. Do not allow an unhandled exception to terminate the message receive loop abnormally.
+
+                logger.Error(string.Format("ProcessMessagesForSubscription Message Error={0} Declared={1} MessageTytpe={2} IsReusable={3} Error={4}",
+                    data.EndPointData.SubscriptionName,
+                    data.EndPointData.DeclaredType.ToString(),
+                    data.EndPointData.MessageType.ToString(),
+                    data.EndPointData.IsReusable,
+                    ex.ToString()));
+
+                if (!data.CancelToken.IsCancellationRequested) {
+                    // Continue receiving and processing new messages until we are told to stop regardless of any exceptions.
+                    receiveMessage();
+                }
+                data.Cancelled = true;
+                
+                logger.Log(LogLevel.Info, "ProcessMessagesForSubscription Message Complete={0} Declared={1} MessageTytpe={2} IsReusable={3}", data.EndPointData.SubscriptionName,
+                    data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
+            });
+
+            // Start receiving messages asynchronously.
+            receiveMessage();
         }
 
-        static void ProcessMessage(AzureReceiveState state) {
+        static void ProcessMessageCallBack(AzureReceiveState state) {
 
             logger.Log(LogLevel.Info, "ProcessMessage Start received new message={0} Thread={1} MessageId={2}",
                 state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
 
-            using (var usingMesssage = state.Message) {
-                try {
+            try {
 
-                    IDictionary<string, object> values = new Dictionary<string, object>();
+                IDictionary<string, object> values = new Dictionary<string, object>();
 
-                    if (state.Message.Properties != null) {
-                        foreach (var item in state.Message.Properties) {
-                            if (item.Key != AzureSenderReceiverBase.TYPE_HEADER_NAME) {
-                                values.Add(item);
-                            }
+                if (state.Message.Properties != null) {
+                    foreach (var item in state.Message.Properties) {
+                        if (item.Key != AzureSenderReceiverBase.TYPE_HEADER_NAME) {
+                            values.Add(item);
                         }
                     }
-
-                    using (var serial = state.CreateSerializer()) {
-                        var stream = state.Message.GetBody<Stream>();
-                        stream.Position = 0;
-                        object msg = serial.Deserialize(stream, state.Data.EndPointData.MessageType);
-
-                        //TODO create a cache for object creation.
-                        var gt = typeof(ReceivedMessage<>).MakeGenericType(state.Data.EndPointData.MessageType);
-
-                        object receivedMessage = Activator.CreateInstance(gt, new object[] { state.Message, msg });
-
-                        logger.Log(LogLevel.Info, "ProcessMessage invoke callback message start message={0} Thread={1} MessageId={2}", state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
-
-                        var handler = BusConfiguration.Container.Resolve(state.Data.EndPointData.DeclaredType);
-                        state.MethodInfo.Invoke(handler, new object[] {receivedMessage, values});
-                        logger.Log(LogLevel.Info, "ProcessMessage invoke callback message end message={0} Thread={1} MessageId={2}", state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
-                    }
-                    state.Message.Complete();
-                }
-                catch (Exception ex) {
-                    logger.Log(LogLevel.Error, "ProcessMessage invoke callback message failed message={0} Thread={1} MessageId={2} Exception={3}", state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId, ex.ToString());
-                    
-                    usingMesssage.Abandon();
-                    
-                    //TODO remove hard code dead letter value
-                    if (state.Message.DeliveryCount == 5) {
-                        Helpers.Execute(() => state.Message.DeadLetter(ex.ToString(), "Died"));
-                    }
                 }
 
-                logger.Log(LogLevel.Info, "ProcessMessage End received new message={0} Thread={1} MessageId={2}",
-                    state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
+                using (var serial = state.CreateSerializer()) {
+                    var stream = state.Message.GetBody<Stream>();
+                    stream.Position = 0;
+                    object msg = serial.Deserialize(stream, state.Data.EndPointData.MessageType);
 
-                usingMesssage.Dispose();
+                    //TODO create a cache for object creation.
+                    var gt = typeof(ReceivedMessage<>).MakeGenericType(state.Data.EndPointData.MessageType);
+
+                    object receivedMessage = Activator.CreateInstance(gt, new object[] { state.Message, msg });
+
+                    logger.Log(LogLevel.Info, "ProcessMessage invoke callback message start message={0} Thread={1} MessageId={2}", state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
+
+                    var handler = BusConfiguration.Container.Resolve(state.Data.EndPointData.DeclaredType);
+                    state.MethodInfo.Invoke(handler, new object[] { receivedMessage, values });
+                    logger.Log(LogLevel.Info, "ProcessMessage invoke callback message end message={0} Thread={1} MessageId={2}", state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
+                }
             }
+            catch (Exception ex) {
+                logger.Log(LogLevel.Error, "ProcessMessage invoke callback message failed message={0} Thread={1} MessageId={2} Exception={3}", state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId, ex.ToString());
+
+                //TODO remove hard code dead letter value
+                if (state.Message.DeliveryCount == 5) {
+                    Helpers.Execute(() => state.Message.DeadLetter(ex.ToString(), "Died"));
+                }
+                throw;
+            }
+
+            logger.Log(LogLevel.Info, "ProcessMessage End received new message={0} Thread={1} MessageId={2}",
+                state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
+        }
+
+        static bool SafeComplete(BrokeredMessage msg) {
+            try {
+                // Mark brokered message as complete.
+                msg.Complete();
+
+                // Return a result indicating that the message has been completed successfully.
+                return true;
+            }
+            catch (MessageLockLostException) {
+                // It's too late to compensate the loss of a message lock. We should just ignore it so that it does not break the receive loop.
+                // We should be prepared to receive the same message again.
+            }
+            catch (MessagingException) {
+                // There is nothing we can do as the connection may have been lost, or the underlying topic/subscription may have been removed.
+                // If Complete() fails with this exception, the only recourse is to prepare to receive another message (possibly the same one).
+            }
+
+            return false;
+        }
+
+        static bool SafeAbandon(BrokeredMessage msg) {
+            try {
+                // Abandons a brokered message. This will cause the Service Bus to unlock the message and make it available to be received again, 
+                // either by the same consumer or by another competing consumer.
+                msg.Abandon();
+
+                // Return a result indicating that the message has been abandoned successfully.
+                return true;
+            }
+            catch (MessageLockLostException) {
+                // It's too late to compensate the loss of a message lock. We should just ignore it so that it does not break the receive loop.
+                // We should be prepared to receive the same message again.
+            }
+            catch (MessagingException) {
+                // There is nothing we can do as the connection may have been lost, or the underlying topic/subscription may have been removed.
+                // If Abandon() fails with this exception, the only recourse is to receive another message (possibly the same one).
+            }
+
+            return false;
         }
 
         private class AzureReceiveState {
@@ -241,6 +375,14 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// Class used to store everything needed in the state and also used so we can cancel.
         /// </summary>
         private class AzureBusReceiverState {
+
+            CancellationTokenSource cancelToken = new CancellationTokenSource();
+
+            public CancellationTokenSource CancelToken {
+                get {
+                    return cancelToken;
+                }
+            }
 
             /// <summary>
             /// Set to true to have the thread clean itself up

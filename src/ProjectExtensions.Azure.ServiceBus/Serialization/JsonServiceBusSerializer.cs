@@ -9,7 +9,7 @@ using NLog;
 namespace ProjectExtensions.Azure.ServiceBus.Serialization {
 
     public class JsonServiceBusSerializer : ServiceBusSerializerBase {
-        
+
         static Logger logger = LogManager.GetCurrentClassLogger();
         Stream serializedStream;
 
@@ -38,9 +38,9 @@ namespace ProjectExtensions.Azure.ServiceBus.Serialization {
             serializer.Serialize(jw, obj);
             jw.Flush();
             serializedStream.Position = 0; //make sure you always set the stream position to where you want to serialize.
-            
+
             logger.Log(LogLevel.Info, "Serialize {0} at {1} bytes", obj.GetType(), serializedStream.Length);
-            
+
             return serializedStream;
         }
 

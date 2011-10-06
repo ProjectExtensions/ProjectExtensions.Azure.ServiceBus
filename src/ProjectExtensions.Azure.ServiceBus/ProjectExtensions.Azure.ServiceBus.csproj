@@ -113,7 +113,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Properties\ExceptionMessages.resx" />
+    <EmbeddedResource Include="Properties\ExceptionMessages.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx" />
     <EmbeddedResource Include="Properties\SqlCommandResources.resx" />
   </ItemGroup>
