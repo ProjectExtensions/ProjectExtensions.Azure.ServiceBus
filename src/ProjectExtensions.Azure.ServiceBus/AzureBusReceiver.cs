@@ -31,22 +31,46 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
             SubscriptionDescription desc = null;
 
-            var data = value.MessageType.FullName;
+            bool createNew = false;
 
-            if (!namespaceManager.SubscriptionExists(topic.Path, value.SubscriptionName)) {
-                logger.Info("CreateSubscription Creating {0}", value.SubscriptionName);
-
-                var filter = new SqlFilter(string.Format(TYPE_HEADER_NAME + " = '{0}'", value.MessageType.FullName.Replace('.', '_')));
-                Helpers.Execute(() => {
-                    desc = namespaceManager.CreateSubscription(topic.Path, value.SubscriptionName, filter);
+            try {
+                logger.Info("CreateSubscription Try {0} ", value.SubscriptionName);
+                // First, let's see if a item with the specified name already exists.
+                retryPolicy.ExecuteAction(() => {
+                    desc = namespaceManager.GetSubscription(topic.Path, value.SubscriptionName);
                 });
+
+                createNew = (topic == null);
             }
-            else {
-                logger.Info("CreateSubscription Exists {0}", value.SubscriptionName);
-                desc = namespaceManager.GetSubscription(topic.Path, value.SubscriptionName);
+            catch (MessagingEntityNotFoundException) {
+                logger.Info("CreateSubscription Does Not Exist {0} ", value.SubscriptionName);
+                // Looks like the item does not exist. We should create a new one.
+                createNew = true;
             }
 
-            SubscriptionClient subscriptionClient = factory.CreateSubscriptionClient(topic.Path, value.SubscriptionName, ReceiveMode.PeekLock);
+            // If a item with the specified name doesn't exist, it will be auto-created.
+            if (createNew) {
+                try {
+                    logger.Info("CreateSubscription CreateTopic {0} ", value.SubscriptionName);
+                    var filter = new SqlFilter(string.Format(TYPE_HEADER_NAME + " = '{0}'", value.MessageType.FullName.Replace('.', '_')));
+                    retryPolicy.ExecuteAction(() => {
+                        desc = namespaceManager.CreateSubscription(topic.Path, value.SubscriptionName, filter);
+                    });
+                }
+                catch (MessagingEntityAlreadyExistsException) {
+                    logger.Info("CreateSubscription GetTopic {0} ", value.SubscriptionName);
+                    // A item under the same name was already created by someone else, perhaps by another instance. Let's just use it.
+                    retryPolicy.ExecuteAction(() => {
+                        desc = namespaceManager.GetSubscription(topic.Path, value.SubscriptionName);
+                    });
+                }
+            }
+
+            SubscriptionClient subscriptionClient = null;
+
+            retryPolicy.ExecuteAction(() => {
+                subscriptionClient = factory.CreateSubscriptionClient(topic.Path, value.SubscriptionName, ReceiveMode.PeekLock);
+            });
 
             var state = new AzureBusReceiverState() {
                 Client = subscriptionClient,
@@ -55,8 +79,6 @@ namespace ProjectExtensions.Azure.ServiceBus {
             };
             mappings.Add(state);
 
-            //Task t = new Task(ProcessMessagesForSubscription, state);
-            //t.Start();
             ProcessMessagesForSubscription(state);
         }
 
@@ -87,9 +109,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
                 if (namespaceManager.SubscriptionExists(topic.Path, value.SubscriptionName)) {
                     var filter = new SqlFilter(string.Format(TYPE_HEADER_NAME + " = '{0}'", value.MessageType.FullName.Replace('.', '_')));
-                    Helpers.Execute(() => {
-                        namespaceManager.DeleteSubscription(topic.Path, value.SubscriptionName);
-                    });
+                    retryPolicy.ExecuteAction(() => namespaceManager.DeleteSubscription(topic.Path, value.SubscriptionName));
                     logger.Info("CancelSubscription Deleted {0}", value.SubscriptionName);
                 }
             });
@@ -232,7 +252,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                     receiveMessage();
                 }
                 data.Cancelled = true;
-                
+
                 logger.Info("ProcessMessagesForSubscription Message Complete={0} Declared={1} MessageTytpe={2} IsReusable={3}", data.EndPointData.SubscriptionName,
                     data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
             });
@@ -241,7 +261,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
             receiveMessage();
         }
 
-        static void ProcessMessageCallBack(AzureReceiveState state) {
+        void ProcessMessageCallBack(AzureReceiveState state) {
 
             logger.Info("ProcessMessage Start received new message={0} Thread={1} MessageId={2}",
                 state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
@@ -280,7 +300,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
                 //TODO remove hard code dead letter value
                 if (state.Message.DeliveryCount == 5) {
-                    Helpers.Execute(() => state.Message.DeadLetter(ex.ToString(), "Died"));
+                    retryPolicy.ExecuteAction(() => state.Message.DeadLetter(ex.ToString(), "Died"));
                 }
                 throw;
             }

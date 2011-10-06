@@ -22,7 +22,9 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
         public AzureBusSender(BusConfiguration configuration)
             : base(configuration) {
-            client = factory.CreateTopicClient(topic.Path);
+            retryPolicy.ExecuteAction(() => {
+                client = factory.CreateTopicClient(topic.Path);
+            });
         }
 
         public void Close() {
@@ -40,7 +42,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
             // Declare a wait object that will be used for synchronization.
             var waitObject = new ManualResetEvent(false);
-            
+
             // Declare a timeout value during which the messages are expected to be sent.
             var sentTimeout = TimeSpan.FromMinutes(2);
 
