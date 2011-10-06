@@ -102,7 +102,6 @@
     <Compile Include="TransientFaultHandling\ITransientErrorDetectionStrategy.cs" />
     <Compile Include="Properties\ExceptionMessages.Designer.cs" />
     <Compile Include="Properties\Resources.Designer.cs" />
-    <Compile Include="Properties\SqlCommandResources.Designer.cs" />
     <Compile Include="TransientFaultHandling\RetryLimitExceededException.cs" />
     <Compile Include="TransientFaultHandling\RetryPolicy.cs" />
     <Compile Include="TransientFaultHandling\RetryPolicyFactory.cs" />
@@ -117,7 +116,6 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx" />
-    <EmbeddedResource Include="Properties\SqlCommandResources.resx" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
