@@ -17,7 +17,6 @@ namespace Microsoft.AzureCAT.Samples.TransientFaultHandling
     using System;
 
     using Microsoft.AzureCAT.Samples.TransientFaultHandling.Configuration;
-    using Microsoft.AzureCAT.Samples.TransientFaultHandling.SqlAzure;
     #endregion
 
     /// <summary>
@@ -25,43 +24,6 @@ namespace Microsoft.AzureCAT.Samples.TransientFaultHandling
     /// </summary>
     public static class RetryPolicyFactory
     {
-        /// <summary>
-        /// Returns the default retry policy dedicated to handling transient conditions with SQL connections.
-        /// </summary>
-        /// <returns>The retry policy for SQL connections, or the default <see cref="RetryPolicy.NoRetry"/> policy if no retry policy definition assigned to SQL connections was found.</returns>
-        public static RetryPolicy GetDefaultSqlConnectionRetryPolicy()
-        {
-            RetryPolicyConfigurationSettings retryPolicySettings = ApplicationConfiguration.Current.GetConfigurationSection<RetryPolicyConfigurationSettings>(RetryPolicyConfigurationSettings.SectionName);
-
-            if (retryPolicySettings != null)
-            {
-                RetryPolicy defaultPolicy = retryPolicySettings.GetRetryPolicy<SqlAzureTransientErrorDetectionStrategy>(retryPolicySettings.DefaultSqlConnectionPolicy);
-                return defaultPolicy != null ? defaultPolicy : ((defaultPolicy = retryPolicySettings.GetRetryPolicy<SqlAzureTransientErrorDetectionStrategy>(retryPolicySettings.DefaultPolicy)) != null ? defaultPolicy : RetryPolicy.NoRetry);
-            }
-            else
-            {
-                return RetryPolicy.NoRetry;
-            }
-        }
-
-        /// <summary>
-        /// Returns the default retry policy dedicated to handling transient conditions with SQL commands.
-        /// </summary>
-        /// <returns>The retry policy for SQL commands, or the default <see cref="RetryPolicy.NoRetry"/> policy if no retry policy definition assigned to SQL commands was found.</returns>
-        public static RetryPolicy GetDefaultSqlCommandRetryPolicy()
-        {
-            RetryPolicyConfigurationSettings retryPolicySettings = ApplicationConfiguration.Current.GetConfigurationSection<RetryPolicyConfigurationSettings>(RetryPolicyConfigurationSettings.SectionName);
-
-            if (retryPolicySettings != null)
-            {
-                RetryPolicy defaultPolicy = retryPolicySettings.GetRetryPolicy<SqlAzureTransientErrorDetectionStrategy>(retryPolicySettings.DefaultSqlCommandPolicy);
-                return defaultPolicy != null ? defaultPolicy : ((defaultPolicy = retryPolicySettings.GetRetryPolicy<SqlAzureTransientErrorDetectionStrategy>(retryPolicySettings.DefaultPolicy)) != null ? defaultPolicy : RetryPolicy.NoRetry);
-            }
-            else
-            {
-                return RetryPolicy.NoRetry;
-            }
-        }
 
         /// <summary>
         /// Returns an instance of the <see cref="RetryPolicy"/> object initialized for a given policy name.
