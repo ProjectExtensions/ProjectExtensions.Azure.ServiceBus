@@ -63,13 +63,11 @@ namespace ProjectExtensions.Azure.ServiceBus {
             bool completed = waitObject.WaitOne(sentTimeout);
             waitObject.Dispose();
 
-            if (completed) {
-                //DO Nothing
+            if (failureException != null) {
+                throw failureException;
             }
-            else {
-                if (failureException != null) {
-                    throw failureException;
-                }
+
+            if (!completed) {
                 throw new Exception("Failed to Send Message. Reason was timeout.");
             }
         }
@@ -153,8 +151,17 @@ namespace ProjectExtensions.Azure.ServiceBus {
                         serializer = null;
                     }
                     failureException = ex;
+
                     // Always log exceptions.
                     logger.Error<Exception>("Send failed {0}", ex);
+
+                    sw.Stop();
+                    resultCallBack(new MessageSentResult<T>() {
+                        IsSuccess = failureException == null,
+                        State = state,
+                        ThrownException = failureException,
+                        TimeSpent = sw.Elapsed
+                    });
                 }
             );
         }
