@@ -91,6 +91,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
         public void Dispose() {
             Dispose(true);
+            factory.Close();
         }
 
         public abstract void Dispose(bool disposing);

@@ -160,7 +160,9 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 if (item is IDisposable) {
                     (item as IDisposable).Dispose();
                 }
+                item.Client = null;
             }
+            mappings.Clear();
         }
 
         void ProcessMessagesForSubscription(AzureBusReceiverState data) {
