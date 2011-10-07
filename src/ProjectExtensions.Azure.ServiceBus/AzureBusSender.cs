@@ -149,15 +149,6 @@ namespace ProjectExtensions.Azure.ServiceBus {
                     logger.Error<Exception>("Send failed {0}", ex);
                 }
             );
-
-            sw.Stop();
-            resultCallBack(new MessageSentResult<T>() {
-                IsSuccess = true,
-                Message = obj,
-                ThrownException = failureException,
-                TimeSpent = sw.Elapsed
-            });
-
         }
 
         public override void Dispose(bool disposing) {
