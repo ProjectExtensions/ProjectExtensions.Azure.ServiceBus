@@ -73,7 +73,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                         descriptionToCreate.LockDuration = new TimeSpan(0, 0, attr.LockDuration);
                     }
                     if (attr.MaxDeliveryCountSet()) {
-                        descriptionToCreate.MaxDeliveryCount = attr.MaxDeliveryCount;
+                        descriptionToCreate.MaxDeliveryCount = attr.MaxRetries;
                     }
                 }
                 

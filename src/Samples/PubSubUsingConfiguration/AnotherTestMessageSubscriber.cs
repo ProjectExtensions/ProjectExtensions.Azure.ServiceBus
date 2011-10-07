@@ -12,7 +12,7 @@ namespace PubSubUsingConfiguration {
     [MessageHandlerConfiguration(
         DefaultMessageTimeToLive = 240, 
         LockDuration = 120, 
-        MaxDeliveryCount = 2, 
+        MaxRetries = 2, 
         PrefetchCount = 20, 
         ReceiveMode = ReceiveMode.PeekLock)]
     [SingletonMessageHandler]

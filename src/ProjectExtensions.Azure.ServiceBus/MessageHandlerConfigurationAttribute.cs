@@ -77,7 +77,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <summary>
         /// Gets or sets the number of maximum deliveries.
         /// </summary>
-        public int MaxDeliveryCount {
+        public int MaxRetries {
             get {
                 return maxDeliveryCount;
             }
@@ -144,7 +144,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
             retVal.Append(" EnableBatchedOperations: ").Append(this.EnableBatchedOperations);
             retVal.Append(" EnableDeadLetteringOnMessageExpiration: ").Append(this.EnableDeadLetteringOnMessageExpiration);
             retVal.Append(" LockDuration: ").Append(this.LockDuration);
-            retVal.Append(" MaxDeliveryCount: ").Append(this.MaxDeliveryCount);
+            retVal.Append(" MaxDeliveryCount: ").Append(this.MaxRetries);
             retVal.Append(" PrefetchCount: ").Append(this.PrefetchCount);
             retVal.Append(" ReceiveMode: ").Append(this.ReceiveMode);
             return retVal.ToString();
