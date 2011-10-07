@@ -88,6 +88,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
             Exception failureException = null;
             BrokeredMessage message = null;
+            bool resultSent = false; //I am not able to determine when the exception block is called.
             var sw = new Stopwatch();
             sw.Start();
 
@@ -132,12 +133,15 @@ namespace ProjectExtensions.Azure.ServiceBus {
                             serializer = null;
                         }
                         sw.Stop();
-                        resultCallBack(new MessageSentResult<T>() {
-                            IsSuccess = failureException == null,
-                            State = state,
-                            ThrownException = failureException,
-                            TimeSpent = sw.Elapsed
-                        });
+                        if (!resultSent) {
+                            resultSent = true;
+                            ExtensionMethods.ExecuteAndReturn(() => resultCallBack(new MessageSentResult<T>() {
+                                IsSuccess = failureException == null,
+                                State = state,
+                                ThrownException = failureException,
+                                TimeSpent = sw.Elapsed
+                            }));
+                        }
                     }
                 },
                 (ex) => {
@@ -156,12 +160,15 @@ namespace ProjectExtensions.Azure.ServiceBus {
                     logger.Error<Exception>("Send failed {0}", ex);
 
                     sw.Stop();
-                    resultCallBack(new MessageSentResult<T>() {
-                        IsSuccess = failureException == null,
-                        State = state,
-                        ThrownException = failureException,
-                        TimeSpent = sw.Elapsed
-                    });
+                    if (!resultSent) {
+                        resultSent = true;
+                        ExtensionMethods.ExecuteAndReturn(() => resultCallBack(new MessageSentResult<T>() {
+                            IsSuccess = failureException == null,
+                            State = state,
+                            ThrownException = failureException,
+                            TimeSpent = sw.Elapsed
+                        }));
+                    }
                 }
             );
         }

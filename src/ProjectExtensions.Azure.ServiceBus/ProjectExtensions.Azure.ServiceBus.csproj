@@ -75,6 +75,7 @@
     <Compile Include="BrokeredMessageWrapper.cs" />
     <Compile Include="BusConfiguration.cs" />
     <Compile Include="BusConfigurationBuilder.cs" />
+    <Compile Include="ExtensionMethods.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="IAzureBusReceiver.cs" />
     <Compile Include="IAzureBusSender.cs" />
