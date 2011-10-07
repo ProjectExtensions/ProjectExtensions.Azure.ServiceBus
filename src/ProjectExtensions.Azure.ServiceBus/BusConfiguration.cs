@@ -178,7 +178,6 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <param name="container">Your optional existing IOC container. Use <see cref="WithSettings()"/> if you do not have an existing container.</param>
         /// <returns></returns>
         public static BusConfigurationBuilder WithSettings(IContainer container) {
-            Guard.ArgumentNotNull(container, "container");
             if (configuration == null) {
                 lock (lockObject) {
                     if (configuration == null) {
