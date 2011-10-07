@@ -32,9 +32,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// </summary>
         /// <param name="configuration"></param>
         public AzureSenderReceiverBase(BusConfiguration configuration) {
-            if (configuration == null) {
-                throw new ArgumentNullException("configuration");
-            }
+            Guard.ArgumentNotNull(configuration, "configuration");
             this.configuration = configuration;
 
             tokenProvider = TokenProvider.CreateSharedSecretTokenProvider(configuration.ServiceBusIssuerName, configuration.ServiceBusIssuerKey);
@@ -52,7 +50,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         }
 
         protected void EnsureTopic(string topicName) {
-
+            Guard.ArgumentNotNull(topicName, "topicName");
             bool createNew = false;
 
             try {

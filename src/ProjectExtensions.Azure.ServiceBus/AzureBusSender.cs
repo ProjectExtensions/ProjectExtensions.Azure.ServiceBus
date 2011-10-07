@@ -22,6 +22,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
         public AzureBusSender(BusConfiguration configuration)
             : base(configuration) {
+            Guard.ArgumentNotNull(configuration, "configuration");
             retryPolicy.ExecuteAction(() => {
                 client = factory.CreateTopicClient(topic.Path);
             });
@@ -43,6 +44,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         }
 
         public void Send<T>(T obj, IServiceBusSerializer serializer = null, IDictionary<string, object> metadata = null) {
+            Guard.ArgumentNotNull(obj, "obj");
 
             // Declare a wait object that will be used for synchronization.
             var waitObject = new ManualResetEvent(false);
@@ -81,6 +83,8 @@ namespace ProjectExtensions.Azure.ServiceBus {
         }
 
         public void SendAsync<T>(T obj, Action<IMessageSentResult<T>> resultCallBack, IServiceBusSerializer serializer = null, IDictionary<string, object> metadata = null) {
+            Guard.ArgumentNotNull(obj, "obj");
+            Guard.ArgumentNotNull(resultCallBack, "resultCallBack");
 
             serializer = serializer ?? configuration.DefaultSerializer.Create();
 

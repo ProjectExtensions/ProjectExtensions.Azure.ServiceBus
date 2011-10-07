@@ -5,6 +5,7 @@ using System.Text;
 using System.Reflection;
 using Autofac;
 using ProjectExtensions.Azure.ServiceBus.Serialization;
+using Microsoft.AzureCAT.Samples.TransientFaultHandling;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 
@@ -141,6 +142,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         }
 
         internal void Configure(ContainerBuilder builder) {
+            Guard.ArgumentNotNull(builder, "builder");
             if (string.IsNullOrWhiteSpace(ServiceBusApplicationId)) {
                 throw new ApplicationException("ApplicationId must be set.");
             }
@@ -152,7 +154,8 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
             if (container == null) {
                 container = builder.Build();
-            } else {
+            }
+            else {
                 builder.Update(container);
             }
 
@@ -175,6 +178,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <param name="container">Your optional existing IOC container. Use <see cref="WithSettings()"/> if you do not have an existing container.</param>
         /// <returns></returns>
         public static BusConfigurationBuilder WithSettings(IContainer container) {
+            Guard.ArgumentNotNull(container, "container");
             if (configuration == null) {
                 lock (lockObject) {
                     if (configuration == null) {
@@ -189,18 +193,14 @@ namespace ProjectExtensions.Azure.ServiceBus {
         }
 
         internal void AddRegisteredAssembly(Assembly value) {
-            if (value == null) {
-                throw new ArgumentNullException("value");
-            }
+            Guard.ArgumentNotNull(value, "value");
             if (!this.registeredAssemblies.Contains(value)) {
                 this.registeredAssemblies.Add(value);
             }
         }
 
         internal void AddRegisteredSubscriber(Type value) {
-            if (value == null) {
-                throw new ArgumentNullException("value");
-            }
+            Guard.ArgumentNotNull(value, "value");
             if (!this.registeredSubscribers.Contains(value)) {
                 this.registeredSubscribers.Add(value);
             }

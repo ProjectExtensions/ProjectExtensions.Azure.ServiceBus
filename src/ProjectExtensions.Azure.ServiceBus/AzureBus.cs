@@ -6,6 +6,7 @@ using System.Reflection;
 using Autofac;
 using NLog;
 using System.Linq.Expressions;
+using Microsoft.AzureCAT.Samples.TransientFaultHandling;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 
@@ -27,9 +28,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// </summary>
         /// <param name="config"></param>
         public AzureBus(BusConfiguration config) {
-            if (config == null) {
-                throw new ArgumentNullException("config");
-            }
+            Guard.ArgumentNotNull(config, "config");
             this.config = config;
             Configure();
         }
@@ -39,9 +38,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// </summary>
         /// <param name="assembly">The assembly to register</param>
         public void RegisterAssembly(Assembly assembly) {
-            if (assembly == null) {
-                throw new ArgumentNullException("assembly");
-            }
+            Guard.ArgumentNotNull(assembly, "assembly");
             logger.Info("RegisterAssembly={0}", assembly.FullName);
 
             foreach (var type in assembly.GetTypes()) {
@@ -61,6 +58,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <param name="message">The message to publish.</param>
         /// <param name="metadata">Metadata to sent with the message.</param>
         public void Publish<T>(T message, IDictionary<string, object> metadata) {
+            Guard.ArgumentNotNull(message, "message");
             logger.Info("Publish={0}", message.GetType().FullName);
             sender.Send<T>(message, metadata);
         }
@@ -73,7 +71,9 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <param name="resultCallBack">The callback when the operation completes</param>
         /// <param name="metadata">Metadata to sent with the message.</param>
         public void PublishAsync<T>(T message, Action<IMessageSentResult<T>> resultCallBack, IDictionary<string, object> metadata) {
-            logger.Info("Publish={0}", message.GetType().FullName);
+            Guard.ArgumentNotNull(message, "message");
+            Guard.ArgumentNotNull(resultCallBack, "resultCallBack");
+            logger.Info("PublishAsync={0}", message.GetType().FullName);
             sender.SendAsync<T>(message, resultCallBack, metadata);
         }
 
@@ -93,6 +93,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <typeparam name="T">The type of message to subscribe to.</typeparam>
         /// <param name="type">The type to subscribe</param>
         public void Subscribe(Type type) {
+            Guard.ArgumentNotNull(type, "type");
             logger.Info("Subscribe={0}", type.FullName);
             SubscribeOrUnsubscribeType(type, receiver.CreateSubscription);
         }
@@ -110,6 +111,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// </summary>
         /// <param name="type">The type of message to unsubscribe from</param>
         public void Unsubscribe(Type type) {
+            Guard.ArgumentNotNull(type, "type");
             logger.Info("Unsubscribe={0}", type.FullName);
 
             if (subscribedTypes.Contains(type)) {
@@ -136,12 +138,16 @@ namespace ProjectExtensions.Azure.ServiceBus {
         }
 
         void RegisterAssembly(IEnumerable<Assembly> assemblies) {
+            Guard.ArgumentNotNull(assemblies, "assemblies");
             foreach (var item in assemblies) {
                 RegisterAssembly(item);
             }
         }
 
         void SubscribeOrUnsubscribeType(Type type, Action<ServiceBusEnpointData> callback) {
+            Guard.ArgumentNotNull(type, "type");
+            Guard.ArgumentNotNull(callback, "callback");
+
             logger.Info("SubscribeOrUnsubscribeType={0}", type.FullName);
             var interfaces = type.GetInterfaces()
                             .Where(i => i.IsGenericType && (i.GetGenericTypeDefinition() == typeof(IHandleMessages<>) || i.GetGenericTypeDefinition() == typeof(IHandleCompetingMessages<>)))

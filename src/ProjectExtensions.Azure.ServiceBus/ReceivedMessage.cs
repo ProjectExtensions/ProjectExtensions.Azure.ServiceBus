@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.ServiceBus.Messaging;
+using Microsoft.AzureCAT.Samples.TransientFaultHandling;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 
@@ -12,12 +13,8 @@ namespace ProjectExtensions.Azure.ServiceBus {
         T message;
 
         public ReceivedMessage(BrokeredMessage brokeredMessage, T message) {
-            if (brokeredMessage == null) {
-                throw new ArgumentNullException("brokeredMessage");
-            }
-            if (message == null) {
-                throw new ArgumentNullException("message");
-            }
+            Guard.ArgumentNotNull(brokeredMessage, "brokeredMessage");
+            Guard.ArgumentNotNull(message, "message");
             this.brokeredMessage = new BrokeredMessageWrapper(brokeredMessage);
             this.message = message;
         }
