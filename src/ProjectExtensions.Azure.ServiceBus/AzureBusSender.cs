@@ -120,6 +120,9 @@ namespace ProjectExtensions.Azure.ServiceBus {
                         // Complete the asynchronous operation. This may throw an exception that will be handled internally by the retry policy.
                         client.EndSend(ar);
                     }
+                    catch (Exception ex) {
+                        failureException = ex;
+                    }
                     finally {
                         // Ensure that any resources allocated by a BrokeredMessage instance are released.
                         if (message != null) {
@@ -132,8 +135,9 @@ namespace ProjectExtensions.Azure.ServiceBus {
                         }
                         sw.Stop();
                         resultCallBack(new MessageSentResult<T>() {
-                            IsSuccess = true,
+                            IsSuccess = failureException == null,
                             State = state,
+                            ThrownException = failureException,
                             TimeSpent = sw.Elapsed
                         });
                     }
