@@ -8,6 +8,14 @@ namespace ProjectExtensions.Azure.ServiceBus {
     class ServiceBusEnpointData {
 
         /// <summary>
+        /// Custom attribute found on the class.
+        /// </summary>
+        public MessageHandlerConfigurationAttribute AttributeData {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// The type containing the interface
         /// </summary>
         public Type DeclaredType {

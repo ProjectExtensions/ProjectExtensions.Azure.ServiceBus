@@ -52,7 +52,7 @@ namespace PubSubUsingConfiguration {
 
             for (int i = 0; i < 20; i++) {
                 var message2 = new AnotherTestMessage() {
-                    Value = 2 + i,
+                    Value = i,
                     MessageId = DateTime.Now.ToString()
                 };
                 BusConfiguration.Instance.Bus.PublishAsync(message2, (result) => {

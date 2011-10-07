@@ -84,6 +84,7 @@
     <Compile Include="IBus.cs" />
     <Compile Include="IMessageSentResult.cs" />
     <Compile Include="IReceivedMessage.cs" />
+    <Compile Include="MessageHandlerConfigurationAttribute.cs" />
     <Compile Include="MessageSentResult.cs" />
     <Compile Include="ReflectionHelper.cs" />
     <Compile Include="ReceivedMessage.cs" />

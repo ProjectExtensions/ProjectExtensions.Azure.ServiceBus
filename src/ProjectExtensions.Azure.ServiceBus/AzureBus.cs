@@ -194,13 +194,13 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 var fullName = (IsCompetingHandler(foundInterface) ? "C_" : config.ServiceBusApplicationId + "_") + hash;
 
                 var info = new ServiceBusEnpointData() {
+                    AttributeData = type.GetCustomAttributes(typeof(MessageHandlerConfigurationAttribute), false).FirstOrDefault() as MessageHandlerConfigurationAttribute,
                     DeclaredType = type,
                     MessageType = implementedMessageType,
                     SubscriptionName = fullName,
                     ServiceType = foundInterface,
                     IsReusable = (type.GetCustomAttributes(typeof(SingletonMessageHandlerAttribute), false).Count() > 0)
                 };
-
 
                 if (!BusConfiguration.Container.IsRegistered(type)) {
                     if (info.IsReusable) {

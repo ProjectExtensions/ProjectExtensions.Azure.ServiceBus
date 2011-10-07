@@ -27,10 +27,17 @@ namespace ProjectExtensions.Azure.ServiceBus {
         }
 
         public void CreateSubscription(ServiceBusEnpointData value) {
-            //TODO determine how we can change the filters for an existing registered item
             Guard.ArgumentNotNull(value, "value");
 
-            logger.Info("CreateSubscription {0} Declared {1} MessageTytpe {2}, IsReusable {3}", value.SubscriptionName, value.DeclaredType.ToString(), value.MessageType.ToString(), value.IsReusable);
+            //TODO determine how we can change the filters for an existing registered item
+            //ServiceBusNamespaceClient
+
+            logger.Info("CreateSubscription {0} Declared {1} MessageTytpe {2}, IsReusable {3} Custom Attribute {4}",
+                value.SubscriptionName,
+                value.DeclaredType.ToString(),
+                value.MessageType.ToString(),
+                value.IsReusable,
+                value.AttributeData != null ? value.AttributeData.ToString() : string.Empty);
 
             SubscriptionDescription desc = null;
 
@@ -53,11 +60,28 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
             // If a item with the specified name doesn't exist, it will be auto-created.
             if (createNew) {
+                var descriptionToCreate = new SubscriptionDescription(topic.Path, value.SubscriptionName);
+
+                if (value.AttributeData != null) {
+                    var attr = value.AttributeData;
+                    if (attr.DefaultMessageTimeToLiveSet()) {
+                        descriptionToCreate.DefaultMessageTimeToLive = new TimeSpan(0, 0, attr.DefaultMessageTimeToLive);
+                    }
+                    descriptionToCreate.EnableBatchedOperations = attr.EnableBatchedOperations;
+                    descriptionToCreate.EnableDeadLetteringOnMessageExpiration = attr.EnableDeadLetteringOnMessageExpiration;
+                    if (attr.LockDurationSet()) {
+                        descriptionToCreate.LockDuration = new TimeSpan(0, 0, attr.LockDuration);
+                    }
+                    if (attr.MaxDeliveryCountSet()) {
+                        descriptionToCreate.MaxDeliveryCount = attr.MaxDeliveryCount;
+                    }
+                }
+                
                 try {
                     logger.Info("CreateSubscription CreateTopic {0} ", value.SubscriptionName);
                     var filter = new SqlFilter(string.Format(TYPE_HEADER_NAME + " = '{0}'", value.MessageType.FullName.Replace('.', '_')));
                     retryPolicy.ExecuteAction(() => {
-                        desc = namespaceManager.CreateSubscription(topic.Path, value.SubscriptionName, filter);
+                        desc = namespaceManager.CreateSubscription(descriptionToCreate, filter);
                     });
                 }
                 catch (MessagingEntityAlreadyExistsException) {
@@ -70,10 +94,19 @@ namespace ProjectExtensions.Azure.ServiceBus {
             }
 
             SubscriptionClient subscriptionClient = null;
+            var rm = ReceiveMode.PeekLock;
+
+            if (value.AttributeData != null) {
+                rm = value.AttributeData.ReceiveMode;
+            }
 
             retryPolicy.ExecuteAction(() => {
-                subscriptionClient = factory.CreateSubscriptionClient(topic.Path, value.SubscriptionName, ReceiveMode.PeekLock);
+                subscriptionClient = factory.CreateSubscriptionClient(topic.Path, value.SubscriptionName, rm);
             });
+
+            if (value.AttributeData != null && value.AttributeData.PrefetchCountSet()) {
+                subscriptionClient.PrefetchCount = value.AttributeData.PrefetchCount;
+            }
 
             var state = new AzureBusReceiverState() {
                 Client = subscriptionClient,
@@ -87,7 +120,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
         public void CancelSubscription(ServiceBusEnpointData value) {
             Guard.ArgumentNotNull(value, "value");
-            
+
             logger.Info("CancelSubscription {0} Declared {1} MessageTytpe {2}, IsReusable {3}", value.SubscriptionName, value.DeclaredType.ToString(), value.MessageType.ToString(), value.IsReusable);
 
             var subscription = mappings.FirstOrDefault(item => item.EndPointData.SubscriptionName.Equals(value.SubscriptionName, StringComparison.OrdinalIgnoreCase));
