@@ -70,7 +70,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 if (failureException != null) {
                     throw failureException;
                 }
-                throw new Exception("Failed to Send Message for Unknown Reason.");
+                throw new Exception("Failed to Send Message. Reason was timeout.");
             }
         }
 
