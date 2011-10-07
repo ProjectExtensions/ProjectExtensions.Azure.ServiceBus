@@ -11,6 +11,7 @@ using ProjectExtensions.Azure.ServiceBus.Serialization;
 using System.Threading;
 using System.Reflection;
 using NLog;
+using Microsoft.AzureCAT.Samples.TransientFaultHandling;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 
@@ -22,10 +23,12 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
         public AzureBusReceiver(BusConfiguration configuration)
             : base(configuration) {
+            Guard.ArgumentNotNull(configuration, "configuration");
         }
 
         public void CreateSubscription(ServiceBusEnpointData value) {
             //TODO determine how we can change the filters for an existing registered item
+            Guard.ArgumentNotNull(value, "value");
 
             logger.Info("CreateSubscription {0} Declared {1} MessageTytpe {2}, IsReusable {3}", value.SubscriptionName, value.DeclaredType.ToString(), value.MessageType.ToString(), value.IsReusable);
 
@@ -83,7 +86,8 @@ namespace ProjectExtensions.Azure.ServiceBus {
         }
 
         public void CancelSubscription(ServiceBusEnpointData value) {
-
+            Guard.ArgumentNotNull(value, "value");
+            
             logger.Info("CancelSubscription {0} Declared {1} MessageTytpe {2}, IsReusable {3}", value.SubscriptionName, value.DeclaredType.ToString(), value.MessageType.ToString(), value.IsReusable);
 
             var subscription = mappings.FirstOrDefault(item => item.EndPointData.SubscriptionName.Equals(value.SubscriptionName, StringComparison.OrdinalIgnoreCase));
@@ -127,6 +131,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         }
 
         void ProcessMessagesForSubscription(AzureBusReceiverState data) {
+            Guard.ArgumentNotNull(data, "data");
 
             logger.Info("ProcessMessagesForSubscription Message Start {0} Declared {1} MessageTytpe {2}, IsReusable {3}", data.EndPointData.SubscriptionName,
                     data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
@@ -262,7 +267,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         }
 
         void ProcessMessageCallBack(AzureReceiveState state) {
-
+            Guard.ArgumentNotNull(state, "state");
             logger.Info("ProcessMessage Start received new message={0} Thread={1} MessageId={2}",
                 state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
 
@@ -354,6 +359,10 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
             public AzureReceiveState(AzureBusReceiverState data, MethodInfo methodInfo,
                 IServiceBusSerializer serializer, BrokeredMessage message) {
+                Guard.ArgumentNotNull(data, "data");
+                Guard.ArgumentNotNull(methodInfo, "methodInfo");
+                Guard.ArgumentNotNull(serializer, "serializer");
+                Guard.ArgumentNotNull(message, "message");
                 this.Data = data;
                 this.MethodInfo = methodInfo;
                 this.Serializer = serializer;

@@ -6,6 +6,7 @@ using System.Reflection;
 using ProjectExtensions.Azure.ServiceBus.Serialization;
 using Autofac;
 using System.Configuration;
+using Microsoft.AzureCAT.Samples.TransientFaultHandling;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 
@@ -18,6 +19,8 @@ namespace ProjectExtensions.Azure.ServiceBus {
         ContainerBuilder builder;
 
         internal BusConfigurationBuilder(ContainerBuilder builder, BusConfiguration configuration) {
+            Guard.ArgumentNotNull(builder, "builder");
+            Guard.ArgumentNotNull(configuration, "configuration");
             this.builder = builder;
             this.configuration = configuration;
         }
@@ -35,9 +38,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <param name="value"></param>
         /// <returns></returns>
         public BusConfigurationBuilder ServiceBusApplicationId(string value) {
-            if (string.IsNullOrWhiteSpace(value)) {
-                throw new ArgumentNullException("value");
-            }
+            Guard.ArgumentNotNullOrEmptyString(value, "value");
             if (value.Length > 10) {
                 throw new ArgumentOutOfRangeException("The length must not be greater than 10.");
             }
@@ -61,9 +62,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <param name="value"></param>
         /// <returns></returns>
         public BusConfigurationBuilder MaxThreads(byte value) {
-            if (value < 1) {
-                throw new ArgumentOutOfRangeException("value", "The thread count must be at least 1.");
-            }
+            Guard.ArgumentNotZeroOrNegativeValue(value, "value");
             configuration.MaxThreads = value;
             return this;
         }
@@ -103,6 +102,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <param name="assembly"></param>
         /// <returns></returns>
         public BusConfigurationBuilder RegisterAssembly(Assembly assembly) {
+            Guard.ArgumentNotNull(assembly, "assembly");
             configuration.AddRegisteredAssembly(assembly);
             return this;
         }
@@ -123,6 +123,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <param name="value"></param>
         /// <returns></returns>
         public BusConfigurationBuilder ServiceBusNamespace(string value) {
+            Guard.ArgumentNotNull(value, "value");
             configuration.ServiceBusNamespace = value;
             return this;
         }
@@ -133,6 +134,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <param name="value"></param>
         /// <returns></returns>
         public BusConfigurationBuilder ServiceBusIssuerName(string value) {
+            Guard.ArgumentNotNull(value, "value");
             configuration.ServiceBusIssuerName = value;
             return this;
         }
@@ -143,6 +145,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <param name="value"></param>
         /// <returns></returns>
         public BusConfigurationBuilder ServiceBusIssuerKey(string value) {
+            Guard.ArgumentNotNull(value, "value");
             configuration.ServiceBusIssuerKey = value;
             return this;
         }
@@ -153,6 +156,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <param name="value"></param>
         /// <returns></returns>
         public BusConfigurationBuilder ServicePath(string value) {
+            Guard.ArgumentNotNull(value, "value");
             configuration.ServicePath = value;
             return this;
         }
@@ -163,6 +167,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <param name="value"></param>
         /// <returns></returns>
         public BusConfigurationBuilder TopicName(string value) {
+            Guard.ArgumentNotNull(value, "value");
             configuration.TopicName = value;
             return this;
         }

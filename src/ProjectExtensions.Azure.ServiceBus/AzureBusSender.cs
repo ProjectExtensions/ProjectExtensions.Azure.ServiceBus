@@ -22,6 +22,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
         public AzureBusSender(BusConfiguration configuration)
             : base(configuration) {
+            Guard.ArgumentNotNull(configuration, "configuration");
             retryPolicy.ExecuteAction(() => {
                 client = factory.CreateTopicClient(topic.Path);
             });
@@ -34,11 +35,16 @@ namespace ProjectExtensions.Azure.ServiceBus {
             }
         }
 
-        public void Send<T>(T obj, IDictionary<string, object> metadata) {
-            Send<T>(obj, metadata, configuration.DefaultSerializer.Create());
+        public void Send<T>(T obj) {
+            Send<T>(obj, null);
         }
 
-        public void Send<T>(T obj, IDictionary<string, object> metadata, IServiceBusSerializer serializer) {
+        public void Send<T>(T obj, IDictionary<string, object> metadata) {
+            Send<T>(obj, configuration.DefaultSerializer.Create(), metadata);
+        }
+
+        public void Send<T>(T obj, IServiceBusSerializer serializer = null, IDictionary<string, object> metadata = null) {
+            Guard.ArgumentNotNull(obj, "obj");
 
             // Declare a wait object that will be used for synchronization.
             var waitObject = new ManualResetEvent(false);
@@ -47,7 +53,45 @@ namespace ProjectExtensions.Azure.ServiceBus {
             var sentTimeout = TimeSpan.FromMinutes(2);
 
             Exception failureException = null;
+
+            SendAsync<T>(obj, null, (result) => {
+                waitObject.Set();
+                failureException = result.ThrownException;
+            });
+
+            // Wait until the messaging operations are completed.
+            bool completed = waitObject.WaitOne(sentTimeout);
+            waitObject.Dispose();
+
+            if (completed) {
+                //DO Nothing
+            }
+            else {
+                if (failureException != null) {
+                    throw failureException;
+                }
+                throw new Exception("Failed to Send Message for Unknown Reason.");
+            }
+        }
+
+        public void SendAsync<T>(T obj, object state, Action<IMessageSentResult<T>> resultCallBack) {
+            SendAsync<T>(obj, state, resultCallBack, configuration.DefaultSerializer.Create());
+        }
+
+        public void SendAsync<T>(T obj, object state, Action<IMessageSentResult<T>> resultCallBack, IDictionary<string, object> metadata) {
+            SendAsync<T>(obj, state, resultCallBack, configuration.DefaultSerializer.Create(), metadata);
+        }
+
+        public void SendAsync<T>(T obj, object state, Action<IMessageSentResult<T>> resultCallBack, IServiceBusSerializer serializer = null, IDictionary<string, object> metadata = null) {
+            Guard.ArgumentNotNull(obj, "obj");
+            Guard.ArgumentNotNull(resultCallBack, "resultCallBack");
+
+            serializer = serializer ?? configuration.DefaultSerializer.Create();
+
+            Exception failureException = null;
             BrokeredMessage message = null;
+            var sw = new Stopwatch();
+            sw.Start();
 
             // Use a retry policy to execute the Send action in an asynchronous and reliable fashion.
             retryPolicy.ExecuteAction
@@ -86,7 +130,12 @@ namespace ProjectExtensions.Azure.ServiceBus {
                             serializer.Dispose();
                             serializer = null;
                         }
-                        waitObject.Set();
+                        sw.Stop();
+                        resultCallBack(new MessageSentResult<T>() {
+                            IsSuccess = true,
+                            State = state,
+                            TimeSpent = sw.Elapsed
+                        });
                     }
                 },
                 (ex) => {
@@ -104,24 +153,11 @@ namespace ProjectExtensions.Azure.ServiceBus {
                     logger.Error<Exception>("Send failed {0}", ex);
                 }
             );
-
-            // Wait until the messaging operations are completed.
-            bool completed = waitObject.WaitOne(sentTimeout);
-            waitObject.Dispose();
-
-            if (completed) {
-                //DO Nothing
-            }
-            else {
-                if (failureException != null) {
-                    throw failureException;
-                }
-                throw new Exception("Failed to Send Message for Unknown Reason.");
-            }
         }
 
         public override void Dispose(bool disposing) {
             Close();
         }
+
     }
 }
