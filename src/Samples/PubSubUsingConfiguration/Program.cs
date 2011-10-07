@@ -9,6 +9,7 @@ using NLog.Config;
 using NLog.Targets;
 using NLog;
 using System.Diagnostics;
+using System.Transactions;
 
 namespace PubSubUsingConfiguration {
 
@@ -33,6 +34,23 @@ namespace PubSubUsingConfiguration {
                 //.ServiceBusNamespace("[addresshere]")
                 .RegisterAssembly(typeof(TestMessageSubscriber).Assembly)
                 .Configure();
+
+            //put 4 messages in a transaction
+            using (var scope = new TransactionScope()) {
+                for (int i = 0; i < 4; i++) {
+                    var sw = new Stopwatch();
+                    sw.Start();
+                    var message1 = new TestMessage() {
+                        Value = 1000 + i,
+                        MessageId = DateTime.Now.ToString()
+                    };
+                    BusConfiguration.Instance.Bus.Publish(message1, null);
+                    sw.Stop();
+                    Debug.WriteLine("sync:" + sw.Elapsed);
+                    Console.WriteLine("sync:" + sw.Elapsed);
+                }
+                scope.Complete();
+            }
 
             for (int i = 0; i < 20; i++) {
                 var sw = new Stopwatch();
