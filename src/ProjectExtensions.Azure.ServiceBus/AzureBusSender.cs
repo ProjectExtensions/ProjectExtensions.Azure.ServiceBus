@@ -54,7 +54,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
             Exception failureException = null;
 
-            SendAsync<T>(obj, (result) => {
+            SendAsync<T>(obj, null, (result) => {
                 waitObject.Set();
                 failureException = result.ThrownException;
             });
@@ -74,15 +74,15 @@ namespace ProjectExtensions.Azure.ServiceBus {
             }
         }
 
-        public void SendAsync<T>(T obj, Action<IMessageSentResult<T>> resultCallBack) {
-            SendAsync<T>(obj, resultCallBack, configuration.DefaultSerializer.Create());
+        public void SendAsync<T>(T obj, object state, Action<IMessageSentResult<T>> resultCallBack) {
+            SendAsync<T>(obj, state, resultCallBack, configuration.DefaultSerializer.Create());
         }
 
-        public void SendAsync<T>(T obj, Action<IMessageSentResult<T>> resultCallBack, IDictionary<string, object> metadata) {
-            SendAsync<T>(obj, resultCallBack, configuration.DefaultSerializer.Create(), metadata);
+        public void SendAsync<T>(T obj, object state, Action<IMessageSentResult<T>> resultCallBack, IDictionary<string, object> metadata) {
+            SendAsync<T>(obj, state, resultCallBack, configuration.DefaultSerializer.Create(), metadata);
         }
 
-        public void SendAsync<T>(T obj, Action<IMessageSentResult<T>> resultCallBack, IServiceBusSerializer serializer = null, IDictionary<string, object> metadata = null) {
+        public void SendAsync<T>(T obj, object state, Action<IMessageSentResult<T>> resultCallBack, IServiceBusSerializer serializer = null, IDictionary<string, object> metadata = null) {
             Guard.ArgumentNotNull(obj, "obj");
             Guard.ArgumentNotNull(resultCallBack, "resultCallBack");
 
@@ -133,7 +133,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                         sw.Stop();
                         resultCallBack(new MessageSentResult<T>() {
                             IsSuccess = true,
-                            Message = obj,
+                            State = state,
                             TimeSpent = sw.Elapsed
                         });
                     }

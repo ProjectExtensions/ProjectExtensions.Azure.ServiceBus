@@ -46,10 +46,10 @@ namespace PubSubUsingConfiguration {
                 //}, null);
                 BusConfiguration.Instance.Bus.Publish(message1, null);
                 sw.Stop();
-                Debug.WriteLine("sync:" +  sw.Elapsed);
+                Debug.WriteLine("sync:" + sw.Elapsed);
                 Console.WriteLine("sync:" + sw.Elapsed);
             }
-            
+
             for (int i = 0; i < 20; i++) {
                 var message2 = new AnotherTestMessage() {
                     Value = 2 + i,

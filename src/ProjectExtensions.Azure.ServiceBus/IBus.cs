@@ -22,8 +22,15 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="message">The message to publish.</param>
+        void Publish<T>(T message);
+
+        /// <summary>
+        /// Publish a Message with the given signature.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="message">The message to publish.</param>
         /// <param name="metadata">Metadata to sent with the message.</param>
-        void Publish<T>(T message, IDictionary<string, object> metadata);
+        void Publish<T>(T message, IDictionary<string, object> metadata = null);
 
         /// <summary>
         /// Publish a Message with the given signature.
@@ -32,7 +39,17 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <param name="message">The message to publish.</param>
         /// <param name="resultCallBack">The callback when the message is complete</param>
         /// <param name="metadata">Metadata to sent with the message.</param>
-        void PublishAsync<T>(T message, Action<IMessageSentResult<T>> resultCallBack, IDictionary<string, object> metadata);
+        void PublishAsync<T>(T message, Action<IMessageSentResult<T>> resultCallBack, IDictionary<string, object> metadata = null);
+
+        /// <summary>
+        /// Publish a Message with the given signature.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="message">The message to publish.</param>
+        /// <param name="state">State object that is returned to the user</param>
+        /// <param name="resultCallBack">The callback when the message is complete</param>
+        /// <param name="metadata">Metadata to sent with the message.</param>
+        void PublishAsync<T>(T message, object state, Action<IMessageSentResult<T>> resultCallBack, IDictionary<string, object> metadata = null);
 
         /// <summary>
         /// Subscribes to recieve published messages of type T.

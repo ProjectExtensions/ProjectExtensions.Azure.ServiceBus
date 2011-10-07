@@ -8,10 +8,10 @@ namespace ProjectExtensions.Azure.ServiceBus {
         void Close();
         void Dispose(bool disposing);
         void Send<T>(T obj);
-        void Send<T>(T obj, IDictionary<string, object> metadata);
-        void Send<T>(T obj, IServiceBusSerializer serializer, IDictionary<string, object> metadata);
-        void SendAsync<T>(T obj, Action<IMessageSentResult<T>> resultCallBack);
-        void SendAsync<T>(T obj, Action<IMessageSentResult<T>> resultCallBack, IDictionary<string, object> metadata);
-        void SendAsync<T>(T obj, Action<IMessageSentResult<T>> resultCallBack, IServiceBusSerializer serializer = null, IDictionary<string, object> metadata = null);
+        void Send<T>(T obj, IDictionary<string, object> metadata = null);
+        void Send<T>(T obj, IServiceBusSerializer serializer = null, IDictionary<string, object> metadata = null);
+        void SendAsync<T>(T obj, object state, Action<IMessageSentResult<T>> resultCallBack);
+        void SendAsync<T>(T obj, object state, Action<IMessageSentResult<T>> resultCallBack, IDictionary<string, object> metadata = null);
+        void SendAsync<T>(T obj, object state, Action<IMessageSentResult<T>> resultCallBack, IServiceBusSerializer serializer = null, IDictionary<string, object> metadata = null);
     }
 }

@@ -57,7 +57,17 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <typeparam name="T"></typeparam>
         /// <param name="message">The message to publish.</param>
         /// <param name="metadata">Metadata to sent with the message.</param>
-        public void Publish<T>(T message, IDictionary<string, object> metadata) {
+        public void Publish<T>(T message) {
+            sender.Send<T>(message, default(IDictionary<string, object>));
+        }
+
+        /// <summary>
+        /// Publish a Message with the given signature.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="message">The message to publish.</param>
+        /// <param name="metadata">Metadata to sent with the message.</param>
+        public void Publish<T>(T message, IDictionary<string, object> metadata = null) {
             Guard.ArgumentNotNull(message, "message");
             logger.Info("Publish={0}", message.GetType().FullName);
             sender.Send<T>(message, metadata);
@@ -71,10 +81,22 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <param name="resultCallBack">The callback when the operation completes</param>
         /// <param name="metadata">Metadata to sent with the message.</param>
         public void PublishAsync<T>(T message, Action<IMessageSentResult<T>> resultCallBack, IDictionary<string, object> metadata) {
+            sender.SendAsync<T>(message, null, resultCallBack, metadata);
+        }
+
+        /// <summary>
+        /// Publish a Message with the given signature.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="message">The message to publish.</param>
+        /// <param name="state">State object that is returned to the user</param>
+        /// <param name="resultCallBack">The callback when the operation completes</param>
+        /// <param name="metadata">Metadata to sent with the message.</param>
+        public void PublishAsync<T>(T message, object state, Action<IMessageSentResult<T>> resultCallBack, IDictionary<string, object> metadata) {
             Guard.ArgumentNotNull(message, "message");
             Guard.ArgumentNotNull(resultCallBack, "resultCallBack");
             logger.Info("PublishAsync={0}", message.GetType().FullName);
-            sender.SendAsync<T>(message, resultCallBack, metadata);
+            sender.SendAsync<T>(message, state, resultCallBack, metadata);
         }
 
         /// <summary>

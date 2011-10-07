@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace ProjectExtensions.Azure.ServiceBus {
-    
+
     /// <summary>
     /// Result of a call to SendAsyc on the message bus
     /// </summary>
@@ -25,7 +25,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
             set;
         }
 
-        public T Message {
+        public object State {
             get;
             set;
         }

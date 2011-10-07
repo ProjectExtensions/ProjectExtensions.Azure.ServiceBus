@@ -14,7 +14,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
             get;
             set;
         }
-        T Message {
+        object State {
             get;
             set;
         }
