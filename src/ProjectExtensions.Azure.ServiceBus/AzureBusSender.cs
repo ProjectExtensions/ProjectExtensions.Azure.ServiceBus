@@ -20,6 +20,8 @@ namespace ProjectExtensions.Azure.ServiceBus {
         static Logger logger = LogManager.GetCurrentClassLogger();
         TopicClient client;
 
+        object lockObject = new object();
+
         public AzureBusSender(BusConfiguration configuration)
             : base(configuration) {
             Guard.ArgumentNotNull(configuration, "configuration");
@@ -45,10 +47,12 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
         public void Send<T>(T obj, IServiceBusSerializer serializer = null, IDictionary<string, object> metadata = null) {
             Guard.ArgumentNotNull(obj, "obj");
-
-            serializer = serializer ?? configuration.DefaultSerializer.Create();
-            var helper = new SenderHelper<T>(client, retryPolicy, logger, obj, null, null, serializer, metadata);
-            helper.Send();
+            //messages get dropped with multi threads otherwise.
+            lock (lockObject) {
+                serializer = serializer ?? configuration.DefaultSerializer.Create();
+                var helper = new SenderHelper<T>(client, retryPolicy, logger, obj, null, null, serializer, metadata);
+                helper.Send();
+            }
         }
 
         public void SendAsync<T>(T obj, object state, Action<IMessageSentResult<T>> resultCallBack) {
