@@ -122,6 +122,14 @@ namespace ProjectExtensions.Azure.ServiceBus {
             set;
         }
 
+        /// <summary>
+        /// Is the message handler a singleton or instance member?
+        /// </summary>
+        public bool Singleton {
+            get;
+            set;
+        }
+
         public bool DefaultMessageTimeToLiveSet() {
             return defaultMessageTimeToLiveSet;
         }

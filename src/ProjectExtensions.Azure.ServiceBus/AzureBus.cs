@@ -198,8 +198,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                     DeclaredType = type,
                     MessageType = implementedMessageType,
                     SubscriptionName = fullName,
-                    ServiceType = foundInterface,
-                    IsReusable = (type.GetCustomAttributes(typeof(SingletonMessageHandlerAttribute), false).Count() > 0)
+                    ServiceType = foundInterface
                 };
 
                 if (!BusConfiguration.Container.IsRegistered(type)) {

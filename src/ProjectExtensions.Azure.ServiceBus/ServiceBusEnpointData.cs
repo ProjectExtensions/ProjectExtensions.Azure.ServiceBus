@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace ProjectExtensions.Azure.ServiceBus {
-    
+
     class ServiceBusEnpointData {
 
         /// <summary>
@@ -37,8 +37,9 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// If true, it is a singleton
         /// </summary>
         public bool IsReusable {
-            get;
-            set;
+            get {
+                return AttributeData != null && AttributeData.Singleton;
+            }
         }
 
         /// <summary>
@@ -47,6 +48,6 @@ namespace ProjectExtensions.Azure.ServiceBus {
         public Type MessageType {
             get;
             set;
-        }       
+        }
     }
 }

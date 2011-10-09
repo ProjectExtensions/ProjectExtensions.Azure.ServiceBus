@@ -14,8 +14,8 @@ namespace PubSubUsingConfiguration {
         LockDuration = 120, 
         MaxRetries = 2, 
         PrefetchCount = 20, 
-        ReceiveMode = ReceiveMode.PeekLock)]
-    [SingletonMessageHandler]
+        ReceiveMode = ReceiveMode.PeekLock, 
+        Singleton=true)]
     public class AnotherTestMessageSubscriber : IHandleCompetingMessages<AnotherTestMessage> {
 
         static Logger logger = LogManager.GetCurrentClassLogger();
