@@ -360,6 +360,9 @@ namespace ProjectExtensions.Azure.ServiceBus {
                         logger.Info("ProcessMessage invoke callback message start Type={0} message={1} Thread={2} MessageId={3}", objectTypeName, state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
 
                         var handler = BusConfiguration.Container.Resolve(state.Data.EndPointData.DeclaredType);
+
+                        logger.Info("ProcessMessage reflection callback message start MethodInfo Type={0} Declared={1} handler={2} MethodInfo={3} Thread={4} MessageId={5}", objectTypeName, state.Data.EndPointData.DeclaredType, handler.GetType().FullName, state.MethodInfo.Name, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
+
                         state.MethodInfo.Invoke(handler, new object[] { receivedMessage, values });
                         logger.Info("ProcessMessage invoke callback message end Type={0} message={1} Thread={2} MessageId={3}", objectTypeName, state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
                     }
