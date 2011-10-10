@@ -116,7 +116,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                             }
                         }
 
-                        logger.Debug("Send Type={0} Serializer={1} MessageId={2}", obj.GetType().FullName, serializer.GetType().FullName, message.MessageId);
+                        logger.Debug("sendAction BeginSend Type={0} Serializer={1} MessageId={2}", obj.GetType().FullName, serializer.GetType().FullName, message.MessageId);
 
                         // Send the event asynchronously.
                         client.BeginSend(message, cb, null);
@@ -124,7 +124,9 @@ namespace ProjectExtensions.Azure.ServiceBus {
                     (ar) => {
                         try {
                             // Complete the asynchronous operation. This may throw an exception that will be handled internally by the retry policy.
+                            logger.Debug("sendAction EndSend Begin Type={0} Serializer={1} MessageId={2}", obj.GetType().FullName, serializer.GetType().FullName, message.MessageId);
                             client.EndSend(ar);
+                            logger.Debug("sendAction EndSend End Type={0} Serializer={1} MessageId={2}", obj.GetType().FullName, serializer.GetType().FullName, message.MessageId);
                         }
                         catch (Exception ex) {
                             failureException = ex;
