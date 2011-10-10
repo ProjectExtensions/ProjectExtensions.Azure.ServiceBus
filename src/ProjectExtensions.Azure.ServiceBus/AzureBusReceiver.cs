@@ -325,6 +325,8 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 logger.Info("ProcessMessage Start received new message={0} Thread={1} MessageId={2}",
                     state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
 
+                string objectTypeName = string.Empty;
+
                 try {
 
                     IDictionary<string, object> values = new Dictionary<string, object>();
@@ -347,15 +349,17 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
                         object receivedMessage = Activator.CreateInstance(gt, new object[] { state.Message, msg });
 
-                        logger.Info("ProcessMessage invoke callback message start message={0} Thread={1} MessageId={2}", state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
+                        objectTypeName = receivedMessage.GetType().FullName;
+
+                        logger.Info("ProcessMessage invoke callback message start Type={0} message={1} Thread={2} MessageId={3}", objectTypeName, state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
 
                         var handler = BusConfiguration.Container.Resolve(state.Data.EndPointData.DeclaredType);
                         state.MethodInfo.Invoke(handler, new object[] { receivedMessage, values });
-                        logger.Info("ProcessMessage invoke callback message end message={0} Thread={1} MessageId={2}", state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
+                        logger.Info("ProcessMessage invoke callback message end Type={0} message={1} Thread={2} MessageId={3}", objectTypeName, state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
                     }
                 }
                 catch (Exception ex) {
-                    logger.Log(LogLevel.Error, "ProcessMessage invoke callback message failed message={0} Thread={1} MessageId={2} Exception={3}", state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId, ex.ToString());
+                    logger.Log(LogLevel.Error, "ProcessMessage invoke callback message failed Type={0} message={1} Thread={2} MessageId={3} Exception={4}", objectTypeName, state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId, ex.ToString());
 
                     //TODO remove hard code dead letter value
                     if (state.Message.DeliveryCount == 5) {
