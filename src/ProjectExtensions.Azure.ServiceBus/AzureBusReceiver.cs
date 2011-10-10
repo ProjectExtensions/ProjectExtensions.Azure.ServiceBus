@@ -21,7 +21,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
         object lockObject = new object();
 
-        List<AzureBusReceiverState> mappings = new List<AzureBusReceiverState>();
+        List<AzureReceiverHelper> mappings = new List<AzureReceiverHelper>();
 
         public AzureBusReceiver(BusConfiguration configuration)
             : base(configuration) {
@@ -117,13 +117,13 @@ namespace ProjectExtensions.Azure.ServiceBus {
                     EndPointData = value,
                     Subscription = desc
                 };
-                mappings.Add(state);
+
 
                 var helper = new AzureReceiverHelper(retryPolicy, state);
+                mappings.Add(helper);
                 helper.ProcessMessagesForSubscription();
 
             } //lock end
-
 
         }
 
@@ -132,20 +132,20 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
             logger.Info("CancelSubscription {0} Declared {1} MessageTytpe {2}, IsReusable {3}", value.SubscriptionName, value.DeclaredType.ToString(), value.MessageType.ToString(), value.IsReusable);
 
-            var subscription = mappings.FirstOrDefault(item => item.EndPointData.SubscriptionName.Equals(value.SubscriptionName, StringComparison.OrdinalIgnoreCase));
+            var subscription = mappings.FirstOrDefault(item => item.Data.EndPointData.SubscriptionName.Equals(value.SubscriptionName, StringComparison.OrdinalIgnoreCase));
 
             if (subscription == null) {
                 logger.Info("CancelSubscription Does not exist {0}", value.SubscriptionName);
                 return;
             }
 
-            subscription.Cancel();
+            subscription.Data.Cancel();
 
             Task t = Task.Factory.StartNew(() => {
                 //HACK find better way to wait for a cancel request so we are not blocking.
                 logger.Info("CancelSubscription Deleting {0}", value.SubscriptionName);
                 for (int i = 0; i < 100; i++) {
-                    if (!subscription.Cancelled) {
+                    if (!subscription.Data.Cancelled) {
                         Thread.Sleep(1000);
                     }
                     else {
@@ -165,11 +165,11 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
         public override void Dispose(bool disposing) {
             foreach (var item in mappings) {
-                item.Client.Close();
+                item.Data.Client.Close();
                 if (item is IDisposable) {
                     (item as IDisposable).Dispose();
                 }
-                item.Client = null;
+                item.Data.Client = null;
             }
             mappings.Clear();
         }
@@ -178,6 +178,12 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
             RetryPolicy retryPolicy;
             AzureBusReceiverState data;
+
+            public AzureBusReceiverState Data {
+                get {
+                    return data;
+                }
+            }
 
             public AzureReceiverHelper(RetryPolicy retryPolicy, AzureBusReceiverState data) {
                 this.retryPolicy = retryPolicy;
