@@ -221,6 +221,8 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
                 var client = data.Client;
 
+                bool messageReceived = false;
+
                 // Declare an action responsible for the core operations in the message receive loop.
                 Action receiveMessage = (() => {
                     // Use a retry policy to execute the Receive action in an asynchronous and reliable fashion.
@@ -231,6 +233,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                             client.BeginReceive(waitTimeout, cb, null);
                         },
                         (ar) => {
+                            messageReceived = false;
                             // Make sure we are not told to stop receiving while we were waiting for a new message.
                             if (!data.CancelToken.IsCancellationRequested) {
                                 // Complete the asynchronous operation. This may throw an exception that will be handled internally by retry policy.
@@ -242,11 +245,11 @@ namespace ProjectExtensions.Azure.ServiceBus {
                                     if (!data.CancelToken.IsCancellationRequested) {
                                         try {
                                             // Process the received message.
-
-                                            logger.Info("ProcessMessagesForSubscription Start received new message: {0}", data.EndPointData.SubscriptionName);
+                                            messageReceived = true;
+                                            logger.Debug("ProcessMessagesForSubscription Start received new message: {0}", data.EndPointData.SubscriptionName);
                                             var receiveState = new AzureReceiveState(data, methodInfo, serializer, msg);
                                             processMessage(receiveState);
-                                            logger.Info("ProcessMessagesForSubscription End received new message: {0}", data.EndPointData.SubscriptionName);
+                                            logger.Debug("ProcessMessagesForSubscription End received new message: {0}", data.EndPointData.SubscriptionName);
 
                                             // With PeekLock mode, we should mark the processed message as completed.
                                             if (client.Mode == ReceiveMode.PeekLock) {
@@ -297,8 +300,10 @@ namespace ProjectExtensions.Azure.ServiceBus {
                     }
                     data.Cancelled = true;
 
-                    logger.Info("ProcessMessagesForSubscription Message Complete={0} Declared={1} MessageTytpe={2} IsReusable={3}", data.EndPointData.SubscriptionName,
-                        data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
+                    if (messageReceived) {
+                        logger.Debug("ProcessMessagesForSubscription Message Complete={0} Declared={1} MessageTytpe={2} IsReusable={3}", data.EndPointData.SubscriptionName,
+                            data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
+                    }
                 });
 
                 // Initialize a custom action acting as a callback whenever a non-transient exception occurs while receiving or processing messages.
@@ -317,9 +322,10 @@ namespace ProjectExtensions.Azure.ServiceBus {
                         receiveMessage();
                     }
                     data.Cancelled = true;
-
-                    logger.Info("ProcessMessagesForSubscription Message Complete={0} Declared={1} MessageTytpe={2} IsReusable={3}", data.EndPointData.SubscriptionName,
-                        data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
+                    if (messageReceived) {
+                        logger.Debug("ProcessMessagesForSubscription Message Complete={0} Declared={1} MessageTytpe={2} IsReusable={3}", data.EndPointData.SubscriptionName,
+                            data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
+                    }
                 });
 
                 // Start receiving messages asynchronously.
@@ -357,14 +363,14 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
                         objectTypeName = receivedMessage.GetType().FullName;
 
-                        logger.Info("ProcessMessage invoke callback message start Type={0} message={1} Thread={2} MessageId={3}", objectTypeName, state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
+                        logger.Debug("ProcessMessage invoke callback message start Type={0} message={1} Thread={2} MessageId={3}", objectTypeName, state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
 
                         var handler = BusConfiguration.Container.Resolve(state.Data.EndPointData.DeclaredType);
 
-                        logger.Info("ProcessMessage reflection callback message start MethodInfo Type={0} Declared={1} handler={2} MethodInfo={3} Thread={4} MessageId={5}", objectTypeName, state.Data.EndPointData.DeclaredType, handler.GetType().FullName, state.MethodInfo.Name, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
+                        logger.Debug("ProcessMessage reflection callback message start MethodInfo Type={0} Declared={1} handler={2} MethodInfo={3} Thread={4} MessageId={5}", objectTypeName, state.Data.EndPointData.DeclaredType, handler.GetType().FullName, state.MethodInfo.Name, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
 
                         state.MethodInfo.Invoke(handler, new object[] { receivedMessage, values });
-                        logger.Info("ProcessMessage invoke callback message end Type={0} message={1} Thread={2} MessageId={3}", objectTypeName, state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
+                        logger.Debug("ProcessMessage invoke callback message end Type={0} message={1} Thread={2} MessageId={3}", objectTypeName, state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
                     }
                 }
                 catch (Exception ex) {
