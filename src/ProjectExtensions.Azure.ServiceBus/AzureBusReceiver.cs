@@ -19,6 +19,8 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
         static Logger logger = LogManager.GetCurrentClassLogger();
 
+        object lockObject = new object();
+
         List<AzureBusReceiverState> mappings = new List<AzureBusReceiverState>();
 
         public AzureBusReceiver(BusConfiguration configuration)
@@ -32,90 +34,97 @@ namespace ProjectExtensions.Azure.ServiceBus {
             //TODO determine how we can change the filters for an existing registered item
             //ServiceBusNamespaceClient
 
-            logger.Info("CreateSubscription {0} Declared {1} MessageTytpe {2}, IsReusable {3} Custom Attribute {4}",
-                value.SubscriptionName,
-                value.DeclaredType.ToString(),
-                value.MessageType.ToString(),
-                value.IsReusable,
-                value.AttributeData != null ? value.AttributeData.ToString() : string.Empty);
+            lock (lockObject) {
 
-            SubscriptionDescription desc = null;
+                logger.Info("CreateSubscription {0} Declared {1} MessageTytpe {2}, IsReusable {3} Custom Attribute {4}",
+                    value.SubscriptionName,
+                    value.DeclaredType.ToString(),
+                    value.MessageType.ToString(),
+                    value.IsReusable,
+                    value.AttributeData != null ? value.AttributeData.ToString() : string.Empty);
 
-            bool createNew = false;
+                SubscriptionDescription desc = null;
 
-            try {
-                logger.Info("CreateSubscription Try {0} ", value.SubscriptionName);
-                // First, let's see if a item with the specified name already exists.
-                retryPolicy.ExecuteAction(() => {
-                    desc = namespaceManager.GetSubscription(topic.Path, value.SubscriptionName);
-                });
+                bool createNew = false;
 
-                createNew = (topic == null);
-            }
-            catch (MessagingEntityNotFoundException) {
-                logger.Info("CreateSubscription Does Not Exist {0} ", value.SubscriptionName);
-                // Looks like the item does not exist. We should create a new one.
-                createNew = true;
-            }
-
-            // If a item with the specified name doesn't exist, it will be auto-created.
-            if (createNew) {
-                var descriptionToCreate = new SubscriptionDescription(topic.Path, value.SubscriptionName);
-
-                if (value.AttributeData != null) {
-                    var attr = value.AttributeData;
-                    if (attr.DefaultMessageTimeToLiveSet()) {
-                        descriptionToCreate.DefaultMessageTimeToLive = new TimeSpan(0, 0, attr.DefaultMessageTimeToLive);
-                    }
-                    descriptionToCreate.EnableBatchedOperations = attr.EnableBatchedOperations;
-                    descriptionToCreate.EnableDeadLetteringOnMessageExpiration = attr.EnableDeadLetteringOnMessageExpiration;
-                    if (attr.LockDurationSet()) {
-                        descriptionToCreate.LockDuration = new TimeSpan(0, 0, attr.LockDuration);
-                    }
-                    if (attr.MaxDeliveryCountSet()) {
-                        descriptionToCreate.MaxDeliveryCount = attr.MaxRetries;
-                    }
-                }
-                
                 try {
-                    logger.Info("CreateSubscription CreateTopic {0} ", value.SubscriptionName);
-                    var filter = new SqlFilter(string.Format(TYPE_HEADER_NAME + " = '{0}'", value.MessageType.FullName.Replace('.', '_')));
-                    retryPolicy.ExecuteAction(() => {
-                        desc = namespaceManager.CreateSubscription(descriptionToCreate, filter);
-                    });
-                }
-                catch (MessagingEntityAlreadyExistsException) {
-                    logger.Info("CreateSubscription GetTopic {0} ", value.SubscriptionName);
-                    // A item under the same name was already created by someone else, perhaps by another instance. Let's just use it.
+                    logger.Info("CreateSubscription Try {0} ", value.SubscriptionName);
+                    // First, let's see if a item with the specified name already exists.
                     retryPolicy.ExecuteAction(() => {
                         desc = namespaceManager.GetSubscription(topic.Path, value.SubscriptionName);
                     });
+
+                    createNew = (topic == null);
                 }
-            }
+                catch (MessagingEntityNotFoundException) {
+                    logger.Info("CreateSubscription Does Not Exist {0} ", value.SubscriptionName);
+                    // Looks like the item does not exist. We should create a new one.
+                    createNew = true;
+                }
 
-            SubscriptionClient subscriptionClient = null;
-            var rm = ReceiveMode.PeekLock;
+                // If a item with the specified name doesn't exist, it will be auto-created.
+                if (createNew) {
+                    var descriptionToCreate = new SubscriptionDescription(topic.Path, value.SubscriptionName);
 
-            if (value.AttributeData != null) {
-                rm = value.AttributeData.ReceiveMode;
-            }
+                    if (value.AttributeData != null) {
+                        var attr = value.AttributeData;
+                        if (attr.DefaultMessageTimeToLiveSet()) {
+                            descriptionToCreate.DefaultMessageTimeToLive = new TimeSpan(0, 0, attr.DefaultMessageTimeToLive);
+                        }
+                        descriptionToCreate.EnableBatchedOperations = attr.EnableBatchedOperations;
+                        descriptionToCreate.EnableDeadLetteringOnMessageExpiration = attr.EnableDeadLetteringOnMessageExpiration;
+                        if (attr.LockDurationSet()) {
+                            descriptionToCreate.LockDuration = new TimeSpan(0, 0, attr.LockDuration);
+                        }
+                        if (attr.MaxDeliveryCountSet()) {
+                            descriptionToCreate.MaxDeliveryCount = attr.MaxRetries;
+                        }
+                    }
 
-            retryPolicy.ExecuteAction(() => {
-                subscriptionClient = factory.CreateSubscriptionClient(topic.Path, value.SubscriptionName, rm);
-            });
+                    try {
+                        logger.Info("CreateSubscription CreateTopic {0} ", value.SubscriptionName);
+                        var filter = new SqlFilter(string.Format(TYPE_HEADER_NAME + " = '{0}'", value.MessageType.FullName.Replace('.', '_')));
+                        retryPolicy.ExecuteAction(() => {
+                            desc = namespaceManager.CreateSubscription(descriptionToCreate, filter);
+                        });
+                    }
+                    catch (MessagingEntityAlreadyExistsException) {
+                        logger.Info("CreateSubscription GetTopic {0} ", value.SubscriptionName);
+                        // A item under the same name was already created by someone else, perhaps by another instance. Let's just use it.
+                        retryPolicy.ExecuteAction(() => {
+                            desc = namespaceManager.GetSubscription(topic.Path, value.SubscriptionName);
+                        });
+                    }
+                }
 
-            if (value.AttributeData != null && value.AttributeData.PrefetchCountSet()) {
-                subscriptionClient.PrefetchCount = value.AttributeData.PrefetchCount;
-            }
+                SubscriptionClient subscriptionClient = null;
+                var rm = ReceiveMode.PeekLock;
 
-            var state = new AzureBusReceiverState() {
-                Client = subscriptionClient,
-                EndPointData = value,
-                Subscription = desc
-            };
-            mappings.Add(state);
+                if (value.AttributeData != null) {
+                    rm = value.AttributeData.ReceiveMode;
+                }
 
-            ProcessMessagesForSubscription(state);
+                retryPolicy.ExecuteAction(() => {
+                    subscriptionClient = factory.CreateSubscriptionClient(topic.Path, value.SubscriptionName, rm);
+                });
+
+                if (value.AttributeData != null && value.AttributeData.PrefetchCountSet()) {
+                    subscriptionClient.PrefetchCount = value.AttributeData.PrefetchCount;
+                }
+
+                var state = new AzureBusReceiverState() {
+                    Client = subscriptionClient,
+                    EndPointData = value,
+                    Subscription = desc
+                };
+                mappings.Add(state);
+
+                var helper = new AzureReceiverHelper(retryPolicy, state);
+                helper.ProcessMessagesForSubscription();
+
+            } //lock end
+
+
         }
 
         public void CancelSubscription(ServiceBusEnpointData value) {
@@ -165,229 +174,241 @@ namespace ProjectExtensions.Azure.ServiceBus {
             mappings.Clear();
         }
 
-        void ProcessMessagesForSubscription(AzureBusReceiverState data) {
-            Guard.ArgumentNotNull(data, "data");
+        private class AzureReceiverHelper {
 
-            logger.Info("ProcessMessagesForSubscription Message Start {0} Declared {1} MessageTytpe {2}, IsReusable {3}", data.EndPointData.SubscriptionName,
-                    data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
+            RetryPolicy retryPolicy;
+            AzureBusReceiverState data;
 
-            //TODO create a cache for object creation.
-            var gt = typeof(IReceivedMessage<>).MakeGenericType(data.EndPointData.MessageType);
+            public AzureReceiverHelper(RetryPolicy retryPolicy, AzureBusReceiverState data) {
+                this.retryPolicy = retryPolicy;
+                this.data = data;
+            }
 
-            //set up the methodinfo
-            var methodInfo = data.EndPointData.DeclaredType.GetMethod("Handle",
-                new Type[] { gt, typeof(IDictionary<string, object>) });
+            public void ProcessMessagesForSubscription() {
+                Guard.ArgumentNotNull(data, "data");
 
-            var serializer = BusConfiguration.Container.Resolve<IServiceBusSerializer>();
+                logger.Info("ProcessMessagesForSubscription Message Start {0} Declared {1} MessageTytpe {2}, IsReusable {3}", data.EndPointData.SubscriptionName,
+                        data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
 
-            var waitTimeout = TimeSpan.FromSeconds(30);
+                //TODO create a cache for object creation.
+                var gt = typeof(IReceivedMessage<>).MakeGenericType(data.EndPointData.MessageType);
 
-            // Declare an action acting as a callback whenever a message arrives on a queue.
-            AsyncCallback completeReceive = null;
+                //set up the methodinfo
+                var methodInfo = data.EndPointData.DeclaredType.GetMethod("Handle",
+                    new Type[] { gt, typeof(IDictionary<string, object>) });
 
-            // Declare an action acting as a callback whenever a non-transient exception occurs while receiving or processing messages.
-            Action<Exception> recoverReceive = null;
+                var serializer = BusConfiguration.Container.Resolve<IServiceBusSerializer>();
 
-            // Declare an action implementing the main processing logic for received messages.
-            Action<AzureReceiveState> processMessage = ((receiveState) => {
-                // Put your custom processing logic here. DO NOT swallow any exceptions.
-                ProcessMessageCallBack(receiveState);
-            });
+                var waitTimeout = TimeSpan.FromSeconds(30);
 
-            var client = data.Client;
+                // Declare an action acting as a callback whenever a message arrives on a queue.
+                AsyncCallback completeReceive = null;
 
-            // Declare an action responsible for the core operations in the message receive loop.
-            Action receiveMessage = (() => {
-                // Use a retry policy to execute the Receive action in an asynchronous and reliable fashion.
-                retryPolicy.ExecuteAction
-                (
-                    (cb) => {
-                        // Start receiving a new message asynchronously.
-                        client.BeginReceive(waitTimeout, cb, null);
-                    },
-                    (ar) => {
-                        // Make sure we are not told to stop receiving while we were waiting for a new message.
-                        if (!data.CancelToken.IsCancellationRequested) {
-                            // Complete the asynchronous operation. This may throw an exception that will be handled internally by retry policy.
-                            BrokeredMessage msg = client.EndReceive(ar);
+                // Declare an action acting as a callback whenever a non-transient exception occurs while receiving or processing messages.
+                Action<Exception> recoverReceive = null;
 
-                            // Check if we actually received any messages.
-                            if (msg != null) {
-                                // Make sure we are not told to stop receiving while we were waiting for a new message.
-                                if (!data.CancelToken.IsCancellationRequested) {
-                                    try {
-                                        // Process the received message.
+                // Declare an action implementing the main processing logic for received messages.
+                Action<AzureReceiveState> processMessage = ((receiveState) => {
+                    // Put your custom processing logic here. DO NOT swallow any exceptions.
+                    ProcessMessageCallBack(receiveState);
+                });
 
-                                        logger.Info("ProcessMessagesForSubscription Start received new message: {0}", data.EndPointData.SubscriptionName);
-                                        var receiveState = new AzureReceiveState(data, methodInfo, serializer, msg);
-                                        processMessage(receiveState);
-                                        logger.Info("ProcessMessagesForSubscription End received new message: {0}", data.EndPointData.SubscriptionName);
+                var client = data.Client;
 
-                                        // With PeekLock mode, we should mark the processed message as completed.
-                                        if (client.Mode == ReceiveMode.PeekLock) {
-                                            // Mark brokered message as completed at which point it's removed from the queue.
-                                            SafeComplete(msg);
+                // Declare an action responsible for the core operations in the message receive loop.
+                Action receiveMessage = (() => {
+                    // Use a retry policy to execute the Receive action in an asynchronous and reliable fashion.
+                    retryPolicy.ExecuteAction
+                    (
+                        (cb) => {
+                            // Start receiving a new message asynchronously.
+                            client.BeginReceive(waitTimeout, cb, null);
+                        },
+                        (ar) => {
+                            // Make sure we are not told to stop receiving while we were waiting for a new message.
+                            if (!data.CancelToken.IsCancellationRequested) {
+                                // Complete the asynchronous operation. This may throw an exception that will be handled internally by retry policy.
+                                BrokeredMessage msg = client.EndReceive(ar);
+
+                                // Check if we actually received any messages.
+                                if (msg != null) {
+                                    // Make sure we are not told to stop receiving while we were waiting for a new message.
+                                    if (!data.CancelToken.IsCancellationRequested) {
+                                        try {
+                                            // Process the received message.
+
+                                            logger.Info("ProcessMessagesForSubscription Start received new message: {0}", data.EndPointData.SubscriptionName);
+                                            var receiveState = new AzureReceiveState(data, methodInfo, serializer, msg);
+                                            processMessage(receiveState);
+                                            logger.Info("ProcessMessagesForSubscription End received new message: {0}", data.EndPointData.SubscriptionName);
+
+                                            // With PeekLock mode, we should mark the processed message as completed.
+                                            if (client.Mode == ReceiveMode.PeekLock) {
+                                                // Mark brokered message as completed at which point it's removed from the queue.
+                                                SafeComplete(msg);
+                                            }
+                                        }
+                                        catch {
+                                            // With PeekLock mode, we should mark the failed message as abandoned.
+                                            if (client.Mode == ReceiveMode.PeekLock) {
+                                                // Abandons a brokered message. This will cause Service Bus to unlock the message and make it available 
+                                                // to be received again, either by the same consumer or by another completing consumer.
+                                                SafeAbandon(msg);
+                                            }
+
+                                            // Re-throw the exception so that we can report it in the fault handler.
+                                            throw;
+                                        }
+                                        finally {
+                                            // Ensure that any resources allocated by a BrokeredMessage instance are released.
+                                            msg.Dispose();
                                         }
                                     }
-                                    catch {
-                                        // With PeekLock mode, we should mark the failed message as abandoned.
+                                    else {
+                                        // If we were told to stop processing, the current message needs to be unlocked and return back to the queue.
                                         if (client.Mode == ReceiveMode.PeekLock) {
-                                            // Abandons a brokered message. This will cause Service Bus to unlock the message and make it available 
-                                            // to be received again, either by the same consumer or by another completing consumer.
                                             SafeAbandon(msg);
                                         }
-
-                                        // Re-throw the exception so that we can report it in the fault handler.
-                                        throw;
-                                    }
-                                    finally {
-                                        // Ensure that any resources allocated by a BrokeredMessage instance are released.
-                                        msg.Dispose();
-                                    }
-                                }
-                                else {
-                                    // If we were told to stop processing, the current message needs to be unlocked and return back to the queue.
-                                    if (client.Mode == ReceiveMode.PeekLock) {
-                                        SafeAbandon(msg);
                                     }
                                 }
                             }
-                        }
 
-                        // Invoke a custom callback method to indicate that we have completed an iteration in the message receive loop.
-                        completeReceive(ar);
-                    },
-                    (ex) => {
-                        // Invoke a custom action to indicate that we have encountered an exception and
-                        // need further decision as to whether to continue receiving messages.
-                        recoverReceive(ex);
-                    });
-            });
+                            // Invoke a custom callback method to indicate that we have completed an iteration in the message receive loop.
+                            completeReceive(ar);
+                        },
+                        (ex) => {
+                            // Invoke a custom action to indicate that we have encountered an exception and
+                            // need further decision as to whether to continue receiving messages.
+                            recoverReceive(ex);
+                        });
+                });
 
-            // Initialize a custom action acting as a callback whenever a message arrives on a queue.
-            completeReceive = ((ar) => {
-                if (!data.CancelToken.IsCancellationRequested) {
-                    // Continue receiving and processing new messages until we are told to stop.
-                    receiveMessage();
-                }
-                data.Cancelled = true;
+                // Initialize a custom action acting as a callback whenever a message arrives on a queue.
+                completeReceive = ((ar) => {
+                    if (!data.CancelToken.IsCancellationRequested) {
+                        // Continue receiving and processing new messages until we are told to stop.
+                        receiveMessage();
+                    }
+                    data.Cancelled = true;
 
-                logger.Info("ProcessMessagesForSubscription Message Complete={0} Declared={1} MessageTytpe={2} IsReusable={3}", data.EndPointData.SubscriptionName,
-                    data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
-            });
+                    logger.Info("ProcessMessagesForSubscription Message Complete={0} Declared={1} MessageTytpe={2} IsReusable={3}", data.EndPointData.SubscriptionName,
+                        data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
+                });
 
-            // Initialize a custom action acting as a callback whenever a non-transient exception occurs while receiving or processing messages.
-            recoverReceive = ((ex) => {
-                // Just log an exception. Do not allow an unhandled exception to terminate the message receive loop abnormally.
+                // Initialize a custom action acting as a callback whenever a non-transient exception occurs while receiving or processing messages.
+                recoverReceive = ((ex) => {
+                    // Just log an exception. Do not allow an unhandled exception to terminate the message receive loop abnormally.
 
-                logger.Error(string.Format("ProcessMessagesForSubscription Message Error={0} Declared={1} MessageTytpe={2} IsReusable={3} Error={4}",
-                    data.EndPointData.SubscriptionName,
-                    data.EndPointData.DeclaredType.ToString(),
-                    data.EndPointData.MessageType.ToString(),
-                    data.EndPointData.IsReusable,
-                    ex.ToString()));
+                    logger.Error(string.Format("ProcessMessagesForSubscription Message Error={0} Declared={1} MessageTytpe={2} IsReusable={3} Error={4}",
+                        data.EndPointData.SubscriptionName,
+                        data.EndPointData.DeclaredType.ToString(),
+                        data.EndPointData.MessageType.ToString(),
+                        data.EndPointData.IsReusable,
+                        ex.ToString()));
 
-                if (!data.CancelToken.IsCancellationRequested) {
-                    // Continue receiving and processing new messages until we are told to stop regardless of any exceptions.
-                    receiveMessage();
-                }
-                data.Cancelled = true;
+                    if (!data.CancelToken.IsCancellationRequested) {
+                        // Continue receiving and processing new messages until we are told to stop regardless of any exceptions.
+                        receiveMessage();
+                    }
+                    data.Cancelled = true;
 
-                logger.Info("ProcessMessagesForSubscription Message Complete={0} Declared={1} MessageTytpe={2} IsReusable={3}", data.EndPointData.SubscriptionName,
-                    data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
-            });
+                    logger.Info("ProcessMessagesForSubscription Message Complete={0} Declared={1} MessageTytpe={2} IsReusable={3}", data.EndPointData.SubscriptionName,
+                        data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
+                });
 
-            // Start receiving messages asynchronously.
-            receiveMessage();
-        }
+                // Start receiving messages asynchronously.
+                receiveMessage();
+            }
 
-        void ProcessMessageCallBack(AzureReceiveState state) {
-            Guard.ArgumentNotNull(state, "state");
-            logger.Info("ProcessMessage Start received new message={0} Thread={1} MessageId={2}",
-                state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
+            void ProcessMessageCallBack(AzureReceiveState state) {
+                Guard.ArgumentNotNull(state, "state");
+                logger.Info("ProcessMessage Start received new message={0} Thread={1} MessageId={2}",
+                    state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
 
-            try {
+                try {
 
-                IDictionary<string, object> values = new Dictionary<string, object>();
+                    IDictionary<string, object> values = new Dictionary<string, object>();
 
-                if (state.Message.Properties != null) {
-                    foreach (var item in state.Message.Properties) {
-                        if (item.Key != AzureSenderReceiverBase.TYPE_HEADER_NAME) {
-                            values.Add(item);
+                    if (state.Message.Properties != null) {
+                        foreach (var item in state.Message.Properties) {
+                            if (item.Key != AzureSenderReceiverBase.TYPE_HEADER_NAME) {
+                                values.Add(item);
+                            }
                         }
                     }
+
+                    using (var serial = state.CreateSerializer()) {
+                        var stream = state.Message.GetBody<Stream>();
+                        stream.Position = 0;
+                        object msg = serial.Deserialize(stream, state.Data.EndPointData.MessageType);
+
+                        //TODO create a cache for object creation.
+                        var gt = typeof(ReceivedMessage<>).MakeGenericType(state.Data.EndPointData.MessageType);
+
+                        object receivedMessage = Activator.CreateInstance(gt, new object[] { state.Message, msg });
+
+                        logger.Info("ProcessMessage invoke callback message start message={0} Thread={1} MessageId={2}", state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
+
+                        var handler = BusConfiguration.Container.Resolve(state.Data.EndPointData.DeclaredType);
+                        state.MethodInfo.Invoke(handler, new object[] { receivedMessage, values });
+                        logger.Info("ProcessMessage invoke callback message end message={0} Thread={1} MessageId={2}", state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
+                    }
+                }
+                catch (Exception ex) {
+                    logger.Log(LogLevel.Error, "ProcessMessage invoke callback message failed message={0} Thread={1} MessageId={2} Exception={3}", state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId, ex.ToString());
+
+                    //TODO remove hard code dead letter value
+                    if (state.Message.DeliveryCount == 5) {
+                        retryPolicy.ExecuteAction(() => state.Message.DeadLetter(ex.ToString(), "Died"));
+                    }
+                    throw;
                 }
 
-                using (var serial = state.CreateSerializer()) {
-                    var stream = state.Message.GetBody<Stream>();
-                    stream.Position = 0;
-                    object msg = serial.Deserialize(stream, state.Data.EndPointData.MessageType);
+                logger.Info("ProcessMessage End received new message={0} Thread={1} MessageId={2}",
+                    state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
+            }
 
-                    //TODO create a cache for object creation.
-                    var gt = typeof(ReceivedMessage<>).MakeGenericType(state.Data.EndPointData.MessageType);
+            static bool SafeComplete(BrokeredMessage msg) {
+                try {
+                    // Mark brokered message as complete.
+                    msg.Complete();
 
-                    object receivedMessage = Activator.CreateInstance(gt, new object[] { state.Message, msg });
-
-                    logger.Info("ProcessMessage invoke callback message start message={0} Thread={1} MessageId={2}", state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
-
-                    var handler = BusConfiguration.Container.Resolve(state.Data.EndPointData.DeclaredType);
-                    state.MethodInfo.Invoke(handler, new object[] { receivedMessage, values });
-                    logger.Info("ProcessMessage invoke callback message end message={0} Thread={1} MessageId={2}", state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
+                    // Return a result indicating that the message has been completed successfully.
+                    return true;
                 }
-            }
-            catch (Exception ex) {
-                logger.Log(LogLevel.Error, "ProcessMessage invoke callback message failed message={0} Thread={1} MessageId={2} Exception={3}", state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId, ex.ToString());
-
-                //TODO remove hard code dead letter value
-                if (state.Message.DeliveryCount == 5) {
-                    retryPolicy.ExecuteAction(() => state.Message.DeadLetter(ex.ToString(), "Died"));
+                catch (MessageLockLostException) {
+                    // It's too late to compensate the loss of a message lock. We should just ignore it so that it does not break the receive loop.
+                    // We should be prepared to receive the same message again.
                 }
-                throw;
+                catch (MessagingException) {
+                    // There is nothing we can do as the connection may have been lost, or the underlying topic/subscription may have been removed.
+                    // If Complete() fails with this exception, the only recourse is to prepare to receive another message (possibly the same one).
+                }
+
+                return false;
             }
 
-            logger.Info("ProcessMessage End received new message={0} Thread={1} MessageId={2}",
-                state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
-        }
+            static bool SafeAbandon(BrokeredMessage msg) {
+                try {
+                    // Abandons a brokered message. This will cause the Service Bus to unlock the message and make it available to be received again, 
+                    // either by the same consumer or by another competing consumer.
+                    msg.Abandon();
 
-        static bool SafeComplete(BrokeredMessage msg) {
-            try {
-                // Mark brokered message as complete.
-                msg.Complete();
+                    // Return a result indicating that the message has been abandoned successfully.
+                    return true;
+                }
+                catch (MessageLockLostException) {
+                    // It's too late to compensate the loss of a message lock. We should just ignore it so that it does not break the receive loop.
+                    // We should be prepared to receive the same message again.
+                }
+                catch (MessagingException) {
+                    // There is nothing we can do as the connection may have been lost, or the underlying topic/subscription may have been removed.
+                    // If Abandon() fails with this exception, the only recourse is to receive another message (possibly the same one).
+                }
 
-                // Return a result indicating that the message has been completed successfully.
-                return true;
-            }
-            catch (MessageLockLostException) {
-                // It's too late to compensate the loss of a message lock. We should just ignore it so that it does not break the receive loop.
-                // We should be prepared to receive the same message again.
-            }
-            catch (MessagingException) {
-                // There is nothing we can do as the connection may have been lost, or the underlying topic/subscription may have been removed.
-                // If Complete() fails with this exception, the only recourse is to prepare to receive another message (possibly the same one).
-            }
-
-            return false;
-        }
-
-        static bool SafeAbandon(BrokeredMessage msg) {
-            try {
-                // Abandons a brokered message. This will cause the Service Bus to unlock the message and make it available to be received again, 
-                // either by the same consumer or by another competing consumer.
-                msg.Abandon();
-
-                // Return a result indicating that the message has been abandoned successfully.
-                return true;
-            }
-            catch (MessageLockLostException) {
-                // It's too late to compensate the loss of a message lock. We should just ignore it so that it does not break the receive loop.
-                // We should be prepared to receive the same message again.
-            }
-            catch (MessagingException) {
-                // There is nothing we can do as the connection may have been lost, or the underlying topic/subscription may have been removed.
-                // If Abandon() fails with this exception, the only recourse is to receive another message (possibly the same one).
+                return false;
             }
 
-            return false;
         }
 
         private class AzureReceiveState {
