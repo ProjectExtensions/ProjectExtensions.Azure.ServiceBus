@@ -3,7 +3,7 @@
   <metadata>
     <id>ProjectExtensions.Azure.ServiceBus</id>
     <title>Azure AppFabric ServiceBus IHandleMessage&lt;T&gt; wrapper by Project Extensions</title>
-    <version>0.7.2.0</version>
+    <version>0.7.4.0</version>
     <authors>Project Extensions, Joe Feser</authors>
     <owners>Project Extensions, Joe Feser</owners>
     <copyright>Copyright (C) Project Extensions and Joe Feser 2011</copyright>

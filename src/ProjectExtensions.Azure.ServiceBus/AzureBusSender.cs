@@ -113,13 +113,73 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 var sentTimeout = TimeSpan.FromMinutes(2);
 
                 Exception failureException = null;
+                BrokeredMessage message = null;
+                var sw = new Stopwatch();
+                sw.Start();
 
-                this.resultCallBack = (result) => {
-                    waitObject.Set();
-                    failureException = result.ThrownException;
-                };
+                // Use a retry policy to execute the Send action in an asynchronous and reliable fashion.
+                retryPolicy.ExecuteAction
+                (
+                    (cb) => {
+                        // A new BrokeredMessage instance must be created each time we send it. Reusing the original BrokeredMessage instance may not 
+                        // work as the state of its BodyStream cannot be guaranteed to be readable from the beginning.
+                        message = new BrokeredMessage(serializer.Serialize(obj), false);
 
-                SendAsync();
+                        message.MessageId = Guid.NewGuid().ToString();
+                        message.Properties.Add(TYPE_HEADER_NAME, obj.GetType().FullName.Replace('.', '_'));
+
+                        if (metadata != null) {
+                            foreach (var item in metadata) {
+                                message.Properties.Add(item.Key, item.Value);
+                            }
+                        }
+
+                        logger.Info("Send Type={0} Serializer={1} MessageId={2}", obj.GetType().FullName, serializer.GetType().FullName, message.MessageId);
+
+                        // Send the event asynchronously.
+                        client.BeginSend(message, cb, null);
+                    },
+                    (ar) => {
+                        try {
+                            // Complete the asynchronous operation. This may throw an exception that will be handled internally by the retry policy.
+                            client.EndSend(ar);
+                        }
+                        catch (Exception ex) {
+                            failureException = ex;
+                        }
+                        finally {
+                            // Ensure that any resources allocated by a BrokeredMessage instance are released.
+                            if (message != null) {
+                                message.Dispose();
+                                message = null;
+                            }
+                            if (serializer != null) {
+                                serializer.Dispose();
+                                serializer = null;
+                            }
+                            sw.Stop();
+                            waitObject.Set();
+                        }
+                    },
+                    (ex) => {
+                        // Always dispose the BrokeredMessage instance even if the send operation has completed unsuccessfully.
+                        if (message != null) {
+                            message.Dispose();
+                            message = null;
+                        }
+                        if (serializer != null) {
+                            serializer.Dispose();
+                            serializer = null;
+                        }
+                        failureException = ex;
+
+                        // Always log exceptions.
+                        logger.Error<Exception>("Send failed {0}", ex);
+
+                        sw.Stop();
+                        waitObject.Set();
+                    }
+                );
 
                 // Wait until the messaging operations are completed.
                 bool completed = waitObject.WaitOne(sentTimeout);
