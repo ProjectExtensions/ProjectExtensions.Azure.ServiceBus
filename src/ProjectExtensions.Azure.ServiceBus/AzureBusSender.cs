@@ -47,12 +47,16 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
         public void Send<T>(T obj, IServiceBusSerializer serializer = null, IDictionary<string, object> metadata = null) {
             Guard.ArgumentNotNull(obj, "obj");
+            logger.Debug("Send start Type={0} Thread={1}", obj.GetType().FullName, System.Threading.Thread.CurrentThread.ManagedThreadId);
             //messages get dropped with multi threads otherwise.
             lock (lockObject) {
+                logger.Debug("Send lockObject start Type={0} Thread={1}", obj.GetType().FullName, System.Threading.Thread.CurrentThread.ManagedThreadId);
                 serializer = serializer ?? configuration.DefaultSerializer.Create();
                 var helper = new SenderHelper<T>(client, retryPolicy, logger, obj, null, null, serializer, metadata);
                 helper.Send();
+                logger.Debug("Send lockObject end Type={0} Thread={1}", obj.GetType().FullName, System.Threading.Thread.CurrentThread.ManagedThreadId);
             }
+            logger.Debug("Send end Type={0} Thread={1}", obj.GetType().FullName, System.Threading.Thread.CurrentThread.ManagedThreadId);
         }
 
         public void SendAsync<T>(T obj, object state, Action<IMessageSentResult<T>> resultCallBack) {
@@ -106,6 +110,8 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
             public void Send() {
 
+                logger.Debug("SenderHelper Send Start Type={0} Serializer={1} Thread={2}", obj.GetType().FullName, serializer.GetType().FullName, System.Threading.Thread.CurrentThread.ManagedThreadId);
+
                 // Declare a wait object that will be used for synchronization.
                 var waitObject = new ManualResetEvent(false);
 
@@ -117,6 +123,8 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 var sw = new Stopwatch();
                 sw.Start();
 
+                string messageId = string.Empty;
+
                 // Use a retry policy to execute the Send action in an asynchronous and reliable fashion.
                 retryPolicy.ExecuteAction
                 (
@@ -124,7 +132,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                         // A new BrokeredMessage instance must be created each time we send it. Reusing the original BrokeredMessage instance may not 
                         // work as the state of its BodyStream cannot be guaranteed to be readable from the beginning.
                         message = new BrokeredMessage(serializer.Serialize(obj), false);
-
+                        messageId = message.MessageId;
                         message.MessageId = Guid.NewGuid().ToString();
                         message.Properties.Add(TYPE_HEADER_NAME, obj.GetType().FullName.Replace('.', '_'));
 
@@ -134,7 +142,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                             }
                         }
 
-                        logger.Info("Send Type={0} Serializer={1} MessageId={2}", obj.GetType().FullName, serializer.GetType().FullName, message.MessageId);
+                        logger.Debug("SenderHelper BeginSend Type={0} Serializer={1} MessageId={2} Thread={3}", obj.GetType().FullName, serializer.GetType().FullName, message.MessageId, System.Threading.Thread.CurrentThread.ManagedThreadId);
 
                         // Send the event asynchronously.
                         client.BeginSend(message, cb, null);
@@ -142,7 +150,10 @@ namespace ProjectExtensions.Azure.ServiceBus {
                     (ar) => {
                         try {
                             // Complete the asynchronous operation. This may throw an exception that will be handled internally by the retry policy.
+                            logger.Debug("SenderHelper EndSend Start Type={0} Serializer={1} MessageId={2} Thread={3}", obj.GetType().FullName, serializer.GetType().FullName, message.MessageId, System.Threading.Thread.CurrentThread.ManagedThreadId);
                             client.EndSend(ar);
+                            logger.Debug("SenderHelper EndSend End Type={0} Serializer={1} MessageId={2} Thread={3}", obj.GetType().FullName, serializer.GetType().FullName, message.MessageId, System.Threading.Thread.CurrentThread.ManagedThreadId);
+
                         }
                         catch (Exception ex) {
                             failureException = ex;
@@ -158,6 +169,8 @@ namespace ProjectExtensions.Azure.ServiceBus {
                                 serializer = null;
                             }
                             sw.Stop();
+                            // Complete the asynchronous operation. This may throw an exception that will be handled internally by the retry policy.
+                            logger.Debug("SenderHelper waitObject.Set() Type={0} MessageId={1} Thread={2}", obj.GetType().FullName, messageId, System.Threading.Thread.CurrentThread.ManagedThreadId);
                             waitObject.Set();
                         }
                     },
@@ -181,9 +194,13 @@ namespace ProjectExtensions.Azure.ServiceBus {
                     }
                 );
 
+                logger.Debug("SenderHelper Send WaitOne Before Type={0} MessageId={1} Thread={2}", obj.GetType().FullName, messageId, System.Threading.Thread.CurrentThread.ManagedThreadId);
+
                 // Wait until the messaging operations are completed.
                 bool completed = waitObject.WaitOne(sentTimeout);
                 waitObject.Dispose();
+
+                logger.Debug("SenderHelper Send WaitOne After Type={0} MessageId={1} Thread={2}", obj.GetType().FullName, messageId, System.Threading.Thread.CurrentThread.ManagedThreadId);
 
                 if (failureException != null) {
                     throw failureException;
@@ -196,6 +213,8 @@ namespace ProjectExtensions.Azure.ServiceBus {
             }
 
             public void SendAsync() {
+
+                logger.Debug("SenderHelper SendAsync Start Type={0} Serializer={1} Thread={2}", obj.GetType().FullName, serializer.GetType().FullName, System.Threading.Thread.CurrentThread.ManagedThreadId);
 
                 Guard.ArgumentNotNull(resultCallBack, "resultCallBack");
 
@@ -222,7 +241,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                             }
                         }
 
-                        logger.Info("Send Type={0} Serializer={1} MessageId={2}", obj.GetType().FullName, serializer.GetType().FullName, message.MessageId);
+                        logger.Debug("SenderHelper BeginSend Type={0} Serializer={1} MessageId={2} Thread={3}", obj.GetType().FullName, serializer.GetType().FullName, message.MessageId, System.Threading.Thread.CurrentThread.ManagedThreadId);
 
                         // Send the event asynchronously.
                         client.BeginSend(message, cb, null);
@@ -230,7 +249,9 @@ namespace ProjectExtensions.Azure.ServiceBus {
                     (ar) => {
                         try {
                             // Complete the asynchronous operation. This may throw an exception that will be handled internally by the retry policy.
+                            logger.Debug("SenderHelper EndSend Start Type={0} Serializer={1} MessageId={2} Thread={3}", obj.GetType().FullName, serializer.GetType().FullName, message.MessageId, System.Threading.Thread.CurrentThread.ManagedThreadId);
                             client.EndSend(ar);
+                            logger.Debug("SenderHelper EndSend End Type={0} Serializer={1} MessageId={2} Thread={3}", obj.GetType().FullName, serializer.GetType().FullName, message.MessageId, System.Threading.Thread.CurrentThread.ManagedThreadId);
                         }
                         catch (Exception ex) {
                             failureException = ex;
@@ -248,12 +269,15 @@ namespace ProjectExtensions.Azure.ServiceBus {
                             sw.Stop();
                             if (!resultSent) {
                                 resultSent = true;
+                                logger.Debug("SenderHelper resultCallBack start Type={0} Serializer={1} MessageId={2} Thread={3}", obj.GetType().FullName, serializer.GetType().FullName, message.MessageId, System.Threading.Thread.CurrentThread.ManagedThreadId);
                                 ExtensionMethods.ExecuteAndReturn(() => resultCallBack(new MessageSentResult<T>() {
                                     IsSuccess = failureException == null,
                                     State = state,
                                     ThrownException = failureException,
                                     TimeSpent = sw.Elapsed
                                 }));
+                                logger.Debug("SenderHelper resultCallBack end Type={0} Serializer={1} MessageId={2} Thread={3}", obj.GetType().FullName, serializer.GetType().FullName, message.MessageId, System.Threading.Thread.CurrentThread.ManagedThreadId);
+
                             }
                         }
                     },
@@ -275,12 +299,14 @@ namespace ProjectExtensions.Azure.ServiceBus {
                         sw.Stop();
                         if (!resultSent) {
                             resultSent = true;
+                            logger.Debug("SenderHelper failed resultCallBack start Type={0} Serializer={1} MessageId={2} Thread={3}", obj.GetType().FullName, serializer.GetType().FullName, message.MessageId, System.Threading.Thread.CurrentThread.ManagedThreadId);
                             ExtensionMethods.ExecuteAndReturn(() => resultCallBack(new MessageSentResult<T>() {
                                 IsSuccess = failureException == null,
                                 State = state,
                                 ThrownException = failureException,
                                 TimeSpent = sw.Elapsed
                             }));
+                            logger.Debug("SenderHelper failed resultCallBack end Type={0} Serializer={1} MessageId={2} Thread={3}", obj.GetType().FullName, serializer.GetType().FullName, message.MessageId, System.Threading.Thread.CurrentThread.ManagedThreadId);
                         }
                     }
                 );
