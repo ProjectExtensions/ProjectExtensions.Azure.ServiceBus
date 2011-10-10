@@ -114,26 +114,15 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
                 logger.Debug("SenderHelper Send Start Type={0} Serializer={1} Thread={2}", obj.GetType().FullName, serializerType, System.Threading.Thread.CurrentThread.ManagedThreadId);
 
-                // Declare a wait object that will be used for synchronization.
-                var waitObject = new ManualResetEvent(false);
-
-                // Declare a timeout value during which the messages are expected to be sent.
-                var sentTimeout = TimeSpan.FromMinutes(2);
-
-                Exception failureException = null;
-                BrokeredMessage message = null;
                 var sw = new Stopwatch();
                 sw.Start();
 
                 string messageId = string.Empty;
 
-                // Use a retry policy to execute the Send action in an asynchronous and reliable fashion.
-                retryPolicy.ExecuteAction
-                (
-                    (cb) => {
-                        // A new BrokeredMessage instance must be created each time we send it. Reusing the original BrokeredMessage instance may not 
-                        // work as the state of its BodyStream cannot be guaranteed to be readable from the beginning.
-                        message = new BrokeredMessage(serializer.Serialize(obj), false);
+                // A new BrokeredMessage instance must be created each time we send it. Reusing the original BrokeredMessage instance may not 
+                // work as the state of its BodyStream cannot be guaranteed to be readable from the beginning.
+                using (var localSerializer = serializer) {
+                    using (var message = new BrokeredMessage(serializer.Serialize(obj), false)) {
                         message.MessageId = Guid.NewGuid().ToString();
                         messageId = message.MessageId;
                         message.Properties.Add(TYPE_HEADER_NAME, obj.GetType().FullName.Replace('.', '_'));
@@ -144,74 +133,16 @@ namespace ProjectExtensions.Azure.ServiceBus {
                             }
                         }
 
-                        logger.Debug("SenderHelper BeginSend Type={0} Serializer={1} MessageId={2} Thread={3}", obj.GetType().FullName, serializerType, messageId, System.Threading.Thread.CurrentThread.ManagedThreadId);
+                        logger.Debug("SenderHelper Send Start Type={0} Serializer={1} MessageId={2} Thread={3}", obj.GetType().FullName, serializerType, messageId, System.Threading.Thread.CurrentThread.ManagedThreadId);
 
-                        // Send the event asynchronously.
-                        client.BeginSend(message, cb, null);
-                    },
-                    (ar) => {
-                        try {
-                            // Complete the asynchronous operation. This may throw an exception that will be handled internally by the retry policy.
-                            logger.Debug("SenderHelper EndSend Start Type={0} Serializer={1} MessageId={2} Thread={3}", obj.GetType().FullName, serializerType, messageId, System.Threading.Thread.CurrentThread.ManagedThreadId);
-                            client.EndSend(ar);
-                            logger.Debug("SenderHelper EndSend End Type={0} Serializer={1} MessageId={2} Thread={3}", obj.GetType().FullName, serializerType, messageId, System.Threading.Thread.CurrentThread.ManagedThreadId);
-
-                        }
-                        catch (Exception ex) {
-                            failureException = ex;
-                        }
-                        finally {
-                            // Ensure that any resources allocated by a BrokeredMessage instance are released.
-                            if (message != null) {
-                                message.Dispose();
-                                message = null;
-                            }
-                            if (serializer != null) {
-                                serializer.Dispose();
-                                serializer = null;
-                            }
-                            sw.Stop();
-                            // Complete the asynchronous operation. This may throw an exception that will be handled internally by the retry policy.
-                            logger.Debug("SenderHelper waitObject.Set() Type={0} MessageId={1} Thread={2}", obj.GetType().FullName, messageId, System.Threading.Thread.CurrentThread.ManagedThreadId);
-                            waitObject.Set();
-                        }
-                    },
-                    (ex) => {
-                        // Always dispose the BrokeredMessage instance even if the send operation has completed unsuccessfully.
-                        if (message != null) {
-                            message.Dispose();
-                            message = null;
-                        }
-                        if (serializer != null) {
-                            serializer.Dispose();
-                            serializer = null;
-                        }
-                        failureException = ex;
-
-                        // Always log exceptions.
-                        logger.Error<Exception>("Send failed {0}", ex);
+                        retryPolicy.ExecuteAction(() => {
+                            client.Send(message);
+                        });
 
                         sw.Stop();
-                        waitObject.Set();
+                        logger.Debug("SenderHelper Send End Type={0} Serializer={1} MessageId={2} Thread={3}", obj.GetType().FullName, serializerType, messageId, System.Threading.Thread.CurrentThread.ManagedThreadId);
                     }
-                );
-
-                logger.Debug("SenderHelper Send WaitOne Before Type={0} MessageId={1} Thread={2}", obj.GetType().FullName, messageId, System.Threading.Thread.CurrentThread.ManagedThreadId);
-
-                // Wait until the messaging operations are completed.
-                bool completed = waitObject.WaitOne(sentTimeout);
-                waitObject.Dispose();
-
-                logger.Debug("SenderHelper Send WaitOne After Type={0} MessageId={1} Thread={2}", obj.GetType().FullName, messageId, System.Threading.Thread.CurrentThread.ManagedThreadId);
-
-                if (failureException != null) {
-                    throw failureException;
                 }
-
-                if (!completed) {
-                    throw new Exception("Failed to Send Message. Reason was timeout.");
-                }
-
             }
 
             public void SendAsync() {
