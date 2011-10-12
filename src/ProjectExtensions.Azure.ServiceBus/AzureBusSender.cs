@@ -18,7 +18,6 @@ namespace ProjectExtensions.Azure.ServiceBus {
     /// </summary>
     class AzureBusSender : AzureSenderReceiverBase, IAzureBusSender {
         static Logger logger = LogManager.GetCurrentClassLogger();
-        static object lockObject = new object();
         TopicClient client;
 
         public AzureBusSender(BusConfiguration configuration)
@@ -47,31 +46,29 @@ namespace ProjectExtensions.Azure.ServiceBus {
         public void Send<T>(T obj, IServiceBusSerializer serializer = null, IDictionary<string, object> metadata = null) {
             Guard.ArgumentNotNull(obj, "obj");
 
-            lock (lockObject) {
-                // Declare a wait object that will be used for synchronization.
-                var waitObject = new ManualResetEvent(false);
+            // Declare a wait object that will be used for synchronization.
+            var waitObject = new ManualResetEvent(false);
 
-                // Declare a timeout value during which the messages are expected to be sent.
-                var sentTimeout = TimeSpan.FromSeconds(30);
+            // Declare a timeout value during which the messages are expected to be sent.
+            var sentTimeout = TimeSpan.FromSeconds(30);
 
-                Exception failureException = null;
+            Exception failureException = null;
 
-                SendAsync<T>(obj, null, (result) => {
-                    waitObject.Set();
-                    failureException = result.ThrownException;
-                });
+            SendAsync<T>(obj, null, (result) => {
+                waitObject.Set();
+                failureException = result.ThrownException;
+            });
 
-                // Wait until the messaging operations are completed.
-                bool completed = waitObject.WaitOne(sentTimeout);
-                waitObject.Dispose();
+            // Wait until the messaging operations are completed.
+            bool completed = waitObject.WaitOne(sentTimeout);
+            waitObject.Dispose();
 
-                if (failureException != null) {
-                    throw failureException;
-                }
+            if (failureException != null) {
+                throw failureException;
+            }
 
-                if (!completed) {
-                    throw new Exception("Failed to Send Message. Reason was timeout.");
-                }
+            if (!completed) {
+                throw new Exception("Failed to Send Message. Reason was timeout.");
             }
         }
 
