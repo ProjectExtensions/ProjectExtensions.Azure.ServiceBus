@@ -22,6 +22,7 @@ namespace Microsoft.AzureCAT.Samples.TransientFaultHandling.ServiceBus
 
     using Microsoft.ServiceBus;
     using Microsoft.ServiceBus.Messaging;
+    using System.Text.RegularExpressions;
     #endregion
 
     /// <summary>
@@ -29,6 +30,11 @@ namespace Microsoft.AzureCAT.Samples.TransientFaultHandling.ServiceBus
     /// </summary>
     public class ServiceBusTransientErrorDetectionStrategy : ITransientErrorDetectionStrategy
     {
+        /// <summary>
+        /// Provides a compiled regular expression used for extracting the error code from the message.
+        /// </summary>
+        private static readonly Regex acsErrorCodeRegEx = new Regex(@"Error:Code:(\d+):SubCode:(\w\d+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
         /// <summary>
         /// Determines whether the specified exception represents a transient failure that can be compensated by a retry.
         /// </summary>
@@ -103,7 +109,26 @@ namespace Microsoft.AzureCAT.Samples.TransientFaultHandling.ServiceBus
             }
             else if (ex is UnauthorizedAccessException)
             {
-                return ex.GetInnerException<TimeoutException>() != null;
+                // There might be a timeout exception masked by UnauthorizedAccessException.
+                if(ex.GetInnerException<TimeoutException>() !=null)
+                {
+                   return true;
+                }
+
+                // Need to provide some resilience against the following fault that was seen a few times:
+                // System.UnauthorizedAccessException: The token provider was unable to provide a security token while accessing 'https://mysbns-sb.accesscontrol.windows.net/WRAPv0.9/'.
+                // Token provider returned message: 'Error:Code:500:SubCode:T9002:Detail:An internal network error occured. Please try again.'. 
+                // System.IdentityModel.Tokens.SecurityTokenException: The token provider was unable to provide a security token while accessing 'https://mysbns-sb.accesscontrol.windows.net/WRAPv0.9/'.
+                // Token provider returned message: 'Error:Code:500:SubCode:T9002:Detail:An internal network error occured. Please try again.'. 
+                // System.Net.WebException: The remote server returned an error: (500) Internal Server Error.
+
+                var match = acsErrorCodeRegEx.Match(ex.Message);
+                var errorCode = 0;
+
+                if (match.Success && match.Groups.Count > 1 && Int32.TryParse(match.Groups[1].Value, out errorCode))
+                {
+                   return errorCode == (int)HttpStatusCode.InternalServerError;
+                }
             }
 
             return false;

@@ -44,7 +44,16 @@ namespace ProjectExtensions.Azure.ServiceBus {
             }
 
             serviceUri = ServiceBusEnvironment.CreateServiceUri("sb", configuration.ServiceBusNamespace, servicePath);
-            factory = MessagingFactory.Create(serviceUri, tokenProvider);
+
+            MessagingFactorySettings factorySettings = new MessagingFactorySettings() {
+                TokenProvider = tokenProvider,
+                OperationTimeout = TimeSpan.FromSeconds(10),
+                NetMessagingTransportSettings = new NetMessagingTransportSettings() { 
+                    BatchFlushInterval = TimeSpan.FromMilliseconds(100)
+                }
+            };
+
+            factory = MessagingFactory.Create(serviceUri, factorySettings);
             namespaceManager = new NamespaceManager(serviceUri, tokenProvider);
             EnsureTopic(configuration.TopicName);
         }
