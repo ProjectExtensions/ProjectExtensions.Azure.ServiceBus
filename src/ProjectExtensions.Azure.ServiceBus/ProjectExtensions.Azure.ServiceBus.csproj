@@ -58,6 +58,7 @@
     <Reference Include="System.IdentityModel" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -96,7 +97,9 @@
     <Compile Include="Serialization\XmlServiceBusSerializer.cs" />
     <Compile Include="ServiceBusEnpointData.cs" />
     <Compile Include="SingletonMessageHandlerAttribute.cs" />
+    <Compile Include="AnonymousDisposable.cs" />
     <Compile Include="TransientFaultHandling\AzureStorage\StorageTransientErrorDetectionStrategy.cs" />
+    <Compile Include="CloudEnvironment.cs" />
     <Compile Include="TransientFaultHandling\Configuration\ApplicationConfiguration.cs" />
     <Compile Include="TransientFaultHandling\Configuration\RetryPolicyCollection.cs" />
     <Compile Include="TransientFaultHandling\Configuration\RetryPolicyConfigurationSettings.cs" />

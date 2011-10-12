@@ -143,15 +143,18 @@ namespace ProjectExtensions.Azure.ServiceBus {
         }
 
         void Configure() {
-            //set up the server first.
-            sender = BusConfiguration.Container.Resolve<IAzureBusSender>(new TypedParameter(typeof(BusConfiguration), config));
-            receiver = BusConfiguration.Container.Resolve<IAzureBusReceiver>(new TypedParameter(typeof(BusConfiguration), config));
+            //this fixes a bug in .net 4 that will be fixed in sp1
+            using (CloudEnvironment.EnsureSafeHttpContext()) {
+                //set up the server first.
+                sender = BusConfiguration.Container.Resolve<IAzureBusSender>(new TypedParameter(typeof(BusConfiguration), config));
+                receiver = BusConfiguration.Container.Resolve<IAzureBusReceiver>(new TypedParameter(typeof(BusConfiguration), config));
 
-            foreach (var item in config.RegisteredAssemblies) {
-                RegisterAssembly(item);
-            }
-            foreach (var item in config.RegisteredSubscribers) {
-                Subscribe(item);
+                foreach (var item in config.RegisteredAssemblies) {
+                    RegisterAssembly(item);
+                }
+                foreach (var item in config.RegisteredSubscribers) {
+                    Subscribe(item);
+                }
             }
         }
 

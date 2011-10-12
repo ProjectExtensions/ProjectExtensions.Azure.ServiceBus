@@ -15,8 +15,8 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: ComVisible(false)]
-[assembly: AssemblyVersion("0.7.4.0")]
-[assembly: AssemblyFileVersion("0.7.4.0")]
+[assembly: AssemblyVersion("0.7.5.0")]
+[assembly: AssemblyFileVersion("0.7.5.0")]
 [assembly: AssemblyCopyright("Copyright (C) Project Extensions 2011")]
 [assembly: AssemblyConfiguration("Debug")]
 [assembly: AssemblyCompany("Project Extensions")]
