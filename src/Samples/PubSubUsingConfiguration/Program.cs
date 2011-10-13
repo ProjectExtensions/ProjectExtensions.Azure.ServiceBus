@@ -99,8 +99,8 @@ namespace PubSubUsingConfiguration {
             fileTarget.FileName = "${basedir}/file.txt";
 
             // Step 3. Set target properties 
-            consoleTarget.Layout = "${date:format=HH\\:MM\\:ss} ${logger} ${message}";
-            fileTarget.Layout = "${date:format=HH\\:MM\\:ss} ${message}";
+            consoleTarget.Layout = "${date:format=HH\\:mm\\:ss} ${logger} ${message}";
+            fileTarget.Layout = "${date:format=HH\\:mm\\:ss} ${message}";
 
             // Step 4. Define rules
             LoggingRule rule = new LoggingRule("*", LogLevel.Debug, consoleTarget);
