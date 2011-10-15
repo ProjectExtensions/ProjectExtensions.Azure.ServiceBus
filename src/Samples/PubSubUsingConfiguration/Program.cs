@@ -66,10 +66,10 @@ namespace PubSubUsingConfiguration {
                             Time = DateTime.Now,
                             MessageId = client.ToString()
                         };
-                        //BusConfiguration.Instance.Bus.PublishAsync(message1, (result) => {
-                        //    Console.WriteLine(result.TimeSpent);
-                        //}, null);
-                        BusConfiguration.Instance.Bus.Publish(message1, null);
+                        BusConfiguration.Instance.Bus.PublishAsync(message1, (result) => {
+                            Console.WriteLine(result.TimeSpent);
+                        }, null);
+                        //BusConfiguration.Instance.Bus.Publish(message1, null);
                     }
                 };
                 taskFactory.StartNew(action);
