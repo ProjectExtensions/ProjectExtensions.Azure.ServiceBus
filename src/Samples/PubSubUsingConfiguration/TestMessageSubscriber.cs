@@ -21,10 +21,10 @@ namespace PubSubUsingConfiguration {
                 MessageId = message.Message.MessageId,
                 Value = message.Message.Value
             };
-            //BusConfiguration.Instance.Bus.PublishAsync(message1, (result) => {
-            //    Console.WriteLine(result.TimeSpent);
-            //}, null);
-            BusConfiguration.Instance.Bus.Publish(newMessage, null);
+            BusConfiguration.Instance.Bus.PublishAsync(newMessage, (result) => {
+                Console.WriteLine(result.TimeSpent);
+            }, null);
+            //BusConfiguration.Instance.Bus.Publish(newMessage, null);
         }
     }
 }
