@@ -179,6 +179,8 @@ namespace ProjectExtensions.Azure.ServiceBus {
             RetryPolicy retryPolicy;
             AzureBusReceiverState data;
 
+            int failCounter = 0;
+
             public AzureBusReceiverState Data {
                 get {
                     return data;
@@ -191,150 +193,163 @@ namespace ProjectExtensions.Azure.ServiceBus {
             }
 
             public void ProcessMessagesForSubscription() {
-                Guard.ArgumentNotNull(data, "data");
 
-                logger.Info("ProcessMessagesForSubscription Message Start {0} Declared {1} MessageTytpe {2}, IsReusable {3}", data.EndPointData.SubscriptionName,
-                        data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
+                try {
 
-                //TODO create a cache for object creation.
-                var gt = typeof(IReceivedMessage<>).MakeGenericType(data.EndPointData.MessageType);
+                    Guard.ArgumentNotNull(data, "data");
 
-                //set up the methodinfo
-                var methodInfo = data.EndPointData.DeclaredType.GetMethod("Handle",
-                    new Type[] { gt, typeof(IDictionary<string, object>) });
+                    logger.Info("ProcessMessagesForSubscription Message Start {0} Declared {1} MessageTytpe {2}, IsReusable {3}", data.EndPointData.SubscriptionName,
+                            data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
 
-                var serializer = BusConfiguration.Container.Resolve<IServiceBusSerializer>();
+                    //TODO create a cache for object creation.
+                    var gt = typeof(IReceivedMessage<>).MakeGenericType(data.EndPointData.MessageType);
 
-                var waitTimeout = TimeSpan.FromSeconds(30);
+                    //set up the methodinfo
+                    var methodInfo = data.EndPointData.DeclaredType.GetMethod("Handle",
+                        new Type[] { gt, typeof(IDictionary<string, object>) });
 
-                // Declare an action acting as a callback whenever a message arrives on a queue.
-                AsyncCallback completeReceive = null;
+                    var serializer = BusConfiguration.Container.Resolve<IServiceBusSerializer>();
 
-                // Declare an action acting as a callback whenever a non-transient exception occurs while receiving or processing messages.
-                Action<Exception> recoverReceive = null;
+                    var waitTimeout = TimeSpan.FromSeconds(30);
 
-                // Declare an action implementing the main processing logic for received messages.
-                Action<AzureReceiveState> processMessage = ((receiveState) => {
-                    // Put your custom processing logic here. DO NOT swallow any exceptions.
-                    ProcessMessageCallBack(receiveState);
-                });
+                    // Declare an action acting as a callback whenever a message arrives on a queue.
+                    AsyncCallback completeReceive = null;
 
-                var client = data.Client;
+                    // Declare an action acting as a callback whenever a non-transient exception occurs while receiving or processing messages.
+                    Action<Exception> recoverReceive = null;
 
-                bool messageReceived = false;
+                    // Declare an action implementing the main processing logic for received messages.
+                    Action<AzureReceiveState> processMessage = ((receiveState) => {
+                        // Put your custom processing logic here. DO NOT swallow any exceptions.
+                        ProcessMessageCallBack(receiveState);
+                    });
 
-                // Declare an action responsible for the core operations in the message receive loop.
-                Action receiveMessage = (() => {
-                    // Use a retry policy to execute the Receive action in an asynchronous and reliable fashion.
-                    retryPolicy.ExecuteAction
-                    (
-                        (cb) => {
-                            // Start receiving a new message asynchronously.
-                            client.BeginReceive(waitTimeout, cb, null);
-                        },
-                        (ar) => {
-                            messageReceived = false;
-                            // Make sure we are not told to stop receiving while we were waiting for a new message.
-                            if (!data.CancelToken.IsCancellationRequested) {
-                                // Complete the asynchronous operation. This may throw an exception that will be handled internally by retry policy.
-                                BrokeredMessage msg = client.EndReceive(ar);
+                    var client = data.Client;
 
-                                // Check if we actually received any messages.
-                                if (msg != null) {
-                                    // Make sure we are not told to stop receiving while we were waiting for a new message.
-                                    if (!data.CancelToken.IsCancellationRequested) {
-                                        try {
-                                            // Process the received message.
-                                            messageReceived = true;
-                                            logger.Debug("ProcessMessagesForSubscription Start received new message: {0}", data.EndPointData.SubscriptionName);
-                                            var receiveState = new AzureReceiveState(data, methodInfo, serializer, msg);
-                                            processMessage(receiveState);
-                                            logger.Debug("ProcessMessagesForSubscription End received new message: {0}", data.EndPointData.SubscriptionName);
+                    bool messageReceived = false;
 
-                                            // With PeekLock mode, we should mark the processed message as completed.
-                                            if (client.Mode == ReceiveMode.PeekLock) {
-                                                // Mark brokered message as completed at which point it's removed from the queue.
-                                                SafeComplete(msg);
+                    // Declare an action responsible for the core operations in the message receive loop.
+                    Action receiveMessage = (() => {
+                        // Use a retry policy to execute the Receive action in an asynchronous and reliable fashion.
+                        retryPolicy.ExecuteAction
+                        (
+                            (cb) => {
+                                // Start receiving a new message asynchronously.
+                                client.BeginReceive(waitTimeout, cb, null);
+                            },
+                            (ar) => {
+                                messageReceived = false;
+                                // Make sure we are not told to stop receiving while we were waiting for a new message.
+                                if (!data.CancelToken.IsCancellationRequested) {
+                                    // Complete the asynchronous operation. This may throw an exception that will be handled internally by retry policy.
+                                    BrokeredMessage msg = client.EndReceive(ar);
+
+                                    // Check if we actually received any messages.
+                                    if (msg != null) {
+                                        // Make sure we are not told to stop receiving while we were waiting for a new message.
+                                        if (!data.CancelToken.IsCancellationRequested) {
+                                            try {
+                                                // Process the received message.
+                                                messageReceived = true;
+                                                logger.Debug("ProcessMessagesForSubscription Start received new message: {0}", data.EndPointData.SubscriptionName);
+                                                var receiveState = new AzureReceiveState(data, methodInfo, serializer, msg);
+                                                processMessage(receiveState);
+                                                logger.Debug("ProcessMessagesForSubscription End received new message: {0}", data.EndPointData.SubscriptionName);
+
+                                                // With PeekLock mode, we should mark the processed message as completed.
+                                                if (client.Mode == ReceiveMode.PeekLock) {
+                                                    // Mark brokered message as completed at which point it's removed from the queue.
+                                                    SafeComplete(msg);
+                                                }
+                                            }
+                                            catch {
+                                                // With PeekLock mode, we should mark the failed message as abandoned.
+                                                if (client.Mode == ReceiveMode.PeekLock) {
+                                                    // Abandons a brokered message. This will cause Service Bus to unlock the message and make it available 
+                                                    // to be received again, either by the same consumer or by another completing consumer.
+                                                    SafeAbandon(msg);
+                                                }
+
+                                                // Re-throw the exception so that we can report it in the fault handler.
+                                                throw;
+                                            }
+                                            finally {
+                                                // Ensure that any resources allocated by a BrokeredMessage instance are released.
+                                                msg.Dispose();
                                             }
                                         }
-                                        catch {
-                                            // With PeekLock mode, we should mark the failed message as abandoned.
+                                        else {
+                                            // If we were told to stop processing, the current message needs to be unlocked and return back to the queue.
                                             if (client.Mode == ReceiveMode.PeekLock) {
-                                                // Abandons a brokered message. This will cause Service Bus to unlock the message and make it available 
-                                                // to be received again, either by the same consumer or by another completing consumer.
                                                 SafeAbandon(msg);
                                             }
-
-                                            // Re-throw the exception so that we can report it in the fault handler.
-                                            throw;
-                                        }
-                                        finally {
-                                            // Ensure that any resources allocated by a BrokeredMessage instance are released.
-                                            msg.Dispose();
-                                        }
-                                    }
-                                    else {
-                                        // If we were told to stop processing, the current message needs to be unlocked and return back to the queue.
-                                        if (client.Mode == ReceiveMode.PeekLock) {
-                                            SafeAbandon(msg);
                                         }
                                     }
                                 }
-                            }
 
-                            // Invoke a custom callback method to indicate that we have completed an iteration in the message receive loop.
-                            completeReceive(ar);
-                        },
-                        (ex) => {
-                            // Invoke a custom action to indicate that we have encountered an exception and
-                            // need further decision as to whether to continue receiving messages.
-                            recoverReceive(ex);
-                        });
-                });
+                                // Invoke a custom callback method to indicate that we have completed an iteration in the message receive loop.
+                                completeReceive(ar);
+                            },
+                            (ex) => {
+                                // Invoke a custom action to indicate that we have encountered an exception and
+                                // need further decision as to whether to continue receiving messages.
+                                recoverReceive(ex);
+                            });
+                    });
 
-                // Initialize a custom action acting as a callback whenever a message arrives on a queue.
-                completeReceive = ((ar) => {
-                    if (!data.CancelToken.IsCancellationRequested) {
-                        // Continue receiving and processing new messages until we are told to stop.
-                        receiveMessage();
+                    // Initialize a custom action acting as a callback whenever a message arrives on a queue.
+                    completeReceive = ((ar) => {
+                        if (!data.CancelToken.IsCancellationRequested) {
+                            // Continue receiving and processing new messages until we are told to stop.
+                            receiveMessage();
+                        }
+                        else {
+                            data.SetMessageLoopCompleted();
+                        }
+
+                        if (messageReceived) {
+                            logger.Debug("ProcessMessagesForSubscription Message Complete={0} Declared={1} MessageTytpe={2} IsReusable={3}", data.EndPointData.SubscriptionName,
+                                data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
+                        }
+                    });
+
+                    // Initialize a custom action acting as a callback whenever a non-transient exception occurs while receiving or processing messages.
+                    recoverReceive = ((ex) => {
+                        // Just log an exception. Do not allow an unhandled exception to terminate the message receive loop abnormally.
+
+                        logger.Error(string.Format("ProcessMessagesForSubscription Message Error={0} Declared={1} MessageTytpe={2} IsReusable={3} Error={4}",
+                            data.EndPointData.SubscriptionName,
+                            data.EndPointData.DeclaredType.ToString(),
+                            data.EndPointData.MessageType.ToString(),
+                            data.EndPointData.IsReusable,
+                            ex.ToString()));
+
+                        if (!data.CancelToken.IsCancellationRequested) {
+                            // Continue receiving and processing new messages until we are told to stop regardless of any exceptions.
+                            receiveMessage();
+                        }
+                        else {
+                            data.SetMessageLoopCompleted();
+                        }
+
+                        if (messageReceived) {
+                            logger.Debug("ProcessMessagesForSubscription Message Complete={0} Declared={1} MessageTytpe={2} IsReusable={3}", data.EndPointData.SubscriptionName,
+                                data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
+                        }
+                    });
+
+                    // Start receiving messages asynchronously.
+                    receiveMessage();
+                }
+                catch (Exception ex) {
+                    failCounter++;
+                    logger.Error("ProcessMessagesForSubscription: Error during receive during loop. See details and fix: {0}", ex);
+                    if (failCounter < 100) {
+                        //try again
+                        ProcessMessagesForSubscription();
                     }
-                    else {
-                        data.SetMessageLoopCompleted();
-                    }
+                }
 
-                    if (messageReceived) {
-                        logger.Debug("ProcessMessagesForSubscription Message Complete={0} Declared={1} MessageTytpe={2} IsReusable={3}", data.EndPointData.SubscriptionName,
-                            data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
-                    }
-                });
-
-                // Initialize a custom action acting as a callback whenever a non-transient exception occurs while receiving or processing messages.
-                recoverReceive = ((ex) => {
-                    // Just log an exception. Do not allow an unhandled exception to terminate the message receive loop abnormally.
-
-                    logger.Error(string.Format("ProcessMessagesForSubscription Message Error={0} Declared={1} MessageTytpe={2} IsReusable={3} Error={4}",
-                        data.EndPointData.SubscriptionName,
-                        data.EndPointData.DeclaredType.ToString(),
-                        data.EndPointData.MessageType.ToString(),
-                        data.EndPointData.IsReusable,
-                        ex.ToString()));
-
-                    if (!data.CancelToken.IsCancellationRequested) {
-                        // Continue receiving and processing new messages until we are told to stop regardless of any exceptions.
-                        receiveMessage();
-                    }
-                    else {
-                        data.SetMessageLoopCompleted();
-                    }
-
-                    if (messageReceived) {
-                        logger.Debug("ProcessMessagesForSubscription Message Complete={0} Declared={1} MessageTytpe={2} IsReusable={3}", data.EndPointData.SubscriptionName,
-                            data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
-                    }
-                });
-
-                // Start receiving messages asynchronously.
-                receiveMessage();
             }
 
             void ProcessMessageCallBack(AzureReceiveState state) {
