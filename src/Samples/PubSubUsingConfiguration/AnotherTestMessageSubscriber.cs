@@ -10,7 +10,6 @@ using System.Diagnostics;
 namespace PubSubUsingConfiguration {
 
     [MessageHandlerConfiguration(
-        DefaultMessageTimeToLive = 240, 
         LockDuration = 120, 
         MaxRetries = 2, 
         PrefetchCount = 20, 
