@@ -298,7 +298,9 @@ namespace ProjectExtensions.Azure.ServiceBus {
                         // Continue receiving and processing new messages until we are told to stop.
                         receiveMessage();
                     }
-                    data.Cancelled = true;
+                    else {
+                        data.SetMessageLoopCompleted();
+                    }
 
                     if (messageReceived) {
                         logger.Debug("ProcessMessagesForSubscription Message Complete={0} Declared={1} MessageTytpe={2} IsReusable={3}", data.EndPointData.SubscriptionName,
@@ -321,7 +323,10 @@ namespace ProjectExtensions.Azure.ServiceBus {
                         // Continue receiving and processing new messages until we are told to stop regardless of any exceptions.
                         receiveMessage();
                     }
-                    data.Cancelled = true;
+                    else {
+                        data.SetMessageLoopCompleted();
+                    }
+
                     if (messageReceived) {
                         logger.Debug("ProcessMessagesForSubscription Message Complete={0} Declared={1} MessageTytpe={2} IsReusable={3}", data.EndPointData.SubscriptionName,
                             data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
@@ -493,8 +498,9 @@ namespace ProjectExtensions.Azure.ServiceBus {
             /// Once the item has stopped running, it marks the state as cancelled.
             /// </summary>
             public bool Cancelled {
-                get;
-                set;
+                get {
+                    return CancelToken.IsCancellationRequested && MessageLoopCompleted;
+                }
             }
 
             public SubscriptionClient Client {
@@ -507,6 +513,14 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 set;
             }
 
+            /// <summary>
+            /// when a message loop is complete, this is called so things can be cleaned up.
+            /// </summary>
+            public bool MessageLoopCompleted {
+                get;
+                private set;
+            }
+
             public SubscriptionDescription Subscription {
                 get;
                 set;
@@ -516,6 +530,14 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 // Stop the message receive loop gracefully.
                 cancelToken.Cancel();
             }
+
+            /// <summary>
+            /// Called when receive returnes from completing a message loop.
+            /// </summary>
+            public void SetMessageLoopCompleted() {
+                MessageLoopCompleted = true;
+            }
+
         }
 
     }
