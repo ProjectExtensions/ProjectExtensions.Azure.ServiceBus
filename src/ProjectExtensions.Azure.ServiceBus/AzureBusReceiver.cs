@@ -160,7 +160,17 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 }
             });
 
-            Task.WaitAny(t);
+            try {
+                Task.WaitAny(t);
+            }
+            catch (Exception ex) {
+                if (ex is AggregateException) {
+                    //do nothing
+                }
+                else {
+                    throw;
+                }
+            }
         }
 
         public override void Dispose(bool disposing) {
