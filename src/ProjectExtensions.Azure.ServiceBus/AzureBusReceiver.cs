@@ -360,7 +360,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
             void ProcessMessageCallBack(AzureReceiveState state) {
                 Guard.ArgumentNotNull(state, "state");
-                logger.Info("ProcessMessage Start received new message={0} Thread={1} MessageId={2}",
+                logger.Debug("ProcessMessage Start received new message={0} Thread={1} MessageId={2}",
                     state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
 
                 string objectTypeName = string.Empty;
@@ -413,7 +413,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                     throw;
                 }
 
-                logger.Info("ProcessMessage End received new message={0} Thread={1} MessageId={2}",
+                logger.Debug("ProcessMessage End received new message={0} Thread={1} MessageId={2}",
                     state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
             }
 
