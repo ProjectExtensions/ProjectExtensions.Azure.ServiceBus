@@ -15,5 +15,8 @@ namespace ProjectExtensions.Azure.ServiceBus {
             get;
         }
 
+        IDictionary<string, object> Metadata {
+            get;
+        }
     }
 }

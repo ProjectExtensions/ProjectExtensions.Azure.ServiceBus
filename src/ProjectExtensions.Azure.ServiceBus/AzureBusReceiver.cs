@@ -212,8 +212,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                     var gt = typeof(IReceivedMessage<>).MakeGenericType(data.EndPointData.MessageType);
 
                     //set up the methodinfo
-                    var methodInfo = data.EndPointData.DeclaredType.GetMethod("Handle",
-                        new Type[] { gt, typeof(IDictionary<string, object>) });
+                    var methodInfo = data.EndPointData.DeclaredType.GetMethod("Handle", new Type[] { gt });
 
                     var serializer = BusConfiguration.Container.Resolve<IServiceBusSerializer>();
 
@@ -386,7 +385,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                         //TODO create a cache for object creation.
                         var gt = typeof(ReceivedMessage<>).MakeGenericType(state.Data.EndPointData.MessageType);
 
-                        object receivedMessage = Activator.CreateInstance(gt, new object[] { state.Message, msg });
+                        object receivedMessage = Activator.CreateInstance(gt, new object[] { state.Message, msg, values });
 
                         objectTypeName = receivedMessage.GetType().FullName;
 
@@ -396,7 +395,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
                         logger.Debug("ProcessMessage reflection callback message start MethodInfo Type={0} Declared={1} handler={2} MethodInfo={3} Thread={4} MessageId={5}", objectTypeName, state.Data.EndPointData.DeclaredType, handler.GetType().FullName, state.MethodInfo.Name, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
 
-                        state.MethodInfo.Invoke(handler, new object[] { receivedMessage, values });
+                        state.MethodInfo.Invoke(handler, new object[] { receivedMessage });
                         logger.Debug("ProcessMessage invoke callback message end Type={0} message={1} Thread={2} MessageId={3}", objectTypeName, state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
                     }
                 }

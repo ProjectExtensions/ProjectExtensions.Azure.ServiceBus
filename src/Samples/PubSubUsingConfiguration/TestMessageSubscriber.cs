@@ -16,7 +16,7 @@ namespace PubSubUsingConfiguration {
 
         static Logger logger = LogManager.GetCurrentClassLogger();
 
-        public void Handle(IReceivedMessage<TestMessage> message, IDictionary<string, object> metadata) {
+        public void Handle(IReceivedMessage<TestMessage> message) {
             logger.Info("TestMessageSubscriber Message received: {0} {1}", message.Message.Value, message.Message.MessageId);
             //throw new Exception("I hate this message");
         }
@@ -28,7 +28,7 @@ namespace PubSubUsingConfiguration {
 
         static Logger logger = LogManager.GetCurrentClassLogger();
 
-        public void Handle(IReceivedMessage<TestMessage> message, IDictionary<string, object> metadata) {
+        public void Handle(IReceivedMessage<TestMessage> message) {
             logger.Info("TestMessageSubscriberNumber2 Message received: {0} {1}", message.Message.Value, message.Message.MessageId);
         }
     }

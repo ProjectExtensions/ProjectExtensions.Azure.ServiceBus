@@ -11,12 +11,15 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
         BrokeredMessageWrapper brokeredMessage;
         T message;
+        IDictionary<string, object> metadata;
 
-        public ReceivedMessage(BrokeredMessage brokeredMessage, T message) {
+        public ReceivedMessage(BrokeredMessage brokeredMessage, T message, IDictionary<string, object> metadata) {
             Guard.ArgumentNotNull(brokeredMessage, "brokeredMessage");
             Guard.ArgumentNotNull(message, "message");
+            Guard.ArgumentNotNull(metadata, "metadata");
             this.brokeredMessage = new BrokeredMessageWrapper(brokeredMessage);
             this.message = message;
+            this.metadata = metadata;
         }
 
         public IBrokeredMessage BrokeredMessage {
@@ -28,6 +31,12 @@ namespace ProjectExtensions.Azure.ServiceBus {
         public T Message {
             get {
                 return this.message;
+            }
+        }
+
+        public IDictionary<string, object> Metadata {
+            get {
+                return metadata;
             }
         }
     }

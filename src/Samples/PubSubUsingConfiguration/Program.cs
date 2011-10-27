@@ -44,7 +44,10 @@ namespace PubSubUsingConfiguration {
                         Value = 1000 + i,
                         MessageId = DateTime.Now.ToString()
                     };
-                    BusConfiguration.Instance.Bus.Publish(message1, null);
+                    var values = new Dictionary<string, object>();
+                    values.Add("hello", i);
+
+                    BusConfiguration.Instance.Bus.Publish(message1, values);
                     sw.Stop();
                     Debug.WriteLine("sync:" + sw.Elapsed);
                     Console.WriteLine("sync:" + sw.Elapsed);

@@ -24,7 +24,7 @@ namespace PubSubUsingConfiguration {
 
         static Stopwatch sw = new Stopwatch();
 
-        public void Handle(IReceivedMessage<AnotherTestMessage> message, IDictionary<string, object> metadata) {
+        public void Handle(IReceivedMessage<AnotherTestMessage> message) {
             if (!timerSet) {
                 sw.Start();
                 timerSet = true;

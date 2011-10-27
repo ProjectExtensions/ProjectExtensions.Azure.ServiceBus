@@ -15,11 +15,10 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// Process a Message with the given signature.
         /// </summary>
         /// <param name="message">The message to handle.</param>
-        /// <param name="metadata">Metadata that was sent with the message.</param>
         /// <remarks>
         /// Every message received by the bus with this message type will call this method.
         /// </remarks>
-        void Handle(IReceivedMessage<T> message, IDictionary<string, object> metadata);
+        void Handle(IReceivedMessage<T> message);
 
     }
 
