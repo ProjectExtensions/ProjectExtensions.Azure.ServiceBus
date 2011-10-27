@@ -9,6 +9,8 @@ using Microsoft.ServiceBus.Messaging;
 namespace PubSubUsingConfiguration {
 
     [MessageHandlerConfiguration(
+        DeadLetterAfterMaxRetries=true, 
+        MaxRetries=2,
         Singleton = true)]
     public class TestMessageSubscriber : IHandleMessages<TestMessage> {
 
@@ -16,6 +18,7 @@ namespace PubSubUsingConfiguration {
 
         public void Handle(IReceivedMessage<TestMessage> message, IDictionary<string, object> metadata) {
             logger.Info("TestMessageSubscriber Message received: {0} {1}", message.Message.Value, message.Message.MessageId);
+            //throw new Exception("I hate this message");
         }
     }
 

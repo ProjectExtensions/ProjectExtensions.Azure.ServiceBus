@@ -45,6 +45,14 @@ namespace ProjectExtensions.Azure.ServiceBus {
         }
 
         /// <summary>
+        /// Send the letter to the default dead letter queue after the max retries.
+        /// </summary>
+        public bool DeadLetterAfterMaxRetries {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets or sets a value that indicates whether the batched operations are enabled.
         /// </summary>
         public bool EnableBatchedOperations {

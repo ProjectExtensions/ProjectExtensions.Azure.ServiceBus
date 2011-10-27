@@ -76,9 +76,6 @@ namespace ProjectExtensions.Azure.ServiceBus {
                         if (attr.LockDurationSet()) {
                             descriptionToCreate.LockDuration = new TimeSpan(0, 0, attr.LockDuration);
                         }
-                        if (attr.MaxDeliveryCountSet()) {
-                            descriptionToCreate.MaxDeliveryCount = attr.MaxRetries;
-                        }
                     }
 
                     try {
@@ -406,15 +403,39 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 catch (Exception ex) {
                     logger.Log(LogLevel.Error, "ProcessMessage invoke callback message failed Type={0} message={1} Thread={2} MessageId={3} Exception={4}", objectTypeName, state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId, ex.ToString());
 
-                    //TODO remove hard code dead letter value
-                    if (state.Message.DeliveryCount == 5) {
-                        retryPolicy.ExecuteAction(() => state.Message.DeadLetter(ex.ToString(), "Died"));
+                    if (state.Message.DeliveryCount >= state.Data.EndPointData.AttributeData.MaxRetries) {
+                        if (state.Data.EndPointData.AttributeData.DeadLetterAfterMaxRetries) {
+                            SafeDeadLetter(state.Message, ex.Message);
+                        }
+                        else {
+                            SafeComplete(state.Message);
+                        }
                     }
                     throw;
                 }
 
                 logger.Info("ProcessMessage End received new message={0} Thread={1} MessageId={2}",
                     state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
+            }
+
+            static bool SafeDeadLetter(BrokeredMessage msg, string reason) {
+                try {
+                    // Mark brokered message as complete.
+                    msg.DeadLetter(reason, "Max retries Exceeded.");
+
+                    // Return a result indicating that the message has been completed successfully.
+                    return true;
+                }
+                catch (MessageLockLostException) {
+                    // It's too late to compensate the loss of a message lock. We should just ignore it so that it does not break the receive loop.
+                    // We should be prepared to receive the same message again.
+                }
+                catch (MessagingException) {
+                    // There is nothing we can do as the connection may have been lost, or the underlying topic/subscription may have been removed.
+                    // If Complete() fails with this exception, the only recourse is to prepare to receive another message (possibly the same one).
+                }
+
+                return false;
             }
 
             static bool SafeComplete(BrokeredMessage msg) {
