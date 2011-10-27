@@ -10,7 +10,8 @@ namespace PubSubUsingConfiguration {
 
     [MessageHandlerConfiguration(
         DeadLetterAfterMaxRetries=true, 
-        MaxRetries=2,
+        MaxRetries = 2,
+        PauseTimeIfErrorWasThrown = 15000,
         Singleton = true)]
     public class TestMessageSubscriber : IHandleMessages<TestMessage> {
 

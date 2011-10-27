@@ -96,6 +96,17 @@ namespace ProjectExtensions.Azure.ServiceBus {
             }
         }
 
+        /// <summary>
+        /// If we threw an error, pause the provided milliseconds before calling the handler again
+        /// </summary>
+        /// <remarks>
+        /// The goal is to allow the application to have basic retry throttling logic.
+        /// </remarks>
+        public int PauseTimeIfErrorWasThrown {
+            get;
+            set;
+        }
+
         //http://msdn.microsoft.com/en-us/library/hh144031.aspx
 
         /// <summary>

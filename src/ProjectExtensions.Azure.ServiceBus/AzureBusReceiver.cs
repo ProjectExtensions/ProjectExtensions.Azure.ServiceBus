@@ -234,12 +234,22 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
                     bool messageReceived = false;
 
+                    bool lastAttemptWasError = false;
+
                     // Declare an action responsible for the core operations in the message receive loop.
                     Action receiveMessage = (() => {
                         // Use a retry policy to execute the Receive action in an asynchronous and reliable fashion.
                         retryPolicy.ExecuteAction
                         (
                             (cb) => {
+                                if (lastAttemptWasError) {
+                                    if (Data.EndPointData.AttributeData.PauseTimeIfErrorWasThrown > 0) {
+                                        Thread.Sleep(Data.EndPointData.AttributeData.PauseTimeIfErrorWasThrown);
+                                    }
+                                    else {
+                                        Thread.Sleep(1000);
+                                    }
+                                }
                                 // Start receiving a new message asynchronously.
                                 client.BeginReceive(waitTimeout, cb, null);
                             },
@@ -305,6 +315,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
                     // Initialize a custom action acting as a callback whenever a message arrives on a queue.
                     completeReceive = ((ar) => {
+                        lastAttemptWasError = false;
                         if (!data.CancelToken.IsCancellationRequested) {
                             // Continue receiving and processing new messages until we are told to stop.
                             receiveMessage();
@@ -322,7 +333,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                     // Initialize a custom action acting as a callback whenever a non-transient exception occurs while receiving or processing messages.
                     recoverReceive = ((ex) => {
                         // Just log an exception. Do not allow an unhandled exception to terminate the message receive loop abnormally.
-
+                        lastAttemptWasError = true;
                         logger.Error(string.Format("ProcessMessagesForSubscription Message Error={0} Declared={1} MessageTytpe={2} IsReusable={3} Error={4}",
                             data.EndPointData.SubscriptionName,
                             data.EndPointData.DeclaredType.ToString(),
