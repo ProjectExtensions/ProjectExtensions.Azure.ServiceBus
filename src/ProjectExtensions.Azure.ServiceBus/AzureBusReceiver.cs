@@ -401,7 +401,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                     }
                 }
                 catch (Exception ex) {
-                    logger.Log(LogLevel.Error, "ProcessMessage invoke callback message failed Type={0} message={1} Thread={2} MessageId={3} Exception={4}", objectTypeName, state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId, ex.ToString());
+                    logger.Error("ProcessMessage invoke callback message failed Type={0} message={1} Thread={2} MessageId={3} Exception={4}", objectTypeName, state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId, ex.ToString());
 
                     if (state.Message.DeliveryCount >= state.Data.EndPointData.AttributeData.MaxRetries) {
                         if (state.Data.EndPointData.AttributeData.DeadLetterAfterMaxRetries) {
