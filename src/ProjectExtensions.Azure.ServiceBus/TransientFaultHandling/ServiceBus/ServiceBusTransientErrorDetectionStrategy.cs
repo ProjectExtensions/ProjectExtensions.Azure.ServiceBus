@@ -1,27 +1,34 @@
-﻿//=======================================================================================
-// Transient Fault Handling Framework for SQL Azure, Storage, Service Bus & Cache
+﻿
+
+
+
+//======================================================================================
+// CLOUD APPLICATION FRAMEWORK & EXTENSIONS (CloudFx)
 //
-// This sample is supplemental to the technical guidance published on the Windows Azure
-// Customer Advisory Team blog at http://windowsazurecat.com/. 
+// This assembly provides a set of common components forming the foundation of the cloud
+// application framework and extensibility model.
 //
-//=======================================================================================
-// Copyright © 2011 Microsoft Corporation. All rights reserved.
+// For technical guidance related to the use of this framework, please visit the team's
+// site at http://windowsazurecat.com/.
+//--------------------------------------------------------------------------------------
+// Copyright © 2011 Microsoft Corporation. Governed By Microsoft Public License (Ms-PL).
 // 
 // THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER 
 // EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF 
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. YOU BEAR THE RISK OF USING IT.
-//=======================================================================================
+//======================================================================================
 namespace Microsoft.AzureCAT.Samples.TransientFaultHandling.ServiceBus {
     #region Using references
+
     using System;
     using System.Net;
     using System.ServiceModel;
     using System.Net.Sockets;
     using System.IdentityModel.Tokens;
+    using System.Text.RegularExpressions;
 
     using Microsoft.ServiceBus;
     using Microsoft.ServiceBus.Messaging;
-    using System.Text.RegularExpressions;
     #endregion
 
     /// <summary>
@@ -57,9 +64,6 @@ namespace Microsoft.AzureCAT.Samples.TransientFaultHandling.ServiceBus {
             else if (ex is MessagingCommunicationException) {
                 return true;
             }
-            else if (ex is CommunicationException) {
-                return true;
-            }
             else if (ex is TimeoutException) {
                 return true;
             }
@@ -70,6 +74,9 @@ namespace Microsoft.AzureCAT.Samples.TransientFaultHandling.ServiceBus {
                 return true;
             }
             else if (ex is ServerTooBusyException) {
+                return true;
+            }
+            else if (ex is ServerBusyException) {
                 return true;
             }
             else if (ex is ServerErrorException) {
@@ -84,6 +91,9 @@ namespace Microsoft.AzureCAT.Samples.TransientFaultHandling.ServiceBus {
                 // is still in the process of setting up the Service Host).
                 return true;
             }
+            else if (ex is CommunicationException) {
+                return true;
+            }
             else if (ex is SocketException) {
                 var socketFault = ex as SocketException;
 
@@ -96,12 +106,11 @@ namespace Microsoft.AzureCAT.Samples.TransientFaultHandling.ServiceBus {
                 }
 
                 // Need to provide some resilience against the following fault that was seen a few times:
-                // System.UnauthorizedAccessException: The token provider was unable to provide a security token while accessing 'https://mysbns-sb.accesscontrol.windows.net/WRAPv0.9/'.
+                // System.UnauthorizedAccessException: The token provider was unable to provide a security token while accessing 'https://mysbns-sb.accesscontrol.windows.net/WRAPv0.9/'. 
                 // Token provider returned message: 'Error:Code:500:SubCode:T9002:Detail:An internal network error occured. Please try again.'. 
-                // System.IdentityModel.Tokens.SecurityTokenException: The token provider was unable to provide a security token while accessing 'https://mysbns-sb.accesscontrol.windows.net/WRAPv0.9/'.
+                // System.IdentityModel.Tokens.SecurityTokenException: The token provider was unable to provide a security token while accessing 'https://mysbns-sb.accesscontrol.windows.net/WRAPv0.9/'. 
                 // Token provider returned message: 'Error:Code:500:SubCode:T9002:Detail:An internal network error occured. Please try again.'. 
                 // System.Net.WebException: The remote server returned an error: (500) Internal Server Error.
-
                 var match = acsErrorCodeRegEx.Match(ex.Message);
                 var errorCode = 0;
 
@@ -114,3 +123,4 @@ namespace Microsoft.AzureCAT.Samples.TransientFaultHandling.ServiceBus {
         }
     }
 }
+
