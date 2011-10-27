@@ -3,12 +3,14 @@
   <metadata>
     <id>ProjectExtensions.Azure.ServiceBus</id>
     <title>Azure AppFabric ServiceBus IHandleMessage&lt;T&gt; wrapper by Project Extensions</title>
-    <version>0.7.6.0</version>
+    <version>0.8.0.0</version>
     <authors>Project Extensions, Joe Feser</authors>
     <owners>Project Extensions, Joe Feser</owners>
     <copyright>Copyright (C) Project Extensions and Joe Feser 2011</copyright>
     <projectUrl>https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <releaseNotes>Added support for pausing after an error for a handler. Added ability to auto DeadLetter after MaxRetries.
+    Breaking Change: The IDictionary parameter on the handler has been moved to the message and the second parameter has been removed.</releaseNotes>
     <description>Azure AppFabric ServiceBus wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;</description>
     <summary>Azure ServiceBus Wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt; (Debug)</summary>
     <dependencies>
