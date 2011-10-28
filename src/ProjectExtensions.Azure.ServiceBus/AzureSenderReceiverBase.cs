@@ -22,7 +22,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         protected MessagingFactory factory;
         protected NamespaceManager namespaceManager;
         protected RetryPolicy<ServiceBusTransientErrorDetectionStrategy> retryPolicy
-            = new RetryPolicy<ServiceBusTransientErrorDetectionStrategy>(RetryPolicy.DefaultClientRetryCount);
+            = new RetryPolicy<ServiceBusTransientErrorDetectionStrategy>(RetryPolicy.DefaultClientRetryCount, RetryPolicy.DefaultMinBackoff, RetryPolicy.DefaultMaxBackoff, RetryPolicy.DefaultClientBackoff);
         protected TokenProvider tokenProvider;
         protected TopicDescription topic;
         protected Uri serviceUri;
