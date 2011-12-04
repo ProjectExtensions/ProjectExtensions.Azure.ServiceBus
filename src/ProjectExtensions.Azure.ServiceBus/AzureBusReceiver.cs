@@ -11,7 +11,8 @@ using ProjectExtensions.Azure.ServiceBus.Serialization;
 using System.Threading;
 using System.Reflection;
 using NLog;
-using Microsoft.AzureCAT.Samples.TransientFaultHandling;
+using Microsoft.Practices.TransientFaultHandling;
+
 
 namespace ProjectExtensions.Azure.ServiceBus {
 
@@ -305,6 +306,9 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
                                 // Invoke a custom callback method to indicate that we have completed an iteration in the message receive loop.
                                 completeReceive(ar);
+                            },
+                            () => {
+                                //do nothing, we completed.
                             },
                             (ex) => {
                                 // Invoke a custom action to indicate that we have encountered an exception and

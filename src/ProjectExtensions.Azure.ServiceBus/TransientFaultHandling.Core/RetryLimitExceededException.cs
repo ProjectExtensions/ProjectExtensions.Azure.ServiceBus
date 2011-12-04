@@ -1,22 +1,20 @@
-﻿//=======================================================================================
-// Transient Fault Handling Framework for SQL Azure, Storage, Service Bus & Cache
-//
-// This sample is supplemental to the technical guidance published on the Windows Azure
-// Customer Advisory Team blog at http://windowsazurecat.com/. 
-//
-//=======================================================================================
-// Copyright © 2011 Microsoft Corporation. All rights reserved.
-// 
-// THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER 
-// EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF 
-// MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. YOU BEAR THE RISK OF USING IT.
-//=======================================================================================
-namespace Microsoft.AzureCAT.Samples.TransientFaultHandling
+﻿//===============================================================================
+// Microsoft patterns & practices Enterprise Library
+// Transient Fault Handling Application Block
+//===============================================================================
+// Copyright © Microsoft Corporation.  All rights reserved.
+// THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY
+// OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT
+// LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+// FITNESS FOR A PARTICULAR PURPOSE.
+//===============================================================================
+
+namespace Microsoft.Practices.TransientFaultHandling
 {
     #region Using references
     using System;
-
-    using Microsoft.AzureCAT.Samples.TransientFaultHandling.Properties;
+    using System.Runtime.Serialization;
+    using TransientFaultHandling.Properties;
     #endregion
 
     /// <summary>
@@ -50,6 +48,28 @@ namespace Microsoft.AzureCAT.Samples.TransientFaultHandling
         /// <param name="innerException">The exception that is the cause of the current exception.</param>
         public RetryLimitExceededException(Exception innerException)
             : base(innerException != null ? innerException.Message : ExceptionMessages.RetryLimitExceeded, innerException)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RetryLimitExceededException"/> class.
+        /// </summary>
+        /// <param name="message">The message that describes the error.</param>
+        /// <param name="innerException">The exception that is the cause of the current exception.</param>
+        public RetryLimitExceededException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RetryLimitExceededException"/> class.
+        /// </summary>
+        /// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo"/> that holds the serialized object data about the exception being thrown.</param>
+        /// <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext"/> that contains contextual information about the source or destination.</param>
+        /// <exception cref="T:System.ArgumentNullException">The <paramref name="info"/> parameter is null.</exception>
+        /// <exception cref="T:System.Runtime.Serialization.SerializationException">The class name is null or <see cref="P:System.Exception.HResult"/> is zero (0).</exception>
+        private RetryLimitExceededException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
         {
         }
     }

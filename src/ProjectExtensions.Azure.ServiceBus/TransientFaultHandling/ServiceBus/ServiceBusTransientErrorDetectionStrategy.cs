@@ -1,46 +1,51 @@
-﻿//=======================================================================================
-// Transient Fault Handling Framework for SQL Azure, Storage, Service Bus & Cache
-//
-// This sample is supplemental to the technical guidance published on the Windows Azure
-// Customer Advisory Team blog at http://windowsazurecat.com/. 
-//
-//=======================================================================================
-// Copyright © 2011 Microsoft Corporation. All rights reserved.
-// 
-// THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER 
-// EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF 
-// MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. YOU BEAR THE RISK OF USING IT.
-//=======================================================================================
-namespace Microsoft.AzureCAT.Samples.TransientFaultHandling.ServiceBus
-{
-    #region Using references
-    using System;
-    using System.Net;
-    using System.ServiceModel;
-    using System.Net.Sockets;
-    using System.IdentityModel.Tokens;
-    using System.Text.RegularExpressions;
+﻿//===============================================================================
+// Microsoft patterns & practices Enterprise Library
+// Transient Fault Handling Application Block
+//===============================================================================
+// Copyright © Microsoft Corporation.  All rights reserved.
+// THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY
+// OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT
+// LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+// FITNESS FOR A PARTICULAR PURPOSE.
+//===============================================================================
 
+namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling.ServiceBus
+{
+    using System;
+    using System.IdentityModel.Tokens;
+    using System.Net;
+    using System.Net.Sockets;
+    using System.Security;
+    using System.ServiceModel;
+    using System.Text.RegularExpressions;
+    using Microsoft.Practices.TransientFaultHandling;
     using Microsoft.ServiceBus;
     using Microsoft.ServiceBus.Messaging;
-    #endregion
 
-    /// <summary>
-    /// Provides the transient error detection logic that can recognize transient faults when dealing with Windows Azure Service Bus.
-    /// </summary>
+    /// <summary> 
+    /// Provides the transient error detection logic that can recognize transient faults when dealing with Windows Azure Service Bus. 
+    /// </summary> 
     public class ServiceBusTransientErrorDetectionStrategy : ITransientErrorDetectionStrategy
     {
-        /// <summary>
-        /// Provides a compiled regular expression used for extracting the error code from the message.
-        /// </summary>
+        /// <summary> 
+        /// Provides a compiled regular expression used for extracting the error code from the message. 
+        /// </summary> 
         private static readonly Regex acsErrorCodeRegEx = new Regex(@"Error:Code:(\d+):SubCode:(\w\d+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-        /// <summary>
-        /// Determines whether the specified exception represents a transient failure that can be compensated by a retry.
-        /// </summary>
-        /// <param name="ex">The exception object to be verified.</param>
-        /// <returns>True if the specified exception is considered as transient, otherwise false.</returns>
+        /// <summary> 
+        /// Determines whether the specified exception represents a transient failure that can be compensated by a retry. 
+        /// </summary> 
+        /// <param name="ex">The exception object to be verified.</param> 
+        /// <returns>True if the specified exception is considered as transient, otherwise false.</returns> 
         public bool IsTransient(Exception ex)
+        {
+            return ex != null && (CheckIsTransient(ex) || (ex.InnerException != null && CheckIsTransient(ex.InnerException)));
+        }
+
+        // SecuritySafeCritical because it references MessageLockLostException, MessagingCommunicationException, 
+        // MessagingEntityAlreadyExistsException, MessagingEntityNotFoundException, ServerBusyException, ServerErrorException
+        [SecuritySafeCritical]
+        private static bool CheckIsTransient(Exception ex)
         {
             if (ex is FaultException)
             {
@@ -96,9 +101,9 @@ namespace Microsoft.AzureCAT.Samples.TransientFaultHandling.ServiceBus
             }
             else if (ex is EndpointNotFoundException)
             {
-                // This exception may occur when a listener and a consumer are being
-                // initialized out of sync (e.g. consumer is reaching to a listener that
-                // is still in the process of setting up the Service Host).
+                // This exception may occur when a listener and a consumer are being 
+                // initialized out of sync (e.g. consumer is reaching to a listener that 
+                // is still in the process of setting up the Service Host). 
                 return true;
             }
             else if (ex is CommunicationException)
@@ -113,22 +118,16 @@ namespace Microsoft.AzureCAT.Samples.TransientFaultHandling.ServiceBus
             }
             else if (ex is UnauthorizedAccessException)
             {
-                // There might be a timeout exception masked by UnauthorizedAccessException.
-                if (ex.GetInnerException<TimeoutException>() != null)
-                {
-                    return true;
-                }
-
-                // Need to provide some resilience against the following fault that was seen a few times:
-                // System.UnauthorizedAccessException: The token provider was unable to provide a security token while accessing 'https://mysbns-sb.accesscontrol.windows.net/WRAPv0.9/'. 
-                // Token provider returned message: 'Error:Code:500:SubCode:T9002:Detail:An internal network error occured. Please try again.'. 
-                // System.IdentityModel.Tokens.SecurityTokenException: The token provider was unable to provide a security token while accessing 'https://mysbns-sb.accesscontrol.windows.net/WRAPv0.9/'. 
-                // Token provider returned message: 'Error:Code:500:SubCode:T9002:Detail:An internal network error occured. Please try again.'. 
-                // System.Net.WebException: The remote server returned an error: (500) Internal Server Error.
+                // Need to provide some resilience against the following fault that was seen a few times: 
+                // System.UnauthorizedAccessException: The token provider was unable to provide a security token while accessing 'https://mysbns-sb.accesscontrol.windows.net/WRAPv0.9/'.  
+                // Token provider returned message: 'Error:Code:500:SubCode:T9002:Detail:An internal network error occured. Please try again.'.  
+                // System.IdentityModel.Tokens.SecurityTokenException: The token provider was unable to provide a security token while accessing 'https://mysbns-sb.accesscontrol.windows.net/WRAPv0.9/'.  
+                // Token provider returned message: 'Error:Code:500:SubCode:T9002:Detail:An internal network error occured. Please try again.'.  
+                // System.Net.WebException: The remote server returned an error: (500) Internal Server Error. 
                 var match = acsErrorCodeRegEx.Match(ex.Message);
                 var errorCode = 0;
 
-                if (match.Success && match.Groups.Count > 1 && Int32.TryParse(match.Groups[1].Value, out errorCode))
+                if (match.Success && match.Groups.Count > 1 && int.TryParse(match.Groups[1].Value, out errorCode))
                 {
                     return errorCode == (int)HttpStatusCode.InternalServerError;
                 }

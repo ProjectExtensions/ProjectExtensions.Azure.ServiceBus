@@ -98,12 +98,20 @@
     <Compile Include="ServiceBusEnpointData.cs" />
     <Compile Include="SingletonMessageHandlerAttribute.cs" />
     <Compile Include="AnonymousDisposable.cs" />
+    <Compile Include="TransientFaultHandling.Core\ExponentialBackoff.cs" />
+    <Compile Include="TransientFaultHandling.Core\FixedInterval.cs" />
+    <Compile Include="TransientFaultHandling.Core\GlobalSuppressions.cs" />
+    <Compile Include="TransientFaultHandling.Core\Incremental.cs" />
+    <Compile Include="TransientFaultHandling.Core\Properties\ExceptionMessages.Designer.cs" />
+    <Compile Include="TransientFaultHandling.Core\Properties\Resources.Designer.cs" />
+    <Compile Include="TransientFaultHandling.Core\RetryingEventArgs.cs" />
+    <Compile Include="TransientFaultHandling.Core\RetryPolicy.Generic.cs" />
+    <Compile Include="TransientFaultHandling.Core\RetryStrategy.cs" />
+    <Compile Include="TransientFaultHandling\AzureStorage\AzureStorageExtensions.cs" />
     <Compile Include="TransientFaultHandling\AzureStorage\StorageTransientErrorDetectionStrategy.cs" />
     <Compile Include="CloudEnvironment.cs" />
-    <Compile Include="TransientFaultHandling\Configuration\ApplicationConfiguration.cs" />
-    <Compile Include="TransientFaultHandling\Configuration\RetryPolicyCollection.cs" />
-    <Compile Include="TransientFaultHandling\Configuration\RetryPolicyConfigurationSettings.cs" />
-    <Compile Include="TransientFaultHandling\Configuration\RetryPolicyInfo.cs" />
+    <Compile Include="TransientFaultHandling\Configuration\DesignResources.Designer.cs" />
+    <Compile Include="TransientFaultHandling\Configuration\TransientFaultHandlingDesignTime.cs" />
     <Compile Include="TransientFaultHandling\ExtensionMethods.cs" />
     <Compile Include="TransientFaultHandling.Core\Guard.cs" />
     <Compile Include="TransientFaultHandling.Core\ITransientErrorDetectionStrategy.cs" />
@@ -111,7 +119,12 @@
     <Compile Include="Properties\Resources.Designer.cs" />
     <Compile Include="TransientFaultHandling.Core\RetryLimitExceededException.cs" />
     <Compile Include="TransientFaultHandling.Core\RetryPolicy.cs" />
-    <Compile Include="TransientFaultHandling.Core\RetryPolicyFactory.cs" />
+    <Compile Include="TransientFaultHandling\GlobalSuppressions.cs" />
+    <Compile Include="TransientFaultHandling\Properties\Resources.Designer.cs" />
+    <Compile Include="TransientFaultHandling\Properties\SqlCommandResources.Designer.cs" />
+    <Compile Include="TransientFaultHandling\RetryManager.cs" />
+    <Compile Include="TransientFaultHandling\RetryManagerImpl.cs" />
+    <Compile Include="TransientFaultHandling\RetryPolicyException.cs" />
     <Compile Include="TransientFaultHandling\ServiceBus\ServiceBusTransientErrorDetectionStrategy.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -123,6 +136,11 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx" />
+    <EmbeddedResource Include="TransientFaultHandling.Core\Properties\ExceptionMessages.resx" />
+    <EmbeddedResource Include="TransientFaultHandling.Core\Properties\Resources.resx" />
+    <EmbeddedResource Include="TransientFaultHandling\Configuration\DesignResources.resx" />
+    <EmbeddedResource Include="TransientFaultHandling\Properties\Resources.resx" />
+    <EmbeddedResource Include="TransientFaultHandling\Properties\SqlCommandResources.resx" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,23 +1,21 @@
-﻿//=======================================================================================
-// Transient Fault Handling Framework for SQL Azure, Storage, Service Bus & Cache
-//
-// This sample is supplemental to the technical guidance published on the Windows Azure
-// Customer Advisory Team blog at http://windowsazurecat.com/. 
-//
-//=======================================================================================
-// Copyright © 2011 Microsoft Corporation. All rights reserved.
-// 
-// THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER 
-// EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF 
-// MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. YOU BEAR THE RISK OF USING IT.
-//=======================================================================================
-namespace Microsoft.AzureCAT.Samples.TransientFaultHandling
+﻿//===============================================================================
+// Microsoft patterns & practices Enterprise Library
+// Transient Fault Handling Application Block
+//===============================================================================
+// Copyright © Microsoft Corporation.  All rights reserved.
+// THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY
+// OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT
+// LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+// FITNESS FOR A PARTICULAR PURPOSE.
+//===============================================================================
+
+namespace Microsoft.Practices.TransientFaultHandling
 {
     #region Using statements
     using System;
     using System.Globalization;
 
-    using Microsoft.AzureCAT.Samples.TransientFaultHandling.Properties;
+    using TransientFaultHandling.Properties;
     #endregion
 
     /// <summary>
@@ -31,13 +29,14 @@ namespace Microsoft.AzureCAT.Samples.TransientFaultHandling
         /// <param name="argumentValue">The argument value to check.</param>
         /// <param name="argumentName">The name of the argument.</param>
         /// <returns>The return value should be ignored. It is intended to be used only when validating arguments during instance creation (e.g. when calling base constructor).</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Validated with method.")]
         public static bool ArgumentNotNullOrEmptyString(string argumentValue, string argumentName)
         {
             ArgumentNotNull(argumentValue, argumentName);
 
             if (argumentValue.Length == 0)
             {
-                throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, ExceptionMessages.StringCannotBeEmpty, argumentName));
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, ExceptionMessages.StringCannotBeEmpty, argumentName));
             }
 
             return true;
@@ -69,7 +68,7 @@ namespace Microsoft.AzureCAT.Samples.TransientFaultHandling
         {
             if (!IsValueDefined<T>(argumentValue))
             {
-                throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, ExceptionMessages.ArgumentCannotBeDefault, argumentName));
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, ExceptionMessages.ArgumentCannotBeDefault, argumentName));
             }
         }
 
@@ -82,7 +81,7 @@ namespace Microsoft.AzureCAT.Samples.TransientFaultHandling
         {
             if (argumentValue <= 0)
             {
-                throw new ArgumentOutOfRangeException(argumentName, argumentValue, String.Format(CultureInfo.CurrentCulture, ExceptionMessages.ArgumentCannotBeZeroOrNegative, argumentName));
+                throw new ArgumentOutOfRangeException(argumentName, argumentValue, string.Format(CultureInfo.CurrentCulture, ExceptionMessages.ArgumentCannotBeZeroOrNegative, argumentName));
             }
         }
 
@@ -95,7 +94,7 @@ namespace Microsoft.AzureCAT.Samples.TransientFaultHandling
         {
             if (argumentValue < 0)
             {
-                throw new ArgumentOutOfRangeException(argumentName, argumentValue, String.Format(CultureInfo.CurrentCulture, ExceptionMessages.ArgumentCannotBeNegative, argumentName));
+                throw new ArgumentOutOfRangeException(argumentName, argumentValue, string.Format(CultureInfo.CurrentCulture, ExceptionMessages.ArgumentCannotBeNegative, argumentName));
             }
         }
 
@@ -108,7 +107,7 @@ namespace Microsoft.AzureCAT.Samples.TransientFaultHandling
         {
             if (argumentValue < 0)
             {
-                throw new ArgumentOutOfRangeException(argumentName, argumentValue, String.Format(CultureInfo.CurrentCulture, ExceptionMessages.ArgumentCannotBeNegative, argumentName));
+                throw new ArgumentOutOfRangeException(argumentName, argumentValue, string.Format(CultureInfo.CurrentCulture, ExceptionMessages.ArgumentCannotBeNegative, argumentName));
             }
         }
 
@@ -122,7 +121,7 @@ namespace Microsoft.AzureCAT.Samples.TransientFaultHandling
         {
             if (argumentValue > ceilingValue)
             {
-                throw new ArgumentOutOfRangeException(argumentName, argumentValue, String.Format(CultureInfo.CurrentCulture, ExceptionMessages.ArgumentCannotBeGreaterThanBaseline, argumentName, ceilingValue));
+                throw new ArgumentOutOfRangeException(argumentName, argumentValue, string.Format(CultureInfo.CurrentCulture, ExceptionMessages.ArgumentCannotBeGreaterThanBaseline, argumentName, ceilingValue));
             }
         }
 
@@ -136,7 +135,7 @@ namespace Microsoft.AzureCAT.Samples.TransientFaultHandling
         {
             if (Enum.IsDefined(enumType, value) == false)
             {
-                throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, ExceptionMessages.InvalidEnumValue, argumentName, enumType.ToString()));
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, ExceptionMessages.InvalidEnumValue, argumentName, enumType));
             }
         }
 
@@ -149,9 +148,9 @@ namespace Microsoft.AzureCAT.Samples.TransientFaultHandling
         /// <param name="argumentName">The argument name.</param>
         public static void TypeIsAssignableFromType(Type assignee, Type providedType, string argumentName)
         {
-            if (!providedType.IsAssignableFrom(assignee))
+            if (providedType != null && !providedType.IsAssignableFrom(assignee))
             {
-                throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, ExceptionMessages.TypeNotCompatible, assignee, providedType), argumentName);
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, ExceptionMessages.TypeNotCompatible, assignee, providedType), argumentName);
             }
         }
 

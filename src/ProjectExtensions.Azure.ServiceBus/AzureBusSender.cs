@@ -6,8 +6,7 @@ using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 using ProjectExtensions.Azure.ServiceBus.Serialization;
 using NLog;
-using Microsoft.AzureCAT.Samples.TransientFaultHandling.ServiceBus;
-using Microsoft.AzureCAT.Samples.TransientFaultHandling;
+using Microsoft.Practices.TransientFaultHandling;
 using System.Diagnostics;
 using System.Threading;
 
@@ -152,6 +151,9 @@ namespace ProjectExtensions.Azure.ServiceBus {
                                 }));
                             }
                         }
+                    },
+                    () => {
+                        //do nothing, we completed.
                     },
                     (ex) => {
                         // Always dispose the BrokeredMessage instance even if the send operation has completed unsuccessfully.

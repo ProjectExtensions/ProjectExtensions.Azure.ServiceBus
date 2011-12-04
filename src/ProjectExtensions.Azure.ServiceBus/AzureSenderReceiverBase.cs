@@ -5,8 +5,8 @@ using System.Text;
 using Microsoft.ServiceBus.Messaging;
 using Microsoft.ServiceBus;
 using NLog;
-using Microsoft.AzureCAT.Samples.TransientFaultHandling;
-using Microsoft.AzureCAT.Samples.TransientFaultHandling.ServiceBus;
+using Microsoft.Practices.TransientFaultHandling;
+using Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling.ServiceBus;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 
@@ -22,7 +22,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         protected MessagingFactory factory;
         protected NamespaceManager namespaceManager;
         protected RetryPolicy<ServiceBusTransientErrorDetectionStrategy> retryPolicy
-            = new RetryPolicy<ServiceBusTransientErrorDetectionStrategy>(RetryPolicy.DefaultClientRetryCount, RetryPolicy.DefaultMinBackoff, RetryPolicy.DefaultMaxBackoff, RetryPolicy.DefaultClientBackoff);
+            = new RetryPolicy<ServiceBusTransientErrorDetectionStrategy>(RetryStrategy.DefaultClientRetryCount, RetryStrategy.DefaultMinBackoff, RetryStrategy.DefaultMaxBackoff, RetryStrategy.DefaultClientBackoff);
         protected TokenProvider tokenProvider;
         protected TopicDescription topic;
         protected Uri serviceUri;

@@ -6,7 +6,7 @@ using System.Reflection;
 using Autofac;
 using NLog;
 using System.Linq.Expressions;
-using Microsoft.AzureCAT.Samples.TransientFaultHandling;
+using Microsoft.Practices.TransientFaultHandling;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 

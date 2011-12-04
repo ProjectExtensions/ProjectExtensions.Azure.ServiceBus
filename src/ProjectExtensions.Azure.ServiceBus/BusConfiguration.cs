@@ -5,7 +5,7 @@ using System.Text;
 using System.Reflection;
 using Autofac;
 using ProjectExtensions.Azure.ServiceBus.Serialization;
-using Microsoft.AzureCAT.Samples.TransientFaultHandling;
+using Microsoft.Practices.TransientFaultHandling;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 
