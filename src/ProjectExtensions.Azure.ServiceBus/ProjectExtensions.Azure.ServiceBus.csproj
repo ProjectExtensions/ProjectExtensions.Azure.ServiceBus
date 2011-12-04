@@ -105,13 +105,13 @@
     <Compile Include="TransientFaultHandling\Configuration\RetryPolicyConfigurationSettings.cs" />
     <Compile Include="TransientFaultHandling\Configuration\RetryPolicyInfo.cs" />
     <Compile Include="TransientFaultHandling\ExtensionMethods.cs" />
-    <Compile Include="TransientFaultHandling\Guard.cs" />
-    <Compile Include="TransientFaultHandling\ITransientErrorDetectionStrategy.cs" />
+    <Compile Include="TransientFaultHandling.Core\Guard.cs" />
+    <Compile Include="TransientFaultHandling.Core\ITransientErrorDetectionStrategy.cs" />
     <Compile Include="Properties\ExceptionMessages.Designer.cs" />
     <Compile Include="Properties\Resources.Designer.cs" />
-    <Compile Include="TransientFaultHandling\RetryLimitExceededException.cs" />
-    <Compile Include="TransientFaultHandling\RetryPolicy.cs" />
-    <Compile Include="TransientFaultHandling\RetryPolicyFactory.cs" />
+    <Compile Include="TransientFaultHandling.Core\RetryLimitExceededException.cs" />
+    <Compile Include="TransientFaultHandling.Core\RetryPolicy.cs" />
+    <Compile Include="TransientFaultHandling.Core\RetryPolicyFactory.cs" />
     <Compile Include="TransientFaultHandling\ServiceBus\ServiceBusTransientErrorDetectionStrategy.cs" />
   </ItemGroup>
   <ItemGroup>
