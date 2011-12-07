@@ -301,7 +301,7 @@ namespace Microsoft.Practices.TransientFaultHandling
                                     Thread.Sleep(delay);
                                 }
 
-                                executeWithRetry(() => beginAction(endInvoke));
+                                executeWithRetry(() => a());
                             }
                         }
 
