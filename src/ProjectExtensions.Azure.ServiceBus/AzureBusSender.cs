@@ -135,6 +135,12 @@ namespace ProjectExtensions.Azure.ServiceBus {
                             client.EndSend(ar);
                             logger.Debug("sendAction EndSend End Type={0} Serializer={1} MessageId={2}", obj.GetType().FullName, serializer.GetType().FullName, message.MessageId);
                         }
+                        catch (ServerBusyException) {
+                            //we are making a special case because we know we need to pause for 10 seconds.
+                            //we are hoping the retry policy will eventually deal with this on it's own.
+                            Thread.Sleep(10000);
+                            throw;
+                        }
                         catch (Exception ex) {
                             failureException = ex;
                             throw;
