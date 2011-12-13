@@ -282,12 +282,6 @@ namespace ProjectExtensions.Azure.ServiceBus {
                                             }
                                         }
                                     }
-                                    catch (ServerBusyException) {
-                                        //we are making a special case because we know we need to pause for 10 seconds.
-                                        //we are hoping the retry policy will eventually deal with this on it's own.
-                                        Thread.Sleep(10000);
-                                        throw;
-                                    }
                                     catch (Exception) {
                                         //do nothing
                                         throw;
