@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets ="Dist" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <!-- See https://onpointondemand.fogbugz.com/default.asp?W695 for documentation -->
-  <Import Project="$(MSBuildProjectDirectory)\Tools\MSBuild\BuildSupport\Onpoint.Targets.properties"/>
+  <Import Project="$(MSBuildProjectDirectory)\Tools\MSBuild\BuildSupport\Common.Targets.properties"/>
 
   <!-- Version Information -->
   <PropertyGroup>
@@ -53,5 +52,5 @@
     </NugetItem>
   </ItemGroup>
 
-  <Import Project="$(MSBuildProjectDirectory)\Tools\MSBuild\BuildSupport\Onpoint.Targets"/>
+  <Import Project="$(MSBuildProjectDirectory)\Tools\MSBuild\BuildSupport\Common.Targets"/>
 </Project>
