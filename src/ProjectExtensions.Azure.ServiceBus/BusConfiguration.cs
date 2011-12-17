@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using Autofac;
+using ProjectExtensions.Azure.ServiceBus.Container;
 using ProjectExtensions.Azure.ServiceBus.Serialization;
 using Microsoft.Practices.TransientFaultHandling;
 
@@ -17,17 +18,16 @@ namespace ProjectExtensions.Azure.ServiceBus {
         static object lockObject = new object();
         static BusConfiguration configuration;
 
-        IContainer container;
+        internal IAzureBusContainer container;
         List<Assembly> registeredAssemblies = new List<Assembly>();
         List<Type> registeredSubscribers = new List<Type>();
 
         /// <summary>
         /// ctor
         /// </summary>
-        internal BusConfiguration(IContainer container = null) {
+        internal BusConfiguration() {
             MaxThreads = 1;
             TopicName = "pro_ext_topic";
-            this.container = container;
         }
 
         /// <summary>
@@ -42,9 +42,13 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <summary>
         /// The IOC Container
         /// </summary>
-        public static IContainer Container {
+        public static IAzureBusContainer Container {
             get {
                 return configuration.container;
+            }
+            internal set {
+                Guard.ArgumentNotNull(value, "Container");
+                configuration.container = value;
             }
         }
 
@@ -141,24 +145,19 @@ namespace ProjectExtensions.Azure.ServiceBus {
             internal set;
         }
 
-        internal void Configure(ContainerBuilder builder) {
-            Guard.ArgumentNotNull(builder, "builder");
+        internal void Configure() {
             if (string.IsNullOrWhiteSpace(ServiceBusApplicationId)) {
                 throw new ApplicationException("ApplicationId must be set.");
             }
 
-            builder.Register<AzureBus>(item => new AzureBus(this)).As<IBus>().SingleInstance();
-
-            builder.RegisterType<AzureBusReceiver>().As<IAzureBusReceiver>().SingleInstance();
-            builder.RegisterType<AzureBusSender>().As<IAzureBusSender>().SingleInstance();
-
-            if (container == null) {
-                container = builder.Build();
+            container.RegisterBus(this);
+            container.Register(typeof(IAzureBusReceiver), typeof(AzureBusReceiver));
+            container.Register(typeof(IAzureBusSender), typeof(AzureBusSender));
+            if (!container.IsRegistered(typeof(IServiceBusSerializer))) {
+                container.Register(typeof(IServiceBusSerializer), typeof(JsonServiceBusSerializer));
             }
-            else {
-                builder.Update(container);
-            }
-
+            container.Build();
+            
             //Set the Bus property so that the receiver will register the end points
             var prime = this.Bus;
         }
@@ -181,14 +180,12 @@ namespace ProjectExtensions.Azure.ServiceBus {
             if (configuration == null) {
                 lock (lockObject) {
                     if (configuration == null) {
-                        configuration = new BusConfiguration(container);
+                        configuration = new BusConfiguration();
                     }
                 }
             }
-            var builder = new ContainerBuilder();
-            //last one in wins so if one is registered it will be called.
-            builder.RegisterType<JsonServiceBusSerializer>().As<IServiceBusSerializer>().SingleInstance();
-            return new BusConfigurationBuilder(builder, configuration);
+
+            return new BusConfigurationBuilder(configuration);
         }
 
         internal void AddRegisteredAssembly(Assembly value) {

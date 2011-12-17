@@ -15,13 +15,11 @@ namespace ProjectExtensions.Azure.ServiceBus {
     /// </summary>
     public class BusConfigurationBuilder {
 
-        BusConfiguration configuration;
-        ContainerBuilder builder;
+        internal BusConfiguration configuration;
 
-        internal BusConfigurationBuilder(ContainerBuilder builder, BusConfiguration configuration) {
-            Guard.ArgumentNotNull(builder, "builder");
+
+        internal BusConfigurationBuilder(BusConfiguration configuration) {
             Guard.ArgumentNotNull(configuration, "configuration");
-            this.builder = builder;
             this.configuration = configuration;
         }
 
@@ -29,7 +27,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// Mark the configuration as complete
         /// </summary>
         public void Configure() {
-            configuration.Configure(builder);
+            configuration.Configure();
         }
 
         /// <summary>
@@ -52,7 +50,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <param name="serializer"></param>
         /// <returns></returns>
         public BusConfigurationBuilder DefaultSerializer(IServiceBusSerializer serializer) {
-            builder.RegisterType(serializer.GetType()).As<IServiceBusSerializer>().SingleInstance();
+            configuration.container.Register(typeof(IServiceBusSerializer), serializer.GetType());
             return this;
         }
 

@@ -146,8 +146,8 @@ namespace ProjectExtensions.Azure.ServiceBus {
             //this fixes a bug in .net 4 that will be fixed in sp1
             using (CloudEnvironment.EnsureSafeHttpContext()) {
                 //set up the server first.
-                sender = BusConfiguration.Container.Resolve<IAzureBusSender>(new TypedParameter(typeof(BusConfiguration), config));
-                receiver = BusConfiguration.Container.Resolve<IAzureBusReceiver>(new TypedParameter(typeof(BusConfiguration), config));
+                sender = BusConfiguration.Container.Resolve<IAzureBusSender>(new KeyValuePair<string, object>("configuration", config));
+                receiver = BusConfiguration.Container.Resolve<IAzureBusReceiver>(new KeyValuePair<string, object>("configuration", config));
 
                 foreach (var item in config.RegisteredAssemblies) {
                     RegisterAssembly(item);
@@ -184,8 +184,6 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
             subscribedTypes.Add(type);
 
-            var builder = new ContainerBuilder();
-
             //for each interface we find, we need to register it with the bus.
             foreach (var foundInterface in interfaces) {
 
@@ -206,10 +204,10 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
                 if (!BusConfiguration.Container.IsRegistered(type)) {
                     if (info.IsReusable) {
-                        builder.RegisterType(type).SingleInstance();
+                        BusConfiguration.Container.Register(type, type);
                     }
                     else {
-                        builder.RegisterType(type).InstancePerDependency();
+                        BusConfiguration.Container.Register(type, type, true);
                     }
                 }
 
@@ -217,7 +215,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 callback(info);
             }
 
-            builder.Update(BusConfiguration.Container);
+            BusConfiguration.Container.Build();
         }
     }
 }
