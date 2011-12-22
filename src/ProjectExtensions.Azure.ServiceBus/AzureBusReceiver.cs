@@ -6,7 +6,6 @@ using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 using System.Threading.Tasks;
 using System.IO;
-using Autofac;
 using ProjectExtensions.Azure.ServiceBus.Serialization;
 using System.Threading;
 using System.Reflection;
@@ -43,6 +42,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                     value.MessageType.ToString(),
                     value.IsReusable,
                     value.AttributeData != null ? value.AttributeData.ToString() : string.Empty);
+                logger.Info("TRANSIENT ERROR HANDLING CAN CAUSE THIS CHECK TO TAKE UP TO 10 SECONDS IF THE SUBSCRIPTION DOES NOT EXIST");
 
                 SubscriptionDescription desc = null;
 
@@ -51,7 +51,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 try {
                     logger.Info("CreateSubscription Try {0} ", value.SubscriptionName);
                     // First, let's see if a item with the specified name already exists.
-                    retryPolicy.ExecuteAction(() => {
+                    minimalRetryPolicy.ExecuteAction(() => {
                         desc = namespaceManager.GetSubscription(topic.Path, value.SubscriptionName);
                     });
 
