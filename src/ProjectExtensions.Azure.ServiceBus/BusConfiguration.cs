@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
-using Autofac;
 using ProjectExtensions.Azure.ServiceBus.Container;
 using ProjectExtensions.Azure.ServiceBus.Serialization;
 using Microsoft.Practices.TransientFaultHandling;
@@ -40,7 +39,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         }
 
         /// <summary>
-        /// The IOC Container
+        /// The IOC Container for the application
         /// </summary>
         public static IAzureBusContainer Container {
             get {
@@ -49,6 +48,19 @@ namespace ProjectExtensions.Azure.ServiceBus {
             internal set {
                 Guard.ArgumentNotNull(value, "Container");
                 configuration.container = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets and sets the IOC container for the current instance.
+        /// </summary>
+        public IAzureBusContainer InstanceContainer {
+            get {
+                return configuration.container;
+            }
+            set {
+                Guard.ArgumentNotNull(value, "conttainer");
+                container = value;
             }
         }
 
@@ -168,15 +180,6 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <param name="container">Your optional existing IOC container.</param>
         /// <returns></returns>
         public static BusConfigurationBuilder WithSettings() {
-            return WithSettings(null);
-        }
-
-        /// <summary>
-        /// Get the settings builder optionally passing in your existing IOC Container
-        /// </summary>
-        /// <param name="container">Your optional existing IOC container. Use <see cref="WithSettings()"/> if you do not have an existing container.</param>
-        /// <returns></returns>
-        public static BusConfigurationBuilder WithSettings(IContainer container) {
             if (configuration == null) {
                 lock (lockObject) {
                     if (configuration == null) {

@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Autofac;
-using Autofac.Core;
-using Microsoft.Practices.TransientFaultHandling;
+using ProjectExtensions.Azure.ServiceBus.Container;
 
-namespace ProjectExtensions.Azure.ServiceBus.Container {
+namespace ProjectExtensions.Azure.ServiceBus.Autofac.Container {
     /// <summary>
     /// Autofac support for the azure service bus
     /// </summary>

@@ -4,7 +4,7 @@
 
   <!-- Version Information -->
   <PropertyGroup>
-    <AppVersion>0.8.3</AppVersion>
+    <AppVersion>0.8.4</AppVersion>
     <SchemaVersion>0</SchemaVersion>
     <CompanyName>Project Extensions</CompanyName>
   </PropertyGroup>
@@ -25,6 +25,7 @@
   <PropertyGroup>
     <BinInclude>
       src\ProjectExtensions.Azure.ServiceBus\bin\$(Configuration)\*.*;
+	  src\ProjectExtensions.Azure.ServiceBus.Autofac\bin\$(Configuration)\*.*;
     </BinInclude>
   </PropertyGroup>
 

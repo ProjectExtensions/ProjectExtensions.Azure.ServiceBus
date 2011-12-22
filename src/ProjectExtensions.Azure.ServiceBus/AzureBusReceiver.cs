@@ -6,7 +6,6 @@ using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 using System.Threading.Tasks;
 using System.IO;
-using Autofac;
 using ProjectExtensions.Azure.ServiceBus.Serialization;
 using System.Threading;
 using System.Reflection;

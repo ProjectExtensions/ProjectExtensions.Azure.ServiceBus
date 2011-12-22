@@ -1,6 +1,6 @@
 using Autofac;
 
-namespace ProjectExtensions.Azure.ServiceBus.Container {
+namespace ProjectExtensions.Azure.ServiceBus.Autofac.Container {
     /// <summary>
     /// Extensions to allow configuration using Autofac
     /// </summary>
@@ -12,7 +12,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Container {
         /// <param name="container"></param>
         /// <returns></returns>
         public static BusConfigurationBuilder UseAutofacContainer(this BusConfigurationBuilder builder, IContainer container = null) {
-            builder.configuration.container = new AutofacAzureBusContainer(container);
+            builder.Configuration.InstanceContainer = new AutofacAzureBusContainer(container);
             return builder;
         }
         

@@ -75,6 +75,10 @@
     <Compile Include="TestMessage.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\ProjectExtensions.Azure.ServiceBus.Autofac\ProjectExtensions.Azure.ServiceBus.Autofac.csproj">
+      <Project>{11192756-9ABB-4C2B-8FE5-2DBD4DC0DC36}</Project>
+      <Name>ProjectExtensions.Azure.ServiceBus.Autofac</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\ProjectExtensions.Azure.ServiceBus\ProjectExtensions.Azure.ServiceBus.csproj">
       <Project>{8C8A8531-95AE-41CD-B2AC-6651F104245E}</Project>
       <Name>ProjectExtensions.Azure.ServiceBus</Name>

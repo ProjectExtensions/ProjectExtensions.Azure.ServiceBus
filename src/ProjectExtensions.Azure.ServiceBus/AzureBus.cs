@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
-using Autofac;
 using NLog;
 using System.Linq.Expressions;
 using Microsoft.Practices.TransientFaultHandling;
