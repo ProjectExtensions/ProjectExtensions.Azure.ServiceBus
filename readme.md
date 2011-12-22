@@ -12,10 +12,10 @@ Use ClickToBuild.bat to build.
 
 The Nuget package is ProjectExtensions.Azure.ServiceBus
 
-1. Create a console application
-2. Using NuGet, install the package ProjectExtensions.Azure.ServiceBus.
-3. Optionally Add a reference to NLog
-4. Create a Message Class that you wish to handle:
+1) Create a console application
+2) Using NuGet, install the package ProjectExtensions.Azure.ServiceBus.
+3) Optionally Add a reference to NLog
+4) Create a Message Class that you wish to handle:
 
 ```csharp
 public class TestMessage {
@@ -32,7 +32,7 @@ public class TestMessage {
 }
 ```
 
-5. Create a Handler that will receive notifications when the message is placed on the bus:
+5) Create a Handler that will receive notifications when the message is placed on the bus:
 
 ```csharp
 public class TestMessageSubscriber : IHandleMessages<TestMessage> {
@@ -46,7 +46,7 @@ public class TestMessageSubscriber : IHandleMessages<TestMessage> {
 ```
 
 
-6. Place initialization code at the beginning of your method or in your BootStrapper.  You will need a couple of using declarations:
+6) Place initialization code at the beginning of your method or in your BootStrapper.  You will need a couple of using declarations:
 
 ```csharp
 using ProjectExtensions.Azure.ServiceBus;
@@ -86,7 +86,7 @@ ProjectExtensions.Azure.ServiceBus.BusConfiguration.WithSettings()
     .Configure();
 ```
 
-7. Put some messages on the Bus:
+7) Put some messages on the Bus:
 
 ```csharp
 for (int i = 0; i < 20; i++) {
@@ -108,7 +108,7 @@ Welcome to Azure Service Bus.
 
 * Support for Castle Windsor IOC container
 
-###Version 0.8.3
+###Version 0.8.4
 
 * Allow support for other IOC containers to be added
 * BREAKING CHANGE.  Move Autofac support into seperate DLL.  Existing implementations need to add a reference to ProjectExtensions.Azure.ServiceBus.Autofac and change initialization code as shown in the getting started example.
