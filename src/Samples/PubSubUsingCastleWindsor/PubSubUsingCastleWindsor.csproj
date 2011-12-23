@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{2B545669-3B24-4805-B7B1-B7AA4E2B6A62}</ProjectGuid>
+    <ProjectGuid>{7635ABF3-31F7-408E-ACDB-FFDBE7DA6D10}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PubSubUsingConfiguration</RootNamespace>
-    <AssemblyName>PubSubUsingConfiguration</AssemblyName>
+    <RootNamespace>PubSubUsingCastleWindsor</RootNamespace>
+    <AssemblyName>PubSubUsingCastleWindsor</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
@@ -35,11 +35,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Autofac, Version=2.5.2.830, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Autofac.2.5.2.830\lib\NET40\Autofac.dll</HintPath>
+    <Reference Include="Castle.Core">
+      <HintPath>..\..\..\packages\Castle.Core.3.0.0.4001\lib\net40-client\Castle.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Autofac.Configuration">
-      <HintPath>..\..\..\packages\Autofac.2.5.2.830\lib\NET40\Autofac.Configuration.dll</HintPath>
+    <Reference Include="Castle.Windsor">
+      <HintPath>..\..\..\packages\Castle.Windsor.3.0.0.4001\lib\net40-client\Castle.Windsor.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceBus, Version=1.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -64,33 +64,39 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\CommonAssemblyInfo.cs">
-      <Link>Properties\CommonAssemblyInfo.cs</Link>
+      <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="AnotherTestMessage.cs" />
-    <Compile Include="AnotherTestMessageSubscriber.cs" />
+    <Compile Include="..\PubSubUsingConfiguration\AnotherTestMessage.cs">
+      <Link>AnotherTestMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\PubSubUsingConfiguration\AnotherTestMessageSubscriber.cs">
+      <Link>AnotherTestMessageSubscriber.cs</Link>
+    </Compile>
+    <Compile Include="..\PubSubUsingConfiguration\TestMessage.cs">
+      <Link>TestMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\PubSubUsingConfiguration\TestMessageSubscriber.cs">
+      <Link>TestMessageSubscriber.cs</Link>
+    </Compile>
     <Compile Include="Bootstrapper.cs" />
-    <Compile Include="TestMessageSubscriber.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestMessage.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ProjectExtensions.Azure.ServiceBus.Autofac\ProjectExtensions.Azure.ServiceBus.Autofac.csproj">
-      <Project>{11192756-9ABB-4C2B-8FE5-2DBD4DC0DC36}</Project>
-      <Name>ProjectExtensions.Azure.ServiceBus.Autofac</Name>
+    <None Include="..\PubSubUsingConfiguration\app.config">
+      <Link>app.config</Link>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\ProjectExtensions.Azure.ServiceBus.CastleWindsor\ProjectExtensions.Azure.ServiceBus.CastleWindsor.csproj">
+      <Project>{69CAB6DE-C753-42F9-9E8F-935B975DBCA2}</Project>
+      <Name>ProjectExtensions.Azure.ServiceBus.CastleWindsor</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\ProjectExtensions.Azure.ServiceBus\ProjectExtensions.Azure.ServiceBus.csproj">
       <Project>{8C8A8531-95AE-41CD-B2AC-6651F104245E}</Project>
       <Name>ProjectExtensions.Azure.ServiceBus</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="packages.config">
-      <SubType>Designer</SubType>
-    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

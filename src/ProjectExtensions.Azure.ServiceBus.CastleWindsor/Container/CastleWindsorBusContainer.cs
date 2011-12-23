@@ -1,26 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Autofac;
+using System.Text;
+using Castle.MicroKernel.Registration;
+using Castle.Windsor;
 using ProjectExtensions.Azure.ServiceBus.Container;
 
-namespace ProjectExtensions.Azure.ServiceBus.Autofac.Container {
-    /// <summary>
-    /// Autofac support for the azure service bus
-    /// </summary>
-    public class AutofacAzureBusContainer : IAzureBusContainer {
-        IContainer container;
-        ContainerBuilder builder = new ContainerBuilder();
-
+namespace ProjectExtensions.Azure.ServiceBus.CastleWindsor.Container {
+    public class CastleWindsorBusContainer : IAzureBusContainer {
+        IWindsorContainer container;
+  
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="container">Optional autofac container owned by the calling application.
-        /// If one is not provided, a new one will be created.</param>
-        public AutofacAzureBusContainer(IContainer container = null) {
-            this.container = container;
+        /// <param name="container">Optional Castle Windsor container.  If one is not provided,
+        /// a new one will be created.</param>
+        public CastleWindsorBusContainer(IWindsorContainer container = null) {
+            this.container = container ?? new WindsorContainer();
         }
-
         /// <summary>
         /// Resolve component type of T with optional arguments.
         /// </summary>
@@ -33,7 +30,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Autofac.Container {
         /// <summary>
         /// Resolve component with optional arguments.
         /// </summary>
-        /// <param name="t">The type to resolve.</param>
+        /// <param name="t">The type to resolve</param>
         /// <returns></returns>
         public object Resolve(Type t) {
             return container.Resolve(t);
@@ -46,12 +43,10 @@ namespace ProjectExtensions.Azure.ServiceBus.Autofac.Container {
         /// <param name="implementationType">The implementation type.</param>
         /// <param name="perInstance">True creates an instance each time resolved.  False uses a singleton instance for the entire lifetime of the process.</param>
         public void Register(Type serviceType, Type implementationType, bool perInstance = false) {
-            var reg = builder.RegisterType(implementationType).As(serviceType);
             if (perInstance) {
-                reg.InstancePerDependency();
-            }
-            else {
-                reg.SingleInstance();
+                container.Register(Component.For(serviceType).ImplementedBy(implementationType).LifestyleTransient());
+            } else {
+                container.Register(Component.For(serviceType).ImplementedBy(implementationType).LifestyleSingleton());
             }
         }
 
@@ -60,7 +55,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Autofac.Container {
         /// </summary>
         public void RegisterConfiguration() {
             if (!IsRegistered(typeof(IBusConfiguration))) {
-                builder.Register(item => BusConfiguration.Instance).As<IBusConfiguration>().SingleInstance();
+                container.Register(Component.For<IBusConfiguration>().Instance(BusConfiguration.Instance).LifestyleSingleton());
             }
         }
 
@@ -68,13 +63,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Autofac.Container {
         /// Build the container if needed.
         /// </summary>
         public void Build() {
-            if (container == null) {
-                container = builder.Build();
-            }
-            else {
-                builder.Update(container);
-            }
-            builder = new ContainerBuilder();
+            //do nothing
         }
 
         /// <summary>
@@ -83,7 +72,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Autofac.Container {
         /// <param name="type"></param>
         /// <returns></returns>
         public bool IsRegistered(Type type) {
-            return container != null && container.IsRegistered(type);
+            return container.Kernel.HasComponent(type.FullName);
         }
     }
 }

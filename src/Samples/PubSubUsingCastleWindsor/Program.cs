@@ -1,19 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using ProjectExtensions.Azure.ServiceBus.Autofac.Container;
-using ProjectExtensions.Azure.ServiceBus.Container;
-using ProjectExtensions.Azure.ServiceBus.Serialization;
-using ProjectExtensions.Azure.ServiceBus;
-using System.Threading.Tasks;
+using System.Transactions;
 using NLog.Config;
 using NLog.Targets;
 using NLog;
 using System.Diagnostics;
-using System.Transactions;
+using ProjectExtensions.Azure.ServiceBus;
+using PubSubUsingConfiguration;
 
-namespace PubSubUsingConfiguration {
+namespace PubSubUsingCastleWindsor {
 
     class Program {
 

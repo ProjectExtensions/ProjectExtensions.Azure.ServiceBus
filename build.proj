@@ -46,7 +46,9 @@
   <!-- Nuget v2 -->
   <ItemGroup>
     <NugetItem Include="ProjectExtensions.Azure.ServiceBus">
-        <NugetPackageSummary>Azure ServiceBus Wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;</NugetPackageSummary>
+        <NugetPackageSummary>Azure ServiceBus Wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;.  Includes Autofac IoC container support.  
+		If you use a different IoC container, get ProjectExtensions.Azure.ServiceBus.Core and one of the IoC packages (ProjectExtensions.Azure.ServiceBus.IOC.[container])
+		where container is currently either Autofac or Castle.</NugetPackageSummary>
         <NugetPackageId>ProjectExtensions.Azure.ServiceBus</NugetPackageId>
         <NugetPushUrl>http://go.microsoft.com/fwlink/?LinkID=207106</NugetPushUrl>
         <NugetPublishSymbols>true</NugetPublishSymbols>
