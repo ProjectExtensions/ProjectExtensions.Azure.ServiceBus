@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ProjectExtensions.Azure.ServiceBus.Autofac.Container;
+using ProjectExtensions.Azure.ServiceBus.Container;
 using ProjectExtensions.Azure.ServiceBus.Serialization;
 using ProjectExtensions.Azure.ServiceBus;
 using System.Threading.Tasks;
@@ -27,6 +29,7 @@ namespace PubSubUsingConfiguration {
             //<add key="ServiceBusNamespace" value="namespace set up in service bus (addresshere) portion" />
 
             ProjectExtensions.Azure.ServiceBus.BusConfiguration.WithSettings()
+                .UseAutofacContainer()
                 .ReadFromConfigFile()
                 .ServiceBusApplicationId("AppName")
                 //.ServiceBusIssuerKey("[sb password]")
