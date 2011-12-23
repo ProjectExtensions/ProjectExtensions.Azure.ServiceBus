@@ -67,7 +67,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Autofac.Container {
         /// </summary>
         /// <param name="busConfiguration">The configuration instance to use on the bus.</param>
         public void RegisterBus(BusConfiguration busConfiguration) {
-            if (!container.IsRegistered(typeof(IBus))) {
+            if (!IsRegistered(typeof(IBus))) {
                 builder.Register(item => new AzureBus(busConfiguration)).As<IBus>().SingleInstance();
             }
         }
