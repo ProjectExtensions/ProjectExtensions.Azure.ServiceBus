@@ -55,6 +55,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                         desc = namespaceManager.GetSubscription(topic.Path, value.SubscriptionName);
                     });
 
+                    createNew = (desc == null);
                     createNew = (topic == null);
                 }
                 catch (MessagingEntityNotFoundException) {
