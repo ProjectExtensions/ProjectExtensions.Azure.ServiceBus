@@ -115,8 +115,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
                 var state = new AzureBusReceiverState() {
                     Client = new SubscriptionClientWrapper(subscriptionClient),
-                    EndPointData = value,
-                    Subscription = desc
+                    EndPointData = value
                 };
 
                 var helper = new AzureReceiverHelper(retryPolicy, state);
@@ -573,11 +572,6 @@ namespace ProjectExtensions.Azure.ServiceBus {
             public bool MessageLoopCompleted {
                 get;
                 private set;
-            }
-
-            public SubscriptionDescription Subscription {
-                get;
-                set;
             }
 
             public void Cancel() {
