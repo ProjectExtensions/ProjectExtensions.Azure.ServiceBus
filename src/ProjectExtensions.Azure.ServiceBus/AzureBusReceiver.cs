@@ -12,6 +12,8 @@ using System.Reflection;
 using NLog;
 using Microsoft.Practices.TransientFaultHandling;
 using System.Net;
+using ProjectExtensions.Azure.ServiceBus.Interfaces;
+using ProjectExtensions.Azure.ServiceBus.Wrappers;
 
 
 namespace ProjectExtensions.Azure.ServiceBus {
@@ -112,11 +114,10 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 }
 
                 var state = new AzureBusReceiverState() {
-                    Client = subscriptionClient,
+                    Client = new SubscriptionClientWrapper(subscriptionClient),
                     EndPointData = value,
                     Subscription = desc
                 };
-
 
                 var helper = new AzureReceiverHelper(retryPolicy, state);
                 mappings.Add(helper);
@@ -183,7 +184,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
             mappings.Clear();
         }
 
-        private class AzureReceiverHelper {
+        class AzureReceiverHelper {
 
             RetryPolicy retryPolicy;
             AzureBusReceiverState data;
@@ -232,8 +233,6 @@ namespace ProjectExtensions.Azure.ServiceBus {
                         ProcessMessageCallBack(receiveState);
                     });
 
-                    var client = data.Client;
-
                     bool messageReceived = false;
 
                     bool lastAttemptWasError = false;
@@ -253,7 +252,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                                     }
                                 }
                                 // Start receiving a new message asynchronously.
-                                client.BeginReceive(waitTimeout, cb, null);
+                                data.Client.BeginReceive(waitTimeout, cb, null);
                             },
                             (ar) => {
                                 messageReceived = false;
@@ -262,7 +261,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                                     BrokeredMessage msg = null;
                                     try {
                                         // Complete the asynchronous operation. This may throw an exception that will be handled internally by retry policy.
-                                        msg = client.EndReceive(ar);
+                                        msg = data.Client.EndReceive(ar);
 
                                         // Check if we actually received any messages.
                                         if (msg != null) {
@@ -276,7 +275,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                                                 logger.Debug("ProcessMessagesForSubscription End received new message: {0}", data.EndPointData.SubscriptionName);
 
                                                 // With PeekLock mode, we should mark the processed message as completed.
-                                                if (client.Mode == ReceiveMode.PeekLock) {
+                                                if (data.Client.Mode == ReceiveMode.PeekLock) {
                                                     // Mark brokered message as completed at which point it's removed from the queue.
                                                     SafeComplete(msg);
                                                 }
@@ -290,7 +289,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                                     finally {
                                         // With PeekLock mode, we should mark the failed message as abandoned.
                                         if (msg != null) {
-                                            if (client.Mode == ReceiveMode.PeekLock) {
+                                            if (data.Client.Mode == ReceiveMode.PeekLock) {
                                                 // Abandons a brokered message. This will cause Service Bus to unlock the message and make it available 
                                                 // to be received again, either by the same consumer or by another completing consumer.
                                                 SafeAbandon(msg);
@@ -558,7 +557,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 }
             }
 
-            public SubscriptionClient Client {
+            public ISubscriptionClient Client {
                 get;
                 set;
             }
