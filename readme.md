@@ -10,6 +10,8 @@ Use ClickToBuild.bat to build.  You will need to have the Azure SDK 1.5 installe
 
 ##Nuget Packages
 
+_Note that the additional Nuget packages for additional IoC support are not available yet_
+
 If you don't use an IoC container in your application or you are happy to use Autofac, download the default Nuget package:
 
 * ProjectExtensions.Azure.ServiceBus
@@ -119,6 +121,8 @@ Welcome to Azure Service Bus.
 
 ##Using Castle Windsor Instead of Autofac
 
+Unless otherwise noted, everything works as shown in the getting starting section above.
+
 1. Install the Nuget packages ProjectExtensions.Azure.ServiceBus.Core and ProjectExtensions.Azure.ServiceBus.IOC.CastleWindsor instead of ProjectExtensions.Azure.ServiceBus
 2. Use this initialization code at the beginning of your method or in your BootStrapper.  You will need a couple of using declarations:
 
@@ -151,11 +155,7 @@ ProjectExtensions.Azure.ServiceBus.BusConfiguration.WithSettings()
     .Configure();
 ```
 
-Everything else works as shown in the getting starting section above.
-
 ##Release Notes
-
-###Coming Soon
 
 ###Version 0.8.4
 
