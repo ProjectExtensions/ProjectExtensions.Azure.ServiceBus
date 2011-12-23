@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using ProjectExtensions.Azure.ServiceBus.Interfaces;
 using Microsoft.ServiceBus.Messaging;
+using Microsoft.Practices.TransientFaultHandling;
 
 namespace ProjectExtensions.Azure.ServiceBus.Wrappers {
     
@@ -12,6 +13,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Wrappers {
         SubscriptionClient client;
 
         public SubscriptionClientWrapper(SubscriptionClient client) {
+            Guard.ArgumentNotNull(client, "client");
             this.client = client;
         }
 
