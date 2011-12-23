@@ -6,6 +6,7 @@ using System.Reflection;
 using ProjectExtensions.Azure.ServiceBus.Serialization;
 using System.Configuration;
 using Microsoft.Practices.TransientFaultHandling;
+using ProjectExtensions.Azure.ServiceBus.Helpers;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 
@@ -74,22 +75,22 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// </summary>
         /// <returns></returns>
         public BusConfigurationBuilder ReadFromConfigFile() {
-            var setting = ConfigurationManager.AppSettings["ServiceBusApplicationId"];
+            var setting = AzureConfigurationHelper.GetConfig("ServiceBusApplicationId");
             Configuration.ServiceBusApplicationId = setting;
 
-            setting = ConfigurationManager.AppSettings["ServiceBusIssuerKey"];
+            setting = AzureConfigurationHelper.GetConfig("ServiceBusIssuerKey");
             if (string.IsNullOrWhiteSpace(setting)) {
                 throw new ArgumentNullException("ServiceBusIssuerKey", "The ServiceBusIssuerKey must be set.");
             }
             Configuration.ServiceBusIssuerKey = setting;
 
-            setting = ConfigurationManager.AppSettings["ServiceBusIssuerName"];
+            setting = AzureConfigurationHelper.GetConfig("ServiceBusIssuerName");
             if (string.IsNullOrWhiteSpace(setting)) {
                 throw new ArgumentNullException("ServiceBusIssuerName", "The ServiceBusIssuerName must be set.");
             }
             Configuration.ServiceBusIssuerName = setting;
 
-            setting = ConfigurationManager.AppSettings["ServiceBusNamespace"];
+            setting = AzureConfigurationHelper.GetConfig("ServiceBusNamespace");
             if (string.IsNullOrWhiteSpace(setting)) {
                 throw new ArgumentNullException("ServiceBusNamespace", "The ServiceBusNamespace must be set.");
             }

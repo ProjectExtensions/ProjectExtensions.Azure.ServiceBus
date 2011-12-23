@@ -6,6 +6,7 @@ using System.Reflection;
 using NLog;
 using System.Linq.Expressions;
 using Microsoft.Practices.TransientFaultHandling;
+using ProjectExtensions.Azure.ServiceBus.Helpers;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 
@@ -190,7 +191,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 //due to the limits of 50 chars we will take the name and a MD5 for the name.
                 var hashName = implementedMessageType.FullName + "|" + type.FullName;
 
-                var hash = Helpers.CalculateMD5(hashName);
+                var hash = MD5Helper.CalculateMD5(hashName);
                 var fullName = (IsCompetingHandler(foundInterface) ? "C_" : config.ServiceBusApplicationId + "_") + hash;
 
                 var info = new ServiceBusEnpointData() {
