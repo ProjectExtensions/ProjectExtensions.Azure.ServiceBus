@@ -7,6 +7,8 @@ using Microsoft.ServiceBus;
 using NLog;
 using Microsoft.Practices.TransientFaultHandling;
 using Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling.ServiceBus;
+using ProjectExtensions.Azure.ServiceBus.TransientFaultHandling.ServiceBus;
+using System.Net;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 
@@ -22,9 +24,9 @@ namespace ProjectExtensions.Azure.ServiceBus {
         protected MessagingFactory factory;
         protected NamespaceManager namespaceManager;
         protected RetryPolicy<ServiceBusTransientErrorDetectionStrategy> retryPolicy
-            = new RetryPolicy<ServiceBusTransientErrorDetectionStrategy>(20, RetryStrategy.DefaultMinBackoff, RetryStrategy.DefaultMaxBackoff, RetryStrategy.DefaultClientBackoff);
-        protected RetryPolicy<ServiceBusTransientErrorDetectionStrategy> minimalRetryPolicy
-            = new RetryPolicy<ServiceBusTransientErrorDetectionStrategy>(5, RetryStrategy.DefaultMinBackoff, TimeSpan.FromSeconds(2.0), RetryStrategy.DefaultClientBackoff);
+            = new RetryPolicy<ServiceBusTransientErrorDetectionStrategy>(20, RetryStrategy.DefaultMinBackoff, TimeSpan.FromSeconds(5.0), RetryStrategy.DefaultClientBackoff);
+        protected RetryPolicy<ServiceBusTransientErrorToDetermineExistanceDetectionStrategy> verifyRetryPolicy
+            = new RetryPolicy<ServiceBusTransientErrorToDetermineExistanceDetectionStrategy>(5, RetryStrategy.DefaultMinBackoff, TimeSpan.FromSeconds(2.0), RetryStrategy.DefaultClientBackoff);
         protected TokenProvider tokenProvider;
         protected TopicDescription topic;
         protected Uri serviceUri;
@@ -58,7 +60,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
             try {
                 logger.Info("EnsureTopic Try {0} ", topicName);
                 // First, let's see if a topic with the specified name already exists.
-                topic = retryPolicy.ExecuteAction<TopicDescription>(() => {
+                topic = verifyRetryPolicy.ExecuteAction<TopicDescription>(() => {
                     return namespaceManager.GetTopic(topicName);
                 });
 

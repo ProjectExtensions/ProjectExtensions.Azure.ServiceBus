@@ -123,6 +123,7 @@
     <Compile Include="TransientFaultHandling\RetryManagerImpl.cs" />
     <Compile Include="TransientFaultHandling\RetryPolicyException.cs" />
     <Compile Include="TransientFaultHandling\ServiceBus\ServiceBusTransientErrorDetectionStrategy.cs" />
+    <Compile Include="TransientFaultHandling\ServiceBus\ServiceBusTransientErrorToDetermineExistanceDetectionStrategy.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
