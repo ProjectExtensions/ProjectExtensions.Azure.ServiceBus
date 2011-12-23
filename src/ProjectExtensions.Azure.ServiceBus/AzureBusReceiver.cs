@@ -24,7 +24,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
         List<AzureReceiverHelper> mappings = new List<AzureReceiverHelper>();
 
-        public AzureBusReceiver(BusConfiguration configuration)
+        public AzureBusReceiver(IBusConfiguration configuration)
             : base(configuration) {
             Guard.ArgumentNotNull(configuration, "configuration");
         }
@@ -216,7 +216,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                     //set up the methodinfo
                     var methodInfo = data.EndPointData.DeclaredType.GetMethod("Handle", new Type[] { gt });
 
-                    var serializer = BusConfiguration.Container.Resolve<IServiceBusSerializer>();
+                    var serializer = BusConfiguration.Instance.Container.Resolve<IServiceBusSerializer>();
 
                     var waitTimeout = TimeSpan.FromSeconds(30);
 
@@ -401,7 +401,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
                         logger.Debug("ProcessMessage invoke callback message start Type={0} message={1} Thread={2} MessageId={3}", objectTypeName, state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
 
-                        var handler = BusConfiguration.Container.Resolve(state.Data.EndPointData.DeclaredType);
+                        var handler = BusConfiguration.Instance.Container.Resolve(state.Data.EndPointData.DeclaredType);
 
                         logger.Debug("ProcessMessage reflection callback message start MethodInfo Type={0} Declared={1} handler={2} MethodInfo={3} Thread={4} MessageId={5}", objectTypeName, state.Data.EndPointData.DeclaredType, handler.GetType().FullName, state.MethodInfo.Name, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
 

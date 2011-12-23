@@ -12,21 +12,34 @@ namespace ProjectExtensions.Azure.ServiceBus {
     /// <summary>
     /// Class used for configuration
     /// </summary>
-    public class BusConfiguration : ProjectExtensions.Azure.ServiceBus.IBusConfiguration {
-
-        static object lockObject = new object();
-        static BusConfiguration configuration;
-
-        internal IAzureBusContainer container;
+    public class BusConfiguration : IBusConfiguration {
+        static readonly BusConfiguration configuration = new BusConfiguration();
+        
+        IAzureBusContainer container;
         List<Assembly> registeredAssemblies = new List<Assembly>();
         List<Type> registeredSubscribers = new List<Type>();
+
+        //Explicit static constructor so type will not be marked beforefieldinit.  
+        //See http://www.yoda.arachsys.com/csharp/singleton.html.
+        static BusConfiguration() {
+        }
 
         /// <summary>
         /// ctor
         /// </summary>
-        internal BusConfiguration() {
+        private BusConfiguration() {
             MaxThreads = 1;
             TopicName = "pro_ext_topic";
+        }
+
+        /// <summary>
+        /// Gets the singleton instance
+        /// </summary>
+        public static BusConfiguration Instance {
+            get
+            {
+                return configuration;
+            }
         }
 
         /// <summary>
@@ -41,45 +54,28 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <summary>
         /// The IOC Container for the application
         /// </summary>
-        public static IAzureBusContainer Container {
+        /// <remarks>The setter can only be called once.  This is normally done via the builder.
+        /// You should not call the setter directly.</remarks>
+        public IAzureBusContainer Container {
             get {
-                return configuration.container;
-            }
-            internal set {
-                Guard.ArgumentNotNull(value, "Container");
-                configuration.container = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets and sets the IOC container for the current instance.
-        /// </summary>
-        public IAzureBusContainer InstanceContainer {
-            get {
-                return configuration.container;
+                return container;
             }
             set {
-                Guard.ArgumentNotNull(value, "conttainer");
+                 if (container != null) {
+                    throw new NotSupportedException("The container can only be set once.");
+                }
+                Guard.ArgumentNotNull(value, "Container");
                 container = value;
             }
         }
 
+        
         /// <summary>
         /// DefaultSerializer
         /// </summary>
         public IServiceBusSerializer DefaultSerializer {
             get {
                 return container.Resolve<IServiceBusSerializer>();
-            }
-        }
-
-        /// <summary>
-        /// Instance of BusConfiguration
-        /// </summary>
-        public static BusConfiguration Instance {
-            get {
-                //TODO should this throw an exception if it was not created?
-                return configuration;
             }
         }
 
@@ -157,12 +153,18 @@ namespace ProjectExtensions.Azure.ServiceBus {
             internal set;
         }
 
-        internal void Configure() {
+        /// <summary>
+        /// Apply the configuration
+        /// </summary>
+        public void Configure() {
             if (string.IsNullOrWhiteSpace(ServiceBusApplicationId)) {
                 throw new ApplicationException("ApplicationId must be set.");
             }
 
-            container.RegisterBus(this);
+            container.RegisterConfiguration();
+            if (!container.IsRegistered(typeof(IBus))) {
+                container.Register(typeof(IBus), typeof(AzureBus));
+            }
             if (!container.IsRegistered(typeof(IAzureBusReceiver))) {
                 container.Register(typeof(IAzureBusReceiver), typeof(AzureBusReceiver));
             }
@@ -183,14 +185,6 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// </summary>
         /// <returns></returns>
         public static BusConfigurationBuilder WithSettings() {
-            if (configuration == null) {
-                lock (lockObject) {
-                    if (configuration == null) {
-                        configuration = new BusConfiguration();
-                    }
-                }
-            }
-
             return new BusConfigurationBuilder(configuration);
         }
 

@@ -12,17 +12,15 @@ namespace ProjectExtensions.Azure.ServiceBus.Container
         /// <summary>
         /// Resolve component type of T with optional arguments.
         /// </summary>
-        /// <param name="parms">Additional parameters to be passed to the constructor.</param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        T Resolve<T>(params KeyValuePair<string, object>[] parms) where T : class;
+        T Resolve<T>() where T : class;
         /// <summary>
         /// Resolve component with optional arguments.
         /// </summary>
-        /// <param name="parms">Additional parameters to be passed to the constructor.</param>
         /// <param name="t">The type to resolve</param>
         /// <returns></returns>
-        object Resolve(Type t, params KeyValuePair<string, object>[] parms);
+        object Resolve(Type t);
         /// <summary>
         /// Register an implementation for a service type.
         /// </summary>
@@ -30,11 +28,11 @@ namespace ProjectExtensions.Azure.ServiceBus.Container
         /// <param name="implementationType">The implementation type.</param>
         /// <param name="perInstance">True creates an instance each time resolved.  False uses a singleton instance for the entire lifetime of the process.</param>
         void Register(Type serviceType, Type implementationType, bool perInstance = false);
+
         /// <summary>
-        /// Register the bus
+        /// Registers the configuration instance with the bus if it is not already registered
         /// </summary>
-        /// <param name="busConfiguration">The configuration instance to use on the bus.</param>
-        void RegisterBus(BusConfiguration busConfiguration);
+        void RegisterConfiguration();
         /// <summary>
         /// Build the container if needed.
         /// </summary>

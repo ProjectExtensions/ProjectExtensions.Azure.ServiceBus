@@ -20,7 +20,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
         protected static string TYPE_HEADER_NAME = "x_proj_ext_type"; //- are not allowed if you filter.
 
-        protected BusConfiguration configuration;
+        protected IBusConfiguration configuration;
         protected MessagingFactory factory;
         protected NamespaceManager namespaceManager;
         protected RetryPolicy<ServiceBusTransientErrorDetectionStrategy> retryPolicy
@@ -35,7 +35,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// Base class used to send and receive messages.
         /// </summary>
         /// <param name="configuration"></param>
-        public AzureSenderReceiverBase(BusConfiguration configuration) {
+        public AzureSenderReceiverBase(IBusConfiguration configuration) {
             Guard.ArgumentNotNull(configuration, "configuration");
             this.configuration = configuration;
 

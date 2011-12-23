@@ -12,7 +12,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Autofac.Container {
         /// <param name="container"></param>
         /// <returns></returns>
         public static BusConfigurationBuilder UseAutofacContainer(this BusConfigurationBuilder builder, IContainer container = null) {
-            builder.Configuration.InstanceContainer = new AutofacAzureBusContainer(container);
+            builder.Configuration.Container = new AutofacAzureBusContainer(container);
             return builder;
         }
         

@@ -19,7 +19,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         static Logger logger = LogManager.GetCurrentClassLogger();
         TopicClient client;
 
-        public AzureBusSender(BusConfiguration configuration)
+        public AzureBusSender(IBusConfiguration configuration)
             : base(configuration) {
             Guard.ArgumentNotNull(configuration, "configuration");
             retryPolicy.ExecuteAction(() => {

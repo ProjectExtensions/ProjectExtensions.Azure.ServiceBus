@@ -17,7 +17,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
         static Logger logger = LogManager.GetCurrentClassLogger();
 
-        BusConfiguration config;
+        IBusConfiguration config;
         IAzureBusSender sender;
         IAzureBusReceiver receiver;
 
@@ -27,7 +27,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// ctor
         /// </summary>
         /// <param name="config"></param>
-        public AzureBus(BusConfiguration config) {
+        public AzureBus(IBusConfiguration config) {
             Guard.ArgumentNotNull(config, "config");
             this.config = config;
             Configure();
@@ -146,8 +146,8 @@ namespace ProjectExtensions.Azure.ServiceBus {
             //this fixes a bug in .net 4 that will be fixed in sp1
             using (CloudEnvironment.EnsureSafeHttpContext()) {
                 //set up the server first.
-                sender = BusConfiguration.Container.Resolve<IAzureBusSender>(new KeyValuePair<string, object>("configuration", config));
-                receiver = BusConfiguration.Container.Resolve<IAzureBusReceiver>(new KeyValuePair<string, object>("configuration", config));
+                sender = BusConfiguration.Instance.Container.Resolve<IAzureBusSender>();
+                receiver = BusConfiguration.Instance.Container.Resolve<IAzureBusReceiver>();
 
                 foreach (var item in config.RegisteredAssemblies) {
                     RegisterAssembly(item);
@@ -202,12 +202,12 @@ namespace ProjectExtensions.Azure.ServiceBus {
                     ServiceType = foundInterface
                 };
 
-                if (!BusConfiguration.Container.IsRegistered(type)) {
+                if (!BusConfiguration.Instance.Container.IsRegistered(type)) {
                     if (info.IsReusable) {
-                        BusConfiguration.Container.Register(type, type);
+                        BusConfiguration.Instance.Container.Register(type, type);
                     }
                     else {
-                        BusConfiguration.Container.Register(type, type, true);
+                        BusConfiguration.Instance.Container.Register(type, type, true);
                     }
                 }
 
@@ -215,7 +215,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 callback(info);
             }
 
-            BusConfiguration.Container.Build();
+            BusConfiguration.Instance.Container.Build();
         }
     }
 }
