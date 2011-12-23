@@ -83,6 +83,7 @@
     <Compile Include="IMessageHandler.cs" />
     <Compile Include="IBus.cs" />
     <Compile Include="IMessageSentResult.cs" />
+    <Compile Include="Interfaces\ISubscriptionClient.cs" />
     <Compile Include="IReceivedMessage.cs" />
     <Compile Include="MessageHandlerConfigurationAttribute.cs" />
     <Compile Include="MessageSentResult.cs" />
@@ -125,6 +126,7 @@
     <Compile Include="TransientFaultHandling\RetryPolicyException.cs" />
     <Compile Include="TransientFaultHandling\ServiceBus\ServiceBusTransientErrorDetectionStrategy.cs" />
     <Compile Include="TransientFaultHandling\ServiceBus\ServiceBusTransientErrorToDetermineExistanceDetectionStrategy.cs" />
+    <Compile Include="Wrappers\SubscriptionClientWrapper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
