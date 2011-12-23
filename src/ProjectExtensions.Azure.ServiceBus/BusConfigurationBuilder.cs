@@ -15,7 +15,6 @@ namespace ProjectExtensions.Azure.ServiceBus {
     public class BusConfigurationBuilder {
         BusConfiguration configuration;
 
-
         internal BusConfigurationBuilder(BusConfiguration configuration) {
             Guard.ArgumentNotNull(configuration, "configuration");
             this.configuration = configuration;

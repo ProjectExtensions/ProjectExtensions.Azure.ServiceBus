@@ -163,8 +163,12 @@ namespace ProjectExtensions.Azure.ServiceBus {
             }
 
             container.RegisterBus(this);
-            container.Register(typeof(IAzureBusReceiver), typeof(AzureBusReceiver));
-            container.Register(typeof(IAzureBusSender), typeof(AzureBusSender));
+            if (!container.IsRegistered(typeof(IAzureBusReceiver))) {
+                container.Register(typeof(IAzureBusReceiver), typeof(AzureBusReceiver));
+            }
+            if (!container.IsRegistered(typeof(IAzureBusSender))) {
+                container.Register(typeof(IAzureBusSender), typeof(AzureBusSender));
+            }
             if (!container.IsRegistered(typeof(IServiceBusSerializer))) {
                 container.Register(typeof(IServiceBusSerializer), typeof(JsonServiceBusSerializer));
             }
@@ -177,7 +181,6 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <summary>
         /// Get the settings builder optionally passing in your existing IOC Container
         /// </summary>
-        /// <param name="container">Your optional existing IOC container.</param>
         /// <returns></returns>
         public static BusConfigurationBuilder WithSettings() {
             if (configuration == null) {
