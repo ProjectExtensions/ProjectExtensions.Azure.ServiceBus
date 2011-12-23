@@ -42,6 +42,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandl
             return ex != null && (CheckIsTransientInternal(ex) || (ex.InnerException != null && CheckIsTransientInternal(ex.InnerException)));
         }
 
+        /// <summary>
+        /// Since we call a static method, we allow you to override the call to change the behavior.
+        /// </summary>
+        /// <param name="ex">The error to check.</param>
+        /// <returns></returns>
         protected virtual bool CheckIsTransientInternal(Exception ex) {
            return CheckIsTransient(ex);
         }
