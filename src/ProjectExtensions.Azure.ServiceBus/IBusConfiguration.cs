@@ -5,6 +5,9 @@ using ProjectExtensions.Azure.ServiceBus.Serialization;
 
 namespace ProjectExtensions.Azure.ServiceBus {
     
+    /// <summary>
+    /// Interface for the Bus Configuration
+    /// </summary>
     public interface IBusConfiguration {
 
         /// <summary>
