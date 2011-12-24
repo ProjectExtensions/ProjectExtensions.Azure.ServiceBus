@@ -1,21 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Microsoft.Practices.Unity;
 using ProjectExtensions.Azure.ServiceBus.Container;
-using StructureMap;
-using StructureMap.Pipeline;
 
-namespace ProjectExtensions.Azure.ServiceBus.StructureMap.Container {
-    /// <summary>
-    /// Implementation of <see cref="IAzureBusContainer"/> for Structure Map.
-    /// </summary>
-    public class StructureMapBusContainer : IAzureBusContainer {
-        IContainer container;
+namespace ProjectExtensions.Azure.ServiceBus.Unity.Container {
+    public class UnityAzureBusContainer : IAzureBusContainer {
+        IUnityContainer container;
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="container">Optional StructueMap container.  If one is not provided, a new one will be created.</param>
-        public StructureMapBusContainer(IContainer container = null) {
-            this.container = container ?? new global::StructureMap.Container();
+        /// <param name="container">Unity container used in your application.  This is optional.  A new container will be created if one is not provided.</param>
+        public UnityAzureBusContainer(IUnityContainer container = null) {
+            this.container = container ?? new UnityContainer();
         }
         /// <summary>
         /// Resolve component type of T with optional arguments.
@@ -23,7 +22,7 @@ namespace ProjectExtensions.Azure.ServiceBus.StructureMap.Container {
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         public T Resolve<T>() where T : class {
-            return container.GetInstance<T>();
+            return container.Resolve<T>();
         }
 
         /// <summary>
@@ -32,7 +31,7 @@ namespace ProjectExtensions.Azure.ServiceBus.StructureMap.Container {
         /// <param name="t">The type to resolve</param>
         /// <returns></returns>
         public object Resolve(Type t) {
-            return container.GetInstance(t);
+            return container.Resolve(t);
         }
 
         /// <summary>
@@ -42,8 +41,11 @@ namespace ProjectExtensions.Azure.ServiceBus.StructureMap.Container {
         /// <param name="implementationType">The implementation type.</param>
         /// <param name="perInstance">True creates an instance each time resolved.  False uses a singleton instance for the entire lifetime of the process.</param>
         public void Register(Type serviceType, Type implementationType, bool perInstance = false) {
-            ILifecycle lifecycle = perInstance ? (ILifecycle) new UniquePerRequestLifecycle() : (ILifecycle) new SingletonLifecycle();
-            container.Configure(c => c.For(serviceType).LifecycleIs(lifecycle).Use(implementationType));
+            if (perInstance) {
+                container.RegisterType(serviceType, implementationType, new TransientLifetimeManager());
+            } else {
+                container.RegisterType(serviceType, implementationType, new ContainerControlledLifetimeManager());
+            }
         }
 
         /// <summary>
@@ -51,7 +53,7 @@ namespace ProjectExtensions.Azure.ServiceBus.StructureMap.Container {
         /// </summary>
         public void RegisterConfiguration() {
             if (!IsRegistered(typeof(IBusConfiguration))) {
-                container.Configure(c => c.For<IBusConfiguration>().LifecycleIs(new SingletonLifecycle()).Use(() => BusConfiguration.Instance));
+                container.RegisterInstance<IBusConfiguration>(BusConfiguration.Instance, new ContainerControlledLifetimeManager());
             }
         }
 
@@ -68,7 +70,7 @@ namespace ProjectExtensions.Azure.ServiceBus.StructureMap.Container {
         /// <param name="type"></param>
         /// <returns></returns>
         public bool IsRegistered(Type type) {
-            return container.Model.HasDefaultImplementationFor(type);
+            return container.IsRegistered(type);
         }
     }
 }
