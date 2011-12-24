@@ -64,7 +64,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                     logger.Info("CreateSubscription Try {0} ", value.SubscriptionName);
                     // First, let's see if a item with the specified name already exists.
                     verifyRetryPolicy.ExecuteAction(() => {
-                        desc = namespaceManager.GetSubscription(topic.Path, value.SubscriptionName);
+                        desc = configurationFactory.NamespaceManager.GetSubscription(topic.Path, value.SubscriptionName);
                     });
 
                     createNew = (desc == null);
@@ -95,14 +95,14 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                         logger.Info("CreateSubscription {0} ", value.SubscriptionName);
                         var filter = new SqlFilter(string.Format(TYPE_HEADER_NAME + " = '{0}'", value.MessageType.FullName.Replace('.', '_')));
                         retryPolicy.ExecuteAction(() => {
-                            desc = namespaceManager.CreateSubscription(descriptionToCreate, filter);
+                            desc = configurationFactory.NamespaceManager.CreateSubscription(descriptionToCreate, filter);
                         });
                     }
                     catch (MessagingEntityAlreadyExistsException) {
                         logger.Info("CreateSubscription {0} ", value.SubscriptionName);
                         // A item under the same name was already created by someone else, perhaps by another instance. Let's just use it.
                         retryPolicy.ExecuteAction(() => {
-                            desc = namespaceManager.GetSubscription(topic.Path, value.SubscriptionName);
+                            desc = configurationFactory.NamespaceManager.GetSubscription(topic.Path, value.SubscriptionName);
                         });
                     }
                 }
@@ -115,7 +115,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                 }
 
                 retryPolicy.ExecuteAction(() => {
-                    subscriptionClient = factory.CreateSubscriptionClient(topic.Path, value.SubscriptionName, rm);
+                    subscriptionClient = configurationFactory.MessageFactory.CreateSubscriptionClient(topic.Path, value.SubscriptionName, rm);
                 });
 
                 if (value.AttributeData != null && value.AttributeData.PrefetchCountSet()) {
@@ -165,9 +165,9 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                     }
                 }
 
-                if (namespaceManager.SubscriptionExists(topic.Path, value.SubscriptionName)) {
+                if (configurationFactory.NamespaceManager.SubscriptionExists(topic.Path, value.SubscriptionName)) {
                     var filter = new SqlFilter(string.Format(TYPE_HEADER_NAME + " = '{0}'", value.MessageType.FullName.Replace('.', '_')));
-                    retryPolicy.ExecuteAction(() => namespaceManager.DeleteSubscription(topic.Path, value.SubscriptionName));
+                    retryPolicy.ExecuteAction(() => configurationFactory.NamespaceManager.DeleteSubscription(topic.Path, value.SubscriptionName));
                     logger.Info("CancelSubscription Deleted {0}", value.SubscriptionName);
                 }
             });

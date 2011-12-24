@@ -9,6 +9,7 @@ using Microsoft.Practices.TransientFaultHandling;
 using Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling.ServiceBus;
 using ProjectExtensions.Azure.ServiceBus.TransientFaultHandling.ServiceBus;
 using System.Net;
+using ProjectExtensions.Azure.ServiceBus.Interfaces;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 
@@ -21,15 +22,13 @@ namespace ProjectExtensions.Azure.ServiceBus {
         internal static string TYPE_HEADER_NAME = "x_proj_ext_type"; //- are not allowed if you filter.
 
         protected IBusConfiguration configuration;
-        protected MessagingFactory factory;
-        protected NamespaceManager namespaceManager;
+        protected IServiceBusConfigurationFactory configurationFactory;
+
         protected RetryPolicy<ServiceBusTransientErrorDetectionStrategy> retryPolicy
             = new RetryPolicy<ServiceBusTransientErrorDetectionStrategy>(20, RetryStrategy.DefaultMinBackoff, TimeSpan.FromSeconds(5.0), RetryStrategy.DefaultClientBackoff);
         protected RetryPolicy<ServiceBusTransientErrorToDetermineExistanceDetectionStrategy> verifyRetryPolicy
             = new RetryPolicy<ServiceBusTransientErrorToDetermineExistanceDetectionStrategy>(5, RetryStrategy.DefaultMinBackoff, TimeSpan.FromSeconds(2.0), RetryStrategy.DefaultClientBackoff);
-        protected TokenProvider tokenProvider;
         protected TopicDescription topic;
-        protected Uri serviceUri;
 
         /// <summary>
         /// Base class used to send and receive messages.
@@ -39,17 +38,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
             Guard.ArgumentNotNull(configuration, "configuration");
             this.configuration = configuration;
 
-            tokenProvider = TokenProvider.CreateSharedSecretTokenProvider(configuration.ServiceBusIssuerName, configuration.ServiceBusIssuerKey);
-
-            var servicePath = string.Empty;
-
-            if (!string.IsNullOrWhiteSpace(configuration.ServicePath)) {
-                servicePath = configuration.ServicePath;
-            }
-
-            serviceUri = ServiceBusEnvironment.CreateServiceUri("sb", configuration.ServiceBusNamespace, servicePath);
-            factory = MessagingFactory.Create(serviceUri, tokenProvider);
-            namespaceManager = new NamespaceManager(serviceUri, tokenProvider);
+            configurationFactory = configuration.Container.Resolve<IServiceBusConfigurationFactory>();
             EnsureTopic(configuration.TopicName);
         }
 
@@ -61,7 +50,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 logger.Info("EnsureTopic Try {0} ", topicName);
                 // First, let's see if a topic with the specified name already exists.
                 topic = verifyRetryPolicy.ExecuteAction<TopicDescription>(() => {
-                    return namespaceManager.GetTopic(topicName);
+                    return configurationFactory.NamespaceManager.GetTopic(topicName);
                 });
 
                 createNew = (topic == null);
@@ -79,14 +68,14 @@ namespace ProjectExtensions.Azure.ServiceBus {
                     var newTopic = new TopicDescription(topicName);
 
                     topic = retryPolicy.ExecuteAction<TopicDescription>(() => {
-                        return namespaceManager.CreateTopic(newTopic);
+                        return configurationFactory.NamespaceManager.CreateTopic(newTopic);
                     });
                 }
                 catch (MessagingEntityAlreadyExistsException) {
                     logger.Info("EnsureTopic GetTopic {0} ", topicName);
                     // A topic under the same name was already created by someone else, perhaps by another instance. Let's just use it.
                     topic = retryPolicy.ExecuteAction<TopicDescription>(() => {
-                        return namespaceManager.GetTopic(topicName);
+                        return configurationFactory.NamespaceManager.GetTopic(topicName);
                     });
                 }
             }
@@ -95,7 +84,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
         public void Dispose() {
             Dispose(true);
-            factory.Close();
+            configurationFactory.MessageFactory.Close();
         }
 
         public abstract void Dispose(bool disposing);

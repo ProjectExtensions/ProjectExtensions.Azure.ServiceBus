@@ -66,6 +66,9 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="AzureBus.cs" />
+    <Compile Include="AzureServiceBusFactories\ServiceBusConfigurationFactory.cs" />
+    <Compile Include="Interfaces\INamespaceManager.cs" />
+    <Compile Include="Interfaces\IServiceBusConfigurationFactory.cs" />
     <Compile Include="Receiver\AzureBusReceiver.cs" />
     <Compile Include="Sender\AzureBusSender.cs" />
     <Compile Include="AzureSenderReceiverBase.cs" />

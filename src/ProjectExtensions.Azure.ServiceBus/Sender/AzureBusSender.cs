@@ -23,7 +23,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Sender {
             : base(configuration) {
             Guard.ArgumentNotNull(configuration, "configuration");
             retryPolicy.ExecuteAction(() => {
-                client = factory.CreateTopicClient(topic.Path);
+                client = configurationFactory.MessageFactory.CreateTopicClient(topic.Path);
             });
         }
 

@@ -8,6 +8,8 @@ using ProjectExtensions.Azure.ServiceBus.Serialization;
 using Microsoft.Practices.TransientFaultHandling;
 using ProjectExtensions.Azure.ServiceBus.Receiver;
 using ProjectExtensions.Azure.ServiceBus.Sender;
+using ProjectExtensions.Azure.ServiceBus.Interfaces;
+using ProjectExtensions.Azure.ServiceBus.AzureServiceBusFactories;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 
@@ -172,6 +174,9 @@ namespace ProjectExtensions.Azure.ServiceBus {
             }
             if (!container.IsRegistered(typeof(IAzureBusSender))) {
                 container.Register(typeof(IAzureBusSender), typeof(AzureBusSender));
+            }
+            if (!container.IsRegistered(typeof(IServiceBusConfigurationFactory))) {
+                container.Register(typeof(IServiceBusConfigurationFactory), typeof(ServiceBusConfigurationFactory));
             }
             if (!container.IsRegistered(typeof(IServiceBusSerializer))) {
                 container.Register(typeof(IServiceBusSerializer), typeof(JsonServiceBusSerializer));
