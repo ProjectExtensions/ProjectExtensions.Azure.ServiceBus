@@ -45,7 +45,6 @@ namespace ProjectExtensions.Azure.ServiceBus {
                     value.MessageType.ToString(),
                     value.IsReusable,
                     value.AttributeData != null ? value.AttributeData.ToString() : string.Empty);
-                logger.Info("TRANSIENT ERROR HANDLING CAN CAUSE THIS CHECK TO TAKE UP TO 10 SECONDS IF THE SUBSCRIPTION DOES NOT EXIST");
 
                 SubscriptionDescription desc = null;
 
@@ -83,14 +82,14 @@ namespace ProjectExtensions.Azure.ServiceBus {
                     }
 
                     try {
-                        logger.Info("CreateSubscription CreateTopic {0} ", value.SubscriptionName);
+                        logger.Info("CreateSubscription {0} ", value.SubscriptionName);
                         var filter = new SqlFilter(string.Format(TYPE_HEADER_NAME + " = '{0}'", value.MessageType.FullName.Replace('.', '_')));
                         retryPolicy.ExecuteAction(() => {
                             desc = namespaceManager.CreateSubscription(descriptionToCreate, filter);
                         });
                     }
                     catch (MessagingEntityAlreadyExistsException) {
-                        logger.Info("CreateSubscription GetTopic {0} ", value.SubscriptionName);
+                        logger.Info("CreateSubscription {0} ", value.SubscriptionName);
                         // A item under the same name was already created by someone else, perhaps by another instance. Let's just use it.
                         retryPolicy.ExecuteAction(() => {
                             desc = namespaceManager.GetSubscription(topic.Path, value.SubscriptionName);

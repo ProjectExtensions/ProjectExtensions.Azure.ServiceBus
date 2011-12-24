@@ -87,7 +87,7 @@
     <Compile Include="IReceivedMessage.cs" />
     <Compile Include="MessageHandlerConfigurationAttribute.cs" />
     <Compile Include="MessageSentResult.cs" />
-    <Compile Include="ReflectionHelper.cs" />
+    <Compile Include="Helpers\ReflectionHelper.cs" />
     <Compile Include="ReceivedMessage.cs" />
     <Compile Include="Serialization\IServiceBusSerializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
