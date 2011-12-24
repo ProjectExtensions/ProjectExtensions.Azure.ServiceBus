@@ -13,7 +13,7 @@ namespace ProjectExtensions.Azure.ServiceBus.AzureServiceBusFactories {
 
         IBusConfiguration configuration;
         MessagingFactory messageFactory;
-        NamespaceManager namespaceManager;
+        INamespaceManager namespaceManager;
         string servicePath;
         Uri serviceUri;
         TokenProvider tokenProvider;
@@ -38,16 +38,17 @@ namespace ProjectExtensions.Azure.ServiceBus.AzureServiceBusFactories {
             }
         }
 
-        public NamespaceManager NamespaceManager {
+        public INamespaceManager NamespaceManager {
             get {
                 if (namespaceManager == null) {
-                    namespaceManager = new NamespaceManager(ServiceUri, TokenProvider);
+                    namespaceManager = configuration.Container.Resolve<INamespaceManager>();
+                    namespaceManager.Initialize(ServiceUri, TokenProvider);
                 }
                 return namespaceManager;
             }
         }
 
-        public TokenProvider TokenProvider {
+        TokenProvider TokenProvider {
             get {
                 if (tokenProvider == null) {
                     tokenProvider = TokenProvider.CreateSharedSecretTokenProvider(configuration.ServiceBusIssuerName, configuration.ServiceBusIssuerKey);
@@ -56,7 +57,7 @@ namespace ProjectExtensions.Azure.ServiceBus.AzureServiceBusFactories {
             }
         }
 
-        public Uri ServiceUri {
+        Uri ServiceUri {
             get {
                 if (serviceUri == null) {
                     serviceUri = ServiceBusEnvironment.CreateServiceUri("sb", configuration.ServiceBusNamespace, servicePath);

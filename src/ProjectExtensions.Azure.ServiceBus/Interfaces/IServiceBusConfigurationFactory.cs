@@ -13,16 +13,9 @@ namespace ProjectExtensions.Azure.ServiceBus.Interfaces {
             get;
         }
 
-        NamespaceManager NamespaceManager {
+        INamespaceManager NamespaceManager {
             get;
         }
 
-        TokenProvider TokenProvider {
-            get;
-        }
-
-        Uri ServiceUri {
-            get;
-        }
     }
 }
