@@ -56,7 +56,6 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="message">The message to publish.</param>
-        /// <param name="metadata">Metadata to sent with the message.</param>
         public void Publish<T>(T message) {
             sender.Send<T>(message, default(IDictionary<string, object>));
         }
@@ -117,7 +116,8 @@ namespace ProjectExtensions.Azure.ServiceBus {
         public void Subscribe(Type type) {
             Guard.ArgumentNotNull(type, "type");
             logger.Info("Subscribe={0}", type.FullName);
-            SubscribeOrUnsubscribeType(type, receiver.CreateSubscription);
+            subscribedTypes.Add(type);
+            SubscribeOrUnsubscribeType(type, config, receiver.CreateSubscription);
         }
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
             if (subscribedTypes.Contains(type)) {
                 subscribedTypes.Remove(type);
             }
-            SubscribeOrUnsubscribeType(type, receiver.CancelSubscription);
+            SubscribeOrUnsubscribeType(type, config, receiver.CancelSubscription);
         }
 
         void Configure() {
@@ -158,10 +158,6 @@ namespace ProjectExtensions.Azure.ServiceBus {
             }
         }
 
-        bool IsCompetingHandler(Type type) {
-            return type.GetGenericTypeDefinition() == typeof(IHandleCompetingMessages<>);
-        }
-
         void RegisterAssembly(IEnumerable<Assembly> assemblies) {
             Guard.ArgumentNotNull(assemblies, "assemblies");
             foreach (var item in assemblies) {
@@ -169,7 +165,11 @@ namespace ProjectExtensions.Azure.ServiceBus {
             }
         }
 
-        void SubscribeOrUnsubscribeType(Type type, Action<ServiceBusEnpointData> callback) {
+        internal static bool IsCompetingHandler(Type type) {
+            return type.GetGenericTypeDefinition() == typeof(IHandleCompetingMessages<>);
+        }
+
+        internal static void SubscribeOrUnsubscribeType(Type type, IBusConfiguration config, Action<ServiceBusEnpointData> callback) {
             Guard.ArgumentNotNull(type, "type");
             Guard.ArgumentNotNull(callback, "callback");
 
@@ -181,8 +181,6 @@ namespace ProjectExtensions.Azure.ServiceBus {
             if (interfaces.Count == 0) {
                 throw new ApplicationException(string.Format("Type {0} does not implement IHandleMessages or IHandleCompetingMessages", type.FullName));
             }
-
-            subscribedTypes.Add(type);
 
             //for each interface we find, we need to register it with the bus.
             foreach (var foundInterface in interfaces) {
@@ -210,7 +208,6 @@ namespace ProjectExtensions.Azure.ServiceBus {
                         BusConfiguration.Instance.Container.Register(type, type, true);
                     }
                 }
-
 
                 callback(info);
             }
