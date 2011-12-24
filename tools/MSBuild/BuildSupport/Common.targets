@@ -84,7 +84,7 @@
       <ProjectWithPackages Include="%(Values.path)"/>
     </ItemGroup>
     <Exec WorkingDirectory="$(PackageDir)" 
-          Command="$(NuGet) install %(ProjectWithPackages.Identity) -s https://go.microsoft.com/fwlink/?LinkID=206669;http://development.onpointod.com:8082/nuget -o $(MSBuildProjectDirectory)\packages"/>
+          Command="$(NuGet) install %(ProjectWithPackages.Identity) -s https://go.microsoft.com/fwlink/?LinkID=206669 -o $(MSBuildProjectDirectory)\packages"/>
   </Target>
   
   <Target Name="Version">
