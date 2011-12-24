@@ -121,12 +121,13 @@ Welcome to Azure Service Bus.
 
 ##Using an IoC Conatiner Other Than Autofac
 
-Unless otherwise noted, everything works as shown in the getting starting section above.  The code examples shown are for Castle Windsor.  The other IoC container support
-DLLs follow the same pattern.
+Unless otherwise noted, everything works as shown in the getting starting section above.  This section outlines the things you will need to do differently.
 
 1. Install the Nuget packages ProjectExtensions.Azure.ServiceBus.Core and your specific IoC container (e.g. ProjectExtensions.Azure.ServiceBus.IOC.CastleWindsor for Castle Windsor) 
 instead of ProjectExtensions.Azure.ServiceBus
 2. Use this initialization code at the beginning of your method or in your BootStrapper.  You will need a couple of using declarations:
+
+_The code examples shown below are for Castle Windsor.  Code for other containers follows the same pattern._
 
 ```csharp
 using ProjectExtensions.Azure.ServiceBus;
