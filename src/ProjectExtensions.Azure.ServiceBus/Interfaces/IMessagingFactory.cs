@@ -9,7 +9,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Interfaces {
 
     interface IMessagingFactory {
         ISubscriptionClient CreateSubscriptionClient(string topicPath, string name, ReceiveMode receiveMode);
-        TopicClient CreateTopicClient(string path);
+        ITopicClient CreateTopicClient(string path);
         void Close();
         void Initialize(Uri serviceUri, TokenProvider tokenProvider);
     }

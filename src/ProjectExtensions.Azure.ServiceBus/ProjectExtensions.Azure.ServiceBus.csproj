@@ -72,6 +72,7 @@
     <Compile Include="Interfaces\IMessagingFactory.cs" />
     <Compile Include="Interfaces\INamespaceManager.cs" />
     <Compile Include="Interfaces\IServiceBusConfigurationFactory.cs" />
+    <Compile Include="Interfaces\ITopicClient.cs" />
     <Compile Include="Receiver\AzureBusReceiver.cs" />
     <Compile Include="Sender\AzureBusSender.cs" />
     <Compile Include="AzureSenderReceiverBase.cs" />
@@ -136,6 +137,7 @@
     <Compile Include="TransientFaultHandling\ServiceBus\ServiceBusTransientErrorDetectionStrategy.cs" />
     <Compile Include="TransientFaultHandling\ServiceBus\ServiceBusTransientErrorToDetermineExistanceDetectionStrategy.cs" />
     <Compile Include="Wrappers\SubscriptionClientWrapper.cs" />
+    <Compile Include="Wrappers\TopicClientWrapper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

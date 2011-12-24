@@ -18,8 +18,8 @@ namespace ProjectExtensions.Azure.ServiceBus.AzureServiceBusFactories {
             return new SubscriptionClientWrapper(messagingFactory.CreateSubscriptionClient(topicPath, name, receiveMode));
         }
 
-        public TopicClient CreateTopicClient(string path) {
-            return messagingFactory.CreateTopicClient(path);
+        public ITopicClient CreateTopicClient(string path) {
+            return new TopicClientWrapper(messagingFactory.CreateTopicClient(path));
         }
 
         public void Close() {

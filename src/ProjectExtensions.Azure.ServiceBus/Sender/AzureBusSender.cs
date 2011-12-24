@@ -9,6 +9,7 @@ using NLog;
 using Microsoft.Practices.TransientFaultHandling;
 using System.Diagnostics;
 using System.Threading;
+using ProjectExtensions.Azure.ServiceBus.Interfaces;
 
 namespace ProjectExtensions.Azure.ServiceBus.Sender {
 
@@ -17,7 +18,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Sender {
     /// </summary>
     class AzureBusSender : AzureSenderReceiverBase, IAzureBusSender {
         static Logger logger = LogManager.GetCurrentClassLogger();
-        TopicClient client;
+        ITopicClient client;
 
         public AzureBusSender(IBusConfiguration configuration)
             : base(configuration) {
