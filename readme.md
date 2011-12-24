@@ -125,9 +125,9 @@ Unless otherwise noted, everything works as shown in the getting starting sectio
 
 1. Install the Nuget packages ProjectExtensions.Azure.ServiceBus.Core and your specific IoC container (e.g. ProjectExtensions.Azure.ServiceBus.IOC.CastleWindsor for Castle Windsor) 
 instead of ProjectExtensions.Azure.ServiceBus
-2. Use this initialization code at the beginning of your method or in your BootStrapper.  You will need a couple of using declarations:
+2. Use the following initialization code at the beginning of your method or in your BootStrapper.  _The code examples shown below are for Castle Windsor.  Code for other containers follows the same pattern._
 
-_The code examples shown below are for Castle Windsor.  Code for other containers follows the same pattern._
+You will need a couple of using declarations:
 
 ```csharp
 using ProjectExtensions.Azure.ServiceBus;
