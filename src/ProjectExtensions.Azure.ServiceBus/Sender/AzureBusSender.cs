@@ -10,7 +10,7 @@ using Microsoft.Practices.TransientFaultHandling;
 using System.Diagnostics;
 using System.Threading;
 
-namespace ProjectExtensions.Azure.ServiceBus {
+namespace ProjectExtensions.Azure.ServiceBus.Sender {
 
     /// <summary>
     /// Sender class that publishes messages to the bus

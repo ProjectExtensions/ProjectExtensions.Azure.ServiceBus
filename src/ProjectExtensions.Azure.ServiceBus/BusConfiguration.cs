@@ -6,6 +6,8 @@ using System.Reflection;
 using ProjectExtensions.Azure.ServiceBus.Container;
 using ProjectExtensions.Azure.ServiceBus.Serialization;
 using Microsoft.Practices.TransientFaultHandling;
+using ProjectExtensions.Azure.ServiceBus.Receiver;
+using ProjectExtensions.Azure.ServiceBus.Sender;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 

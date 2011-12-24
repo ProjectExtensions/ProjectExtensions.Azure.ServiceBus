@@ -14,9 +14,8 @@ using Microsoft.Practices.TransientFaultHandling;
 using System.Net;
 using ProjectExtensions.Azure.ServiceBus.Interfaces;
 using ProjectExtensions.Azure.ServiceBus.Wrappers;
-using ProjectExtensions.Azure.ServiceBus.Receiver;
 
-namespace ProjectExtensions.Azure.ServiceBus {
+namespace ProjectExtensions.Azure.ServiceBus.Receiver {
 
     /// <summary>
     /// Receiver of Service Bus messages.
