@@ -107,7 +107,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                     }
                 }
 
-                SubscriptionClient subscriptionClient = null;
+                ISubscriptionClient subscriptionClient = null;
                 var rm = ReceiveMode.PeekLock;
 
                 if (value.AttributeData != null) {
@@ -123,7 +123,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                 }
 
                 var state = new AzureBusReceiverState() {
-                    Client = new SubscriptionClientWrapper(subscriptionClient),
+                    Client = subscriptionClient,
                     EndPointData = value
                 };
 

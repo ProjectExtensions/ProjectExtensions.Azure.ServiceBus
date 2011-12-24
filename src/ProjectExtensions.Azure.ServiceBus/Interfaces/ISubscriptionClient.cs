@@ -6,7 +6,12 @@ using Microsoft.ServiceBus.Messaging;
 
 namespace ProjectExtensions.Azure.ServiceBus.Interfaces {
     
-    public interface ISubscriptionClient {
+    interface ISubscriptionClient {
+
+        int PrefetchCount {
+            get;
+            set;
+        }
 
         IAsyncResult BeginReceive(TimeSpan serverWaitTime, AsyncCallback callback, object state);
         BrokeredMessage EndReceive(IAsyncResult result);

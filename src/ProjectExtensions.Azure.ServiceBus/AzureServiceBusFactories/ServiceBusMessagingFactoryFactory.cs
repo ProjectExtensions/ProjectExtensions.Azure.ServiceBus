@@ -6,6 +6,7 @@ using ProjectExtensions.Azure.ServiceBus.Interfaces;
 using Microsoft.ServiceBus.Messaging;
 using Microsoft.Practices.TransientFaultHandling;
 using Microsoft.ServiceBus;
+using ProjectExtensions.Azure.ServiceBus.Wrappers;
 
 namespace ProjectExtensions.Azure.ServiceBus.AzureServiceBusFactories {
 
@@ -13,12 +14,12 @@ namespace ProjectExtensions.Azure.ServiceBus.AzureServiceBusFactories {
 
         MessagingFactory messagingFactory;
 
-        public SubscriptionClient CreateSubscriptionClient(string topicPath, string name, ReceiveMode receiveMode) {
-            return messagingFactory.CreateSubscriptionClient(topicPath, name, receiveMode);
+        public ISubscriptionClient CreateSubscriptionClient(string topicPath, string name, ReceiveMode receiveMode) {
+            return new SubscriptionClientWrapper(messagingFactory.CreateSubscriptionClient(topicPath, name, receiveMode));
         }
 
         public TopicClient CreateTopicClient(string path) {
-           return messagingFactory.CreateTopicClient(path);
+            return messagingFactory.CreateTopicClient(path);
         }
 
         public void Close() {
