@@ -67,7 +67,9 @@
     </Compile>
     <Compile Include="AzureBus.cs" />
     <Compile Include="AzureServiceBusFactories\ServiceBusConfigurationFactory.cs" />
+    <Compile Include="AzureServiceBusFactories\ServiceBusMessagingFactoryFactory.cs" />
     <Compile Include="AzureServiceBusFactories\ServiceBusNamespaceManagerFactory.cs" />
+    <Compile Include="Interfaces\IMessagingFactory.cs" />
     <Compile Include="Interfaces\INamespaceManager.cs" />
     <Compile Include="Interfaces\IServiceBusConfigurationFactory.cs" />
     <Compile Include="Receiver\AzureBusReceiver.cs" />

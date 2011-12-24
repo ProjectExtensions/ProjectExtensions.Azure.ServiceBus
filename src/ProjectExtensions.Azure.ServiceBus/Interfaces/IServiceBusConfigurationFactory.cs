@@ -9,7 +9,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Interfaces {
     
     interface IServiceBusConfigurationFactory {
 
-        MessagingFactory MessageFactory {
+        IMessagingFactory MessageFactory {
             get;
         }
 

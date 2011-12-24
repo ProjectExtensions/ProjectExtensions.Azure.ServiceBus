@@ -181,7 +181,9 @@ namespace ProjectExtensions.Azure.ServiceBus {
             if (!container.IsRegistered(typeof(INamespaceManager))) {
                 container.Register(typeof(INamespaceManager), typeof(ServiceBusNamespaceManagerFactory));
             }
-
+            if (!container.IsRegistered(typeof(IMessagingFactory))) {
+                container.Register(typeof(IMessagingFactory), typeof(ServiceBusMessagingFactoryFactory));
+            }
             if (!container.IsRegistered(typeof(IServiceBusSerializer))) {
                 container.Register(typeof(IServiceBusSerializer), typeof(JsonServiceBusSerializer));
             }

@@ -12,7 +12,7 @@ namespace ProjectExtensions.Azure.ServiceBus.AzureServiceBusFactories {
     class ServiceBusConfigurationFactory : IServiceBusConfigurationFactory {
 
         IBusConfiguration configuration;
-        MessagingFactory messageFactory;
+        IMessagingFactory messageFactory;
         INamespaceManager namespaceManager;
         string servicePath;
         Uri serviceUri;
@@ -29,10 +29,11 @@ namespace ProjectExtensions.Azure.ServiceBus.AzureServiceBusFactories {
 
         }
 
-        public MessagingFactory MessageFactory {
+        public IMessagingFactory MessageFactory {
             get {
                 if (messageFactory == null) {
-                    messageFactory = MessagingFactory.Create(ServiceUri, TokenProvider);
+                    messageFactory = configuration.Container.Resolve<IMessagingFactory>();
+                    messageFactory.Initialize(ServiceUri, TokenProvider);
                 }
                 return messageFactory;
             }
