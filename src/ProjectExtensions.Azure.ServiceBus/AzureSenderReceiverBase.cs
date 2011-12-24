@@ -18,7 +18,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
     abstract class AzureSenderReceiverBase : IDisposable {
         static Logger logger = LogManager.GetCurrentClassLogger();
 
-        protected static string TYPE_HEADER_NAME = "x_proj_ext_type"; //- are not allowed if you filter.
+        internal static string TYPE_HEADER_NAME = "x_proj_ext_type"; //- are not allowed if you filter.
 
         protected IBusConfiguration configuration;
         protected MessagingFactory factory;

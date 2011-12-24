@@ -89,6 +89,9 @@
     <Compile Include="MessageSentResult.cs" />
     <Compile Include="Helpers\ReflectionHelper.cs" />
     <Compile Include="ReceivedMessage.cs" />
+    <Compile Include="Receiver\AzureBusReceiverState.cs" />
+    <Compile Include="Receiver\AzureReceiverHelper.cs" />
+    <Compile Include="Receiver\AzureReceiveState.cs" />
     <Compile Include="Serialization\IServiceBusSerializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serialization\JsonServiceBusSerializer.cs" />
