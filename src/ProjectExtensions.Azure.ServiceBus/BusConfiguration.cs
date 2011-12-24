@@ -35,7 +35,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <summary>
         /// Gets the singleton instance
         /// </summary>
-        public static BusConfiguration Instance {
+        public static IBusConfiguration Instance {
             get
             {
                 return configuration;
