@@ -9,21 +9,22 @@ using NLog;
 using Microsoft.Practices.TransientFaultHandling;
 using System.Diagnostics;
 using System.Threading;
+using ProjectExtensions.Azure.ServiceBus.Interfaces;
 
-namespace ProjectExtensions.Azure.ServiceBus {
+namespace ProjectExtensions.Azure.ServiceBus.Sender {
 
     /// <summary>
     /// Sender class that publishes messages to the bus
     /// </summary>
     class AzureBusSender : AzureSenderReceiverBase, IAzureBusSender {
         static Logger logger = LogManager.GetCurrentClassLogger();
-        TopicClient client;
+        ITopicClient client;
 
         public AzureBusSender(IBusConfiguration configuration)
             : base(configuration) {
             Guard.ArgumentNotNull(configuration, "configuration");
             retryPolicy.ExecuteAction(() => {
-                client = factory.CreateTopicClient(topic.Path);
+                client = configurationFactory.MessageFactory.CreateTopicClient(topic.Path);
             });
         }
 

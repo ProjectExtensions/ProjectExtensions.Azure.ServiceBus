@@ -66,8 +66,15 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="AzureBus.cs" />
-    <Compile Include="AzureBusReceiver.cs" />
-    <Compile Include="AzureBusSender.cs" />
+    <Compile Include="AzureServiceBusFactories\ServiceBusConfigurationFactory.cs" />
+    <Compile Include="AzureServiceBusFactories\ServiceBusMessagingFactoryFactory.cs" />
+    <Compile Include="AzureServiceBusFactories\ServiceBusNamespaceManagerFactory.cs" />
+    <Compile Include="Interfaces\IMessagingFactory.cs" />
+    <Compile Include="Interfaces\INamespaceManager.cs" />
+    <Compile Include="Interfaces\IServiceBusConfigurationFactory.cs" />
+    <Compile Include="Interfaces\ITopicClient.cs" />
+    <Compile Include="Receiver\AzureBusReceiver.cs" />
+    <Compile Include="Sender\AzureBusSender.cs" />
     <Compile Include="AzureSenderReceiverBase.cs" />
     <Compile Include="BrokeredMessageWrapper.cs" />
     <Compile Include="BusConfiguration.cs" />
@@ -89,6 +96,9 @@
     <Compile Include="MessageSentResult.cs" />
     <Compile Include="Helpers\ReflectionHelper.cs" />
     <Compile Include="ReceivedMessage.cs" />
+    <Compile Include="Receiver\AzureBusReceiverState.cs" />
+    <Compile Include="Receiver\AzureReceiverHelper.cs" />
+    <Compile Include="Receiver\AzureReceiveState.cs" />
     <Compile Include="Serialization\IServiceBusSerializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serialization\JsonServiceBusSerializer.cs" />
@@ -127,6 +137,7 @@
     <Compile Include="TransientFaultHandling\ServiceBus\ServiceBusTransientErrorDetectionStrategy.cs" />
     <Compile Include="TransientFaultHandling\ServiceBus\ServiceBusTransientErrorToDetermineExistanceDetectionStrategy.cs" />
     <Compile Include="Wrappers\SubscriptionClientWrapper.cs" />
+    <Compile Include="Wrappers\TopicClientWrapper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

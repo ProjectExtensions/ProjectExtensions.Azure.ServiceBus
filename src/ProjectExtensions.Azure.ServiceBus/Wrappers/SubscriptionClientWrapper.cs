@@ -8,13 +8,28 @@ using Microsoft.Practices.TransientFaultHandling;
 
 namespace ProjectExtensions.Azure.ServiceBus.Wrappers {
     
-    public class SubscriptionClientWrapper : ISubscriptionClient {
+    class SubscriptionClientWrapper : ISubscriptionClient {
 
         SubscriptionClient client;
 
         public SubscriptionClientWrapper(SubscriptionClient client) {
             Guard.ArgumentNotNull(client, "client");
             this.client = client;
+        }
+
+        public ReceiveMode Mode {
+            get {
+                return client.Mode;
+            }
+        }
+
+        public int PrefetchCount {
+            get {
+                return client.PrefetchCount;
+            }
+            set {
+                client.PrefetchCount = value;
+            }
         }
 
         public IAsyncResult BeginReceive(TimeSpan serverWaitTime, AsyncCallback callback, object state) {
@@ -27,12 +42,6 @@ namespace ProjectExtensions.Azure.ServiceBus.Wrappers {
 
         public void Close() {
             client.Close();
-        }
-
-        public ReceiveMode Mode {
-            get {
-                return client.Mode;
-            }
         }
     }
 }
