@@ -1,12 +1,11 @@
-﻿using ProjectExtensions.Azure.ServiceBus;
-using ProjectExtensions.Azure.ServiceBus.StructureMap;
-using PubSubUsingConfiguration;
+using ProjectExtensions.Azure.ServiceBus;
+using ProjectExtensions.Azure.ServiceBus.Ninject.Container;
 
 namespace PubSubUsingConfiguration {
-    public static class Bootstrapper {
+    static internal class Bootstrapper {
         public static void Initialize() {
             BusConfiguration.WithSettings()
-                .UseUnityContainer()
+                .UseNinjectContainer()
                 .ReadFromConfigFile()
                 .ServiceBusApplicationId("AppName")
                 //.ServiceBusIssuerKey("[sb password]")

@@ -27,6 +27,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectExtensions.Azure.Ser
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PubSubUsingUnity", "src\Samples\PubSubUsingUnity\PubSubUsingUnity.csproj", "{9D506199-4F64-4446-85B7-88A7A598F322}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectExtensions.Azure.ServiceBus.Ninject", "src\ProjectExtensions.Azure.ServiceBus.Ninject\ProjectExtensions.Azure.ServiceBus.Ninject.csproj", "{18285A92-F031-45A5-97BB-FE3841DAB434}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PubSubUsingNinject", "src\Samples\PubSubUsingNinject\PubSubUsingNinject.csproj", "{E1182B9A-A509-4B56-AA80-7BD15D6B3D94}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -147,6 +151,26 @@ Global
 		{9D506199-4F64-4446-85B7-88A7A598F322}.Release|Mixed Platforms.Build.0 = Release|x86
 		{9D506199-4F64-4446-85B7-88A7A598F322}.Release|x86.ActiveCfg = Release|x86
 		{9D506199-4F64-4446-85B7-88A7A598F322}.Release|x86.Build.0 = Release|x86
+		{18285A92-F031-45A5-97BB-FE3841DAB434}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{18285A92-F031-45A5-97BB-FE3841DAB434}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{18285A92-F031-45A5-97BB-FE3841DAB434}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{18285A92-F031-45A5-97BB-FE3841DAB434}.Debug|x86.ActiveCfg = Debug|x86
+		{18285A92-F031-45A5-97BB-FE3841DAB434}.Debug|x86.Build.0 = Debug|x86
+		{18285A92-F031-45A5-97BB-FE3841DAB434}.Release|Any CPU.ActiveCfg = Release|x86
+		{18285A92-F031-45A5-97BB-FE3841DAB434}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{18285A92-F031-45A5-97BB-FE3841DAB434}.Release|Mixed Platforms.Build.0 = Release|x86
+		{18285A92-F031-45A5-97BB-FE3841DAB434}.Release|x86.ActiveCfg = Release|x86
+		{18285A92-F031-45A5-97BB-FE3841DAB434}.Release|x86.Build.0 = Release|x86
+		{E1182B9A-A509-4B56-AA80-7BD15D6B3D94}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{E1182B9A-A509-4B56-AA80-7BD15D6B3D94}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{E1182B9A-A509-4B56-AA80-7BD15D6B3D94}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{E1182B9A-A509-4B56-AA80-7BD15D6B3D94}.Debug|x86.ActiveCfg = Debug|x86
+		{E1182B9A-A509-4B56-AA80-7BD15D6B3D94}.Debug|x86.Build.0 = Debug|x86
+		{E1182B9A-A509-4B56-AA80-7BD15D6B3D94}.Release|Any CPU.ActiveCfg = Release|x86
+		{E1182B9A-A509-4B56-AA80-7BD15D6B3D94}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{E1182B9A-A509-4B56-AA80-7BD15D6B3D94}.Release|Mixed Platforms.Build.0 = Release|x86
+		{E1182B9A-A509-4B56-AA80-7BD15D6B3D94}.Release|x86.ActiveCfg = Release|x86
+		{E1182B9A-A509-4B56-AA80-7BD15D6B3D94}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -158,6 +182,7 @@ Global
 		{7635ABF3-31F7-408E-ACDB-FFDBE7DA6D10} = {13C615E7-0790-486F-90CB-3F0EE0981ECB}
 		{59099F13-9153-477B-A35A-B4AB9413DF32} = {13C615E7-0790-486F-90CB-3F0EE0981ECB}
 		{9D506199-4F64-4446-85B7-88A7A598F322} = {13C615E7-0790-486F-90CB-3F0EE0981ECB}
+		{E1182B9A-A509-4B56-AA80-7BD15D6B3D94} = {13C615E7-0790-486F-90CB-3F0EE0981ECB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		EnterpriseLibraryConfigurationToolBinariesPath = packages\Unity.2.1.505.0\lib\NET35

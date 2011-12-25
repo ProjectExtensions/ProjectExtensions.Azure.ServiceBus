@@ -34,6 +34,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>PubSubUsingConfiguration.Program</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.ServiceBus, Version=1.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -69,6 +72,9 @@
     <Compile Include="..\PubSubUsingConfiguration\AnotherTestMessageSubscriber.cs">
       <Link>AnotherTestMessageSubscriber.cs</Link>
     </Compile>
+    <Compile Include="..\PubSubUsingConfiguration\Program.cs">
+      <Link>Program.cs</Link>
+    </Compile>
     <Compile Include="..\PubSubUsingConfiguration\TestMessage.cs">
       <Link>TestMessage.cs</Link>
     </Compile>
@@ -76,7 +82,6 @@
       <Link>TestMessageSubscriber.cs</Link>
     </Compile>
     <Compile Include="Bootstrapper.cs" />
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -27,6 +27,7 @@
       src\ProjectExtensions.Azure.ServiceBus\bin\$(Configuration)\*.*;
 	  src\ProjectExtensions.Azure.ServiceBus.Autofac\bin\$(Configuration)\*.*;
 	  src\ProjectExtensions.Azure.ServiceBus.CastleWindsor\bin\$(Configuration)\*.*;
+	  src\ProjectExtensions.Azure.ServiceBus.Ninject\bin\$(Configuration)\*.*;
 	  src\ProjectExtensions.Azure.ServiceBus.StructureMap\bin\$(Configuration)\*.*;
 	  src\ProjectExtensions.Azure.ServiceBus.Unity\bin\$(Configuration)\*.*;
     </BinInclude>
@@ -59,7 +60,7 @@
 	<NugetItem Include="ProjectExtensions.Azure.ServiceBus.Core">
         <NugetPackageSummary>Azure ServiceBus Wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;.  Does not include IoC container support implementation.  
 		Either create your own implementation of IAzureBusContainer or get one of the IoC packages (ProjectExtensions.Azure.ServiceBus.IOC.[container])
-		where container is Autofac, CastleWindsor, StructureMap or Unity.</NugetPackageSummary>
+		where container is Autofac, CastleWindsor, Ninject, StructureMap or Unity.</NugetPackageSummary>
         <NugetPackageId>ProjectExtensions.Azure.ServiceBus.Core</NugetPackageId>
         <NugetPushUrl>http://go.microsoft.com/fwlink/?LinkID=207106</NugetPushUrl>
         <NugetPublishSymbols>true</NugetPublishSymbols>
@@ -75,6 +76,13 @@
         <NugetPackageSummary>Castle Windsor support for Azure ServiceBus Wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;.  You will
 		also need ProjectExtensions.Azure.ServiceBus.Core.</NugetPackageSummary>
         <NugetPackageId>ProjectExtensions.Azure.ServiceBus.IOC.CastleWindsor</NugetPackageId>
+        <NugetPushUrl>http://go.microsoft.com/fwlink/?LinkID=207106</NugetPushUrl>
+        <NugetPublishSymbols>true</NugetPublishSymbols>
+    </NugetItem>
+	<NugetItem Include="ProjectExtensions.Azure.ServiceBus.IOC.Ninject">
+        <NugetPackageSummary>Ninject support for Azure ServiceBus Wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;.  You will
+		also need ProjectExtensions.Azure.ServiceBus.Core.</NugetPackageSummary>
+        <NugetPackageId>ProjectExtensions.Azure.ServiceBus.IOC.Ninject</NugetPackageId>
         <NugetPushUrl>http://go.microsoft.com/fwlink/?LinkID=207106</NugetPushUrl>
         <NugetPublishSymbols>true</NugetPublishSymbols>
     </NugetItem>

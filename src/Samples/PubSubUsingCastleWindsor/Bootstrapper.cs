@@ -2,7 +2,7 @@
 using ProjectExtensions.Azure.ServiceBus.CastleWindsor.Container;
 using PubSubUsingConfiguration;
 
-namespace PubSubUsingCastleWindsor {
+namespace PubSubUsingConfiguration {
     public static class Bootstrapper {
         public static void Initialize() {
             BusConfiguration.WithSettings()

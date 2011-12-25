@@ -22,10 +22,11 @@ You can then either implement IAzureBusContainer for your IoC of choice or grab 
 
 * Autofac in ProjectExtensions.Azure.ServiceBus.IOC.Autofac
 * Castle Windsor in ProjectExtensions.Azure.ServiceBus.IOC.CastleWindsor
+* Ninject in ProjectExtensions.Azure.ServiceBus.IOC.Ninject
 * StructureMap in ProjectExtensions.Azure.ServiceBus.IOC.StructureMap
 * Unity in ProjectExtensions.Azure.ServiceBus.IOC.Unity
 
-We will be adding support for additional IoC containers in the future.  If you have a favorite, let us know, or, better yet, contribute an implementation.
+If you have a favorite IoC container we don't support, let us know, or, better yet, contribute an implementation.
 
 ##Getting started
 
@@ -164,6 +165,7 @@ ProjectExtensions.Azure.ServiceBus.BusConfiguration.WithSettings()
 
 * Allow support for other IoC containers to be added.  Continue to support Autofac.
 * Support for Castle Windsor IoC.
+* Support for Ninject IoC.
 * Support for StructureMap IoC.
 * Support for Unity IoC.
 * BREAKING CHANGE.  Move Autofac support into seperate DLL.  Existing implementations need to add a reference to ProjectExtensions.Azure.ServiceBus.Autofac and change initialization code as shown in the getting started example.

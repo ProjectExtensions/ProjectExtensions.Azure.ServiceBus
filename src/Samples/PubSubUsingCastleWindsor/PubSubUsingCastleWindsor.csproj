@@ -34,6 +34,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>PubSubUsingConfiguration.Program</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Castle.Core">
       <HintPath>..\..\..\packages\Castle.Core.3.0.0.4001\lib\net40-client\Castle.Core.dll</HintPath>
@@ -72,6 +75,9 @@
     <Compile Include="..\PubSubUsingConfiguration\AnotherTestMessageSubscriber.cs">
       <Link>AnotherTestMessageSubscriber.cs</Link>
     </Compile>
+    <Compile Include="..\PubSubUsingConfiguration\Program.cs">
+      <Link>Program.cs</Link>
+    </Compile>
     <Compile Include="..\PubSubUsingConfiguration\TestMessage.cs">
       <Link>TestMessage.cs</Link>
     </Compile>
@@ -79,7 +85,6 @@
       <Link>TestMessageSubscriber.cs</Link>
     </Compile>
     <Compile Include="Bootstrapper.cs" />
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -2,7 +2,7 @@
 using ProjectExtensions.Azure.ServiceBus.StructureMap.Container;
 using PubSubUsingConfiguration;
 
-namespace PubSubUsingStructureMap {
+namespace PubSubUsingConfiguration {
     public static class Bootstrapper {
         public static void Initialize() {
             BusConfiguration.WithSettings()
