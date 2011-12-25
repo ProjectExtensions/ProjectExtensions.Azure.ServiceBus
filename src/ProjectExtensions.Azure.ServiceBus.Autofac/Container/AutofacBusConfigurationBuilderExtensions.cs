@@ -9,10 +9,10 @@ namespace ProjectExtensions.Azure.ServiceBus.Autofac.Container {
         /// Initializes Autofac
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="container"></param>
+        /// <param name="container">Autofac container used in your application.  This is optional.  A new container will be created if one is not provided</param>
         /// <returns></returns>
         public static BusConfigurationBuilder UseAutofacContainer(this BusConfigurationBuilder builder, IContainer container = null) {
-            builder.Configuration.InstanceContainer = new AutofacAzureBusContainer(container);
+            builder.Configuration.Container = new AutofacAzureBusContainer(container);
             return builder;
         }
         

@@ -1,12 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using ProjectExtensions.Azure.ServiceBus.Autofac.Container;
-using ProjectExtensions.Azure.ServiceBus.Container;
-using ProjectExtensions.Azure.ServiceBus.Serialization;
 using ProjectExtensions.Azure.ServiceBus;
-using System.Threading.Tasks;
 using NLog.Config;
 using NLog.Targets;
 using NLog;
@@ -28,15 +22,8 @@ namespace PubSubUsingConfiguration {
             //https://addresshere.servicebus.windows.net/
             //<add key="ServiceBusNamespace" value="namespace set up in service bus (addresshere) portion" />
 
-            ProjectExtensions.Azure.ServiceBus.BusConfiguration.WithSettings()
-                .UseAutofacContainer()
-                .ReadFromConfigFile()
-                .ServiceBusApplicationId("AppName")
-                //.ServiceBusIssuerKey("[sb password]")
-                //.ServiceBusIssuerName("owner")
-                //.ServiceBusNamespace("[addresshere]")
-                .RegisterAssembly(typeof(TestMessageSubscriber).Assembly)
-                .Configure();
+            //This sets up the bus configuration for the application.
+            Bootstrapper.Initialize();
 
             //put 4 messages in a transaction
             using (var scope = new TransactionScope()) {
