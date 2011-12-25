@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
-    <id>ProjectExtensions.Azure.ServiceBus</id>
-    <title>Azure AppFabric ServiceBus IHandleMessage&lt;T&gt; wrapper by Project Extensions</title>
+    <id>ProjectExtensions.Azure.ServiceBus.Core</id>
+    <title>Azure AppFabric ServiceBus IHandleMessage&lt;T&gt; wrapper by Project Extensions (Core)</title>
     <version>0.8.4.0</version>
     <authors>Project Extensions, Joe Feser</authors>
     <owners>Project Extensions, Joe Feser</owners>
@@ -11,12 +11,11 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <releaseNotes>Added support for pausing after an error for a handler. Added ability to auto DeadLetter after MaxRetries.
     Breaking Change: The IDictionary parameter on the handler has been moved to the message and the second parameter has been removed.</releaseNotes>
-    <description>Azure AppFabric ServiceBus wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;</description>
-    <summary>Azure ServiceBus Wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;.  Includes Autofac IoC container support.  
-		If you use a different IoC container, get ProjectExtensions.Azure.ServiceBus.Core and one of the IoC packages (ProjectExtensions.Azure.ServiceBus.IOC.[container])
-		where container is Autofac, CastleWindsor, StructureMap or Unity. (Debug)</summary>
+    <description>Azure AppFabric ServiceBus wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;. (Core)</description>
+    <summary>Azure ServiceBus Wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;.  Does not include IoC container support implementation.  
+		Either create your own implementation of IAzureBusContainer or get one of the IoC packages (ProjectExtensions.Azure.ServiceBus.IOC.[container])
+		where container is Autofac, CastleWindsor, Ninject, StructureMap or Unity. (Debug)</summary>
     <dependencies>
-      <dependency id="Autofac" version="2.5.2.830" />
       <dependency id="Newtonsoft.Json" version="4.0.3" />
       <dependency id="NLog" version="2.0.0.2000" />
       <dependency id="WindowsAzure.ServiceBus" version="1.5.0.0" />
@@ -27,11 +26,7 @@
     <file src="BuildOutput\bin\ProjectExtensions.Azure.ServiceBus.dll" target="lib\net40-full" />
     <file src="BuildOutput\bin\ProjectExtensions.Azure.ServiceBus.pdb" target="lib\net40-full" />
     <file src="BuildOutput\bin\ProjectExtensions.Azure.ServiceBus.xml" target="lib\net40-full" />
-    <file src="BuildOutput\bin\ProjectExtensions.Azure.ServiceBus.Autofac.dll" target="lib\net40-full" />
-    <file src="BuildOutput\bin\ProjectExtensions.Azure.ServiceBus.Autofac.pdb" target="lib\net40-full" />
-    <file src="BuildOutput\bin\ProjectExtensions.Azure.ServiceBus.Autofac.xml" target="lib\net40-full" />
     <file src="BuildOutput\src\*.cs" target="src" />
     <file src="BuildOutput\src\ProjectExtensions.Azure.ServiceBus\**\*.cs" target="src\ProjectExtensions.Azure.ServiceBus" />
-    <file src="BuildOutput\src\ProjectExtensions.Azure.ServiceBus.Autofac\**\*.cs" target="src\ProjectExtensions.Azure.ServiceBus.Autofac" />
   </files>
 </package>

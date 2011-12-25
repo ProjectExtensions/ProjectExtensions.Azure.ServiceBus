@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>ProjectExtensions.Azure.ServiceBus.IOC.StructureMap</id>
+    <title>StructureMap Support for Azure AppFabric ServiceBus IHandleMessage&lt;T&gt; wrapper by Project Extensions</title>
+    <version>0.8.4.0</version>
+    <authors>Project Extensions, Joe Feser</authors>
+    <owners>Project Extensions, Joe Feser</owners>
+    <copyright>Copyright (C) Project Extensions and Joe Feser 2011</copyright>
+    <projectUrl>https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>StructureMap support for Azure AppFabric ServiceBus wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;</description>
+    <summary>StructureMap support for Azure ServiceBus Wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;.  You will
+		also need ProjectExtensions.Azure.ServiceBus.Core. (Debug)</summary>
+    <dependencies>
+      <dependency id="structuremap" version="2.6.3" />
+    </dependencies>
+    <tags>Azure, AppFabric, ServiceBus</tags>
+  </metadata>
+  <files>
+    <file src="BuildOutput\bin\ProjectExtensions.Azure.ServiceBus.StructureMap.dll" target="lib\net40-full" />
+    <file src="BuildOutput\bin\ProjectExtensions.Azure.ServiceBus.StructureMap.pdb" target="lib\net40-full" />
+    <file src="BuildOutput\bin\ProjectExtensions.Azure.ServiceBus.StructureMap.xml" target="lib\net40-full" />
+    <file src="BuildOutput\src\*.cs" target="src" />
+    <file src="BuildOutput\src\ProjectExtensions.Azure.ServiceBus.StructureMap\**\*.cs" target="src\ProjectExtensions.Azure.ServiceBus.StructureMap" />
+  </files>
+</package>
