@@ -7,7 +7,7 @@ using Microsoft.Practices.TransientFaultHandling;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 
-    public class ReceivedMessage<T> : IReceivedMessage<T> {
+    class ReceivedMessage<T> : IReceivedMessage<T> {
 
         IBrokeredMessage brokeredMessage;
         T message;
