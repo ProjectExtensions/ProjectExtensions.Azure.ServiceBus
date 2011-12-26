@@ -37,6 +37,9 @@ namespace ProjectExtensions.Azure.ServiceBus {
         string MessageId {
             get;
         }
+        IDictionary<string, object> Properties {
+            get;
+        }
         string ReplyTo {
             get;
         }
@@ -61,5 +64,13 @@ namespace ProjectExtensions.Azure.ServiceBus {
         string To {
             get;
         }
+
+        void Abandon();
+        void Complete();
+        void DeadLetter(string deadLetterReason, string deadLetterErrorDescription);
+        void Dispose();
+
+        T GetBody<T>();
+
     }
 }

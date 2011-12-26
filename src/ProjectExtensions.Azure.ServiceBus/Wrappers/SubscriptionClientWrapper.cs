@@ -36,8 +36,8 @@ namespace ProjectExtensions.Azure.ServiceBus.Wrappers {
             return client.BeginReceive(serverWaitTime, callback, state);
         }
 
-        public BrokeredMessage EndReceive(IAsyncResult result) {
-            return client.EndReceive(result);
+        public IBrokeredMessage EndReceive(IAsyncResult result) {
+            return new BrokeredMessageWrapper(client.EndReceive(result));
         }
 
         public void Close() {

@@ -89,7 +89,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                             messageReceived = false;
                             // Make sure we are not told to stop receiving while we were waiting for a new message.
                             if (!data.CancelToken.IsCancellationRequested) {
-                                BrokeredMessage msg = null;
+                                IBrokeredMessage msg = null;
                                 try {
                                     // Complete the asynchronous operation. This may throw an exception that will be handled internally by retry policy.
                                     msg = data.Client.EndReceive(ar);
@@ -254,7 +254,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                 state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
         }
 
-        static bool SafeDeadLetter(BrokeredMessage msg, string reason) {
+        static bool SafeDeadLetter(IBrokeredMessage msg, string reason) {
             try {
                 // Mark brokered message as complete.
                 msg.DeadLetter(reason, "Max retries Exceeded.");
@@ -274,7 +274,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
             return false;
         }
 
-        static bool SafeComplete(BrokeredMessage msg) {
+        static bool SafeComplete(IBrokeredMessage msg) {
             try {
                 // Mark brokered message as complete.
                 msg.Complete();
@@ -294,7 +294,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
             return false;
         }
 
-        static bool SafeAbandon(BrokeredMessage msg) {
+        static bool SafeAbandon(IBrokeredMessage msg) {
             try {
                 // Abandons a brokered message. This will cause the Service Bus to unlock the message and make it available to be received again, 
                 // either by the same consumer or by another competing consumer.

@@ -68,6 +68,12 @@ namespace ProjectExtensions.Azure.ServiceBus {
             }
         }
 
+        public IDictionary<string, object> Properties {
+            get {
+                return message.Properties;
+            }
+        }
+
         public string ReplyTo {
             get {
                 return message.ReplyTo;
@@ -114,6 +120,26 @@ namespace ProjectExtensions.Azure.ServiceBus {
             get {
                 return message.To;
             }
+        }
+
+        public void Abandon() {
+            message.Abandon();
+        }
+
+        public void Complete() {
+            message.Complete();
+        }
+
+        public void DeadLetter(string deadLetterReason, string deadLetterErrorDescription) {
+            message.DeadLetter(deadLetterReason, deadLetterErrorDescription);
+        }
+
+        public void Dispose() {
+            message.Dispose();
+        }
+
+        public T GetBody<T>() {
+            return message.GetBody<T>();
         }
     }
 }
