@@ -69,9 +69,11 @@
     <Compile Include="AzureServiceBusFactories\ServiceBusConfigurationFactory.cs" />
     <Compile Include="AzureServiceBusFactories\ServiceBusMessagingFactoryFactory.cs" />
     <Compile Include="AzureServiceBusFactories\ServiceBusNamespaceManagerFactory.cs" />
+    <Compile Include="AzureServiceBusFactories\ServiceBusTokenProvider.cs" />
     <Compile Include="Interfaces\IMessagingFactory.cs" />
     <Compile Include="Interfaces\INamespaceManager.cs" />
     <Compile Include="Interfaces\IServiceBusConfigurationFactory.cs" />
+    <Compile Include="Interfaces\IServiceBusTokenProvider.cs" />
     <Compile Include="Interfaces\ITopicClient.cs" />
     <Compile Include="Receiver\AzureBusReceiver.cs" />
     <Compile Include="Sender\AzureBusSender.cs" />

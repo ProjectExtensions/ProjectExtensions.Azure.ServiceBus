@@ -178,6 +178,10 @@ namespace ProjectExtensions.Azure.ServiceBus {
             if (!container.IsRegistered(typeof(IServiceBusConfigurationFactory))) {
                 container.Register(typeof(IServiceBusConfigurationFactory), typeof(ServiceBusConfigurationFactory));
             }
+            //Only used by Azure since we can't create an instance of the Token without calling AppFabric.
+            if (!container.IsRegistered(typeof(IServiceBusTokenProvider))) {
+                container.Register(typeof(IServiceBusTokenProvider), typeof(ServiceBusTokenProvider));
+            }
             if (!container.IsRegistered(typeof(INamespaceManager))) {
                 container.Register(typeof(INamespaceManager), typeof(ServiceBusNamespaceManagerFactory));
             }

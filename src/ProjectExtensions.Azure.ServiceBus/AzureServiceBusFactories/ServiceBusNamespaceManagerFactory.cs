@@ -13,6 +13,11 @@ namespace ProjectExtensions.Azure.ServiceBus.AzureServiceBusFactories {
 
         NamespaceManager namespaceManager;
 
+        public ServiceBusNamespaceManagerFactory(IServiceBusTokenProvider tokenProvider) {
+            Guard.ArgumentNotNull(tokenProvider, "tokenProvider");
+            namespaceManager = new NamespaceManager(tokenProvider.ServiceUri, tokenProvider.TokenProvider);
+        }
+
         public SubscriptionDescription CreateSubscription(SubscriptionDescription description, Filter filter) {
             return namespaceManager.CreateSubscription(description, filter);
         }
@@ -37,10 +42,5 @@ namespace ProjectExtensions.Azure.ServiceBus.AzureServiceBusFactories {
             return namespaceManager.SubscriptionExists(topicPath, name);
         }
 
-        public void Initialize(Uri serviceUri, TokenProvider tokenProvider) {
-            Guard.ArgumentNotNull(serviceUri, "tokenProvider");
-            Guard.ArgumentNotNull(serviceUri, "tokenProvider");
-            namespaceManager = new NamespaceManager(serviceUri, tokenProvider);
-        }
     }
 }

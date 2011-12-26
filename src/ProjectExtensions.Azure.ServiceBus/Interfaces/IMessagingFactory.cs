@@ -11,6 +11,5 @@ namespace ProjectExtensions.Azure.ServiceBus.Interfaces {
         ISubscriptionClient CreateSubscriptionClient(string topicPath, string name, ReceiveMode receiveMode);
         ITopicClient CreateTopicClient(string path);
         void Close();
-        void Initialize(Uri serviceUri, TokenProvider tokenProvider);
     }
 }
