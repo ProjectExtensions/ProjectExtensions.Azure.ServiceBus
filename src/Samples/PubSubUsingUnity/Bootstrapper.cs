@@ -1,12 +1,12 @@
 ﻿using ProjectExtensions.Azure.ServiceBus;
-using ProjectExtensions.Azure.ServiceBus.CastleWindsor.Container;
+using ProjectExtensions.Azure.ServiceBus.StructureMap;
 using PubSubUsingConfiguration;
 
 namespace PubSubUsingConfiguration {
     public static class Bootstrapper {
         public static void Initialize() {
             BusConfiguration.WithSettings()
-                .UseCastleWindsorContainer()
+                .UseUnityContainer()
                 .ReadFromConfigFile()
                 .ServiceBusApplicationId("AppName")
                 //.ServiceBusIssuerKey("[sb password]")

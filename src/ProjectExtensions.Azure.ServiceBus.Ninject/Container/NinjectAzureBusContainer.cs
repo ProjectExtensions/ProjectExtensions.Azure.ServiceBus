@@ -2,32 +2,35 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Castle.MicroKernel.Registration;
-using Castle.Windsor;
+using Ninject;
+using Ninject.Activation;
+using Ninject.Parameters;
 using ProjectExtensions.Azure.ServiceBus.Container;
 
-namespace ProjectExtensions.Azure.ServiceBus.CastleWindsor.Container {
+namespace ProjectExtensions.Azure.ServiceBus.Ninject.Container {
     /// <summary>
-    /// Implementation of <see cref="IAzureBusContainer"/> for Castle Windsor.
+    /// Ninject support for the Azure service bus.
     /// </summary>
-    public class CastleWindsorBusContainer : IAzureBusContainer {
-        IWindsorContainer container;
-  
+    public class NinjectAzureBusContainer : IAzureBusContainer {
+        IKernel container;
+
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="container">Optional Castle Windsor container.  If one is not provided,
-        /// a new one will be created.</param>
-        public CastleWindsorBusContainer(IWindsorContainer container = null) {
-            this.container = container ?? new WindsorContainer();
+        /// <param name="container">Optional Ninject kernel owned by the calling application.
+        /// If one is not provided, a new one will be created.</param>
+        public NinjectAzureBusContainer(IKernel container = null) {
+            this.container = container ?? new StandardKernel();
         }
+
+
         /// <summary>
         /// Resolve component type of T with optional arguments.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         public T Resolve<T>() where T : class {
-            return container.Resolve<T>();
+            return container.Get<T>();
         }
 
         /// <summary>
@@ -36,7 +39,7 @@ namespace ProjectExtensions.Azure.ServiceBus.CastleWindsor.Container {
         /// <param name="t">The type to resolve</param>
         /// <returns></returns>
         public object Resolve(Type t) {
-            return container.Resolve(t);
+            return container.Get(t);
         }
 
         /// <summary>
@@ -47,9 +50,9 @@ namespace ProjectExtensions.Azure.ServiceBus.CastleWindsor.Container {
         /// <param name="perInstance">True creates an instance each time resolved.  False uses a singleton instance for the entire lifetime of the process.</param>
         public void Register(Type serviceType, Type implementationType, bool perInstance = false) {
             if (perInstance) {
-                container.Register(Component.For(serviceType).ImplementedBy(implementationType).LifestyleTransient());
+                container.Bind(serviceType).To(implementationType).InTransientScope();
             } else {
-                container.Register(Component.For(serviceType).ImplementedBy(implementationType).LifestyleSingleton());
+                container.Bind(serviceType).To(implementationType).InSingletonScope();
             }
         }
 
@@ -58,7 +61,7 @@ namespace ProjectExtensions.Azure.ServiceBus.CastleWindsor.Container {
         /// </summary>
         public void RegisterConfiguration() {
             if (!IsRegistered(typeof(IBusConfiguration))) {
-                container.Register(Component.For<IBusConfiguration>().Instance(BusConfiguration.Instance).LifestyleSingleton());
+                container.Bind<IBusConfiguration>().ToConstant(BusConfiguration.Instance).InSingletonScope();
             }
         }
 
@@ -75,7 +78,7 @@ namespace ProjectExtensions.Azure.ServiceBus.CastleWindsor.Container {
         /// <param name="type"></param>
         /// <returns></returns>
         public bool IsRegistered(Type type) {
-            return container.Kernel.HasComponent(type.FullName);
+            return container.CanResolve(container.CreateRequest(type, null, new List<IParameter>(), false, false));
         }
     }
 }

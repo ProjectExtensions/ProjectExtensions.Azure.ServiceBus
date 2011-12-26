@@ -1,25 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Castle.MicroKernel.Registration;
-using Castle.Windsor;
 using ProjectExtensions.Azure.ServiceBus.Container;
+using StructureMap;
+using StructureMap.Pipeline;
 
-namespace ProjectExtensions.Azure.ServiceBus.CastleWindsor.Container {
+namespace ProjectExtensions.Azure.ServiceBus.StructureMap.Container {
     /// <summary>
-    /// Implementation of <see cref="IAzureBusContainer"/> for Castle Windsor.
+    /// Implementation of <see cref="IAzureBusContainer"/> for Structure Map.
     /// </summary>
-    public class CastleWindsorBusContainer : IAzureBusContainer {
-        IWindsorContainer container;
-  
+    public class StructureMapAzureBusContainer : IAzureBusContainer {
+        IContainer container;
+
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="container">Optional Castle Windsor container.  If one is not provided,
-        /// a new one will be created.</param>
-        public CastleWindsorBusContainer(IWindsorContainer container = null) {
-            this.container = container ?? new WindsorContainer();
+        /// <param name="container">Optional StructueMap container.  If one is not provided, a new one will be created.</param>
+        public StructureMapAzureBusContainer(IContainer container = null) {
+            this.container = container ?? new global::StructureMap.Container();
         }
         /// <summary>
         /// Resolve component type of T with optional arguments.
@@ -27,7 +23,7 @@ namespace ProjectExtensions.Azure.ServiceBus.CastleWindsor.Container {
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         public T Resolve<T>() where T : class {
-            return container.Resolve<T>();
+            return container.GetInstance<T>();
         }
 
         /// <summary>
@@ -36,7 +32,7 @@ namespace ProjectExtensions.Azure.ServiceBus.CastleWindsor.Container {
         /// <param name="t">The type to resolve</param>
         /// <returns></returns>
         public object Resolve(Type t) {
-            return container.Resolve(t);
+            return container.GetInstance(t);
         }
 
         /// <summary>
@@ -46,11 +42,8 @@ namespace ProjectExtensions.Azure.ServiceBus.CastleWindsor.Container {
         /// <param name="implementationType">The implementation type.</param>
         /// <param name="perInstance">True creates an instance each time resolved.  False uses a singleton instance for the entire lifetime of the process.</param>
         public void Register(Type serviceType, Type implementationType, bool perInstance = false) {
-            if (perInstance) {
-                container.Register(Component.For(serviceType).ImplementedBy(implementationType).LifestyleTransient());
-            } else {
-                container.Register(Component.For(serviceType).ImplementedBy(implementationType).LifestyleSingleton());
-            }
+            ILifecycle lifecycle = perInstance ? (ILifecycle) new UniquePerRequestLifecycle() : (ILifecycle) new SingletonLifecycle();
+            container.Configure(c => c.For(serviceType).LifecycleIs(lifecycle).Use(implementationType));
         }
 
         /// <summary>
@@ -58,7 +51,7 @@ namespace ProjectExtensions.Azure.ServiceBus.CastleWindsor.Container {
         /// </summary>
         public void RegisterConfiguration() {
             if (!IsRegistered(typeof(IBusConfiguration))) {
-                container.Register(Component.For<IBusConfiguration>().Instance(BusConfiguration.Instance).LifestyleSingleton());
+                container.Configure(c => c.For<IBusConfiguration>().LifecycleIs(new SingletonLifecycle()).Use(() => BusConfiguration.Instance));
             }
         }
 
@@ -75,7 +68,7 @@ namespace ProjectExtensions.Azure.ServiceBus.CastleWindsor.Container {
         /// <param name="type"></param>
         /// <returns></returns>
         public bool IsRegistered(Type type) {
-            return container.Kernel.HasComponent(type.FullName);
+            return container.Model.HasDefaultImplementationFor(type);
         }
     }
 }

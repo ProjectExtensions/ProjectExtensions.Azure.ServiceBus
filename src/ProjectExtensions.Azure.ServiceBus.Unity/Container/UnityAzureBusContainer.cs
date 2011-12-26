@@ -2,24 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Castle.MicroKernel.Registration;
-using Castle.Windsor;
+using Microsoft.Practices.Unity;
 using ProjectExtensions.Azure.ServiceBus.Container;
 
-namespace ProjectExtensions.Azure.ServiceBus.CastleWindsor.Container {
-    /// <summary>
-    /// Implementation of <see cref="IAzureBusContainer"/> for Castle Windsor.
-    /// </summary>
-    public class CastleWindsorBusContainer : IAzureBusContainer {
-        IWindsorContainer container;
-  
+namespace ProjectExtensions.Azure.ServiceBus.Unity.Container {
+    public class UnityAzureBusContainer : IAzureBusContainer {
+        IUnityContainer container;
+
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="container">Optional Castle Windsor container.  If one is not provided,
-        /// a new one will be created.</param>
-        public CastleWindsorBusContainer(IWindsorContainer container = null) {
-            this.container = container ?? new WindsorContainer();
+        /// <param name="container">Unity container used in your application.  This is optional.  A new container will be created if one is not provided.</param>
+        public UnityAzureBusContainer(IUnityContainer container = null) {
+            this.container = container ?? new UnityContainer();
         }
         /// <summary>
         /// Resolve component type of T with optional arguments.
@@ -47,9 +42,9 @@ namespace ProjectExtensions.Azure.ServiceBus.CastleWindsor.Container {
         /// <param name="perInstance">True creates an instance each time resolved.  False uses a singleton instance for the entire lifetime of the process.</param>
         public void Register(Type serviceType, Type implementationType, bool perInstance = false) {
             if (perInstance) {
-                container.Register(Component.For(serviceType).ImplementedBy(implementationType).LifestyleTransient());
+                container.RegisterType(serviceType, implementationType, new TransientLifetimeManager());
             } else {
-                container.Register(Component.For(serviceType).ImplementedBy(implementationType).LifestyleSingleton());
+                container.RegisterType(serviceType, implementationType, new ContainerControlledLifetimeManager());
             }
         }
 
@@ -58,7 +53,7 @@ namespace ProjectExtensions.Azure.ServiceBus.CastleWindsor.Container {
         /// </summary>
         public void RegisterConfiguration() {
             if (!IsRegistered(typeof(IBusConfiguration))) {
-                container.Register(Component.For<IBusConfiguration>().Instance(BusConfiguration.Instance).LifestyleSingleton());
+                container.RegisterInstance<IBusConfiguration>(BusConfiguration.Instance, new ContainerControlledLifetimeManager());
             }
         }
 
@@ -75,7 +70,7 @@ namespace ProjectExtensions.Azure.ServiceBus.CastleWindsor.Container {
         /// <param name="type"></param>
         /// <returns></returns>
         public bool IsRegistered(Type type) {
-            return container.Kernel.HasComponent(type.FullName);
+            return container.IsRegistered(type);
         }
     }
 }
