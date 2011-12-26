@@ -12,31 +12,24 @@ namespace ProjectExtensions.Azure.ServiceBus.AzureServiceBusFactories {
     class ServiceBusConfigurationFactory : IServiceBusConfigurationFactory {
 
         IBusConfiguration configuration;
-        IMessagingFactory messageFactory;
-        INamespaceManager namespaceManager;
 
-        public ServiceBusConfigurationFactory(IBusConfiguration configuration) {
+        public ServiceBusConfigurationFactory(IBusConfiguration configuration, IMessagingFactory messageFactory, INamespaceManager namespaceManager) {
             Guard.ArgumentNotNull(configuration, "configuration");
-
+            Guard.ArgumentNotNull(messageFactory, "messageFactory");
+            Guard.ArgumentNotNull(namespaceManager, "namespaceManager");
             this.configuration = configuration;
+            this.MessageFactory = messageFactory;
+            this.NamespaceManager = namespaceManager;
         }
 
         public IMessagingFactory MessageFactory {
-            get {
-                if (messageFactory == null) {
-                    messageFactory = configuration.Container.Resolve<IMessagingFactory>();
-                }
-                return messageFactory;
-            }
+            get;
+            private set;
         }
 
         public INamespaceManager NamespaceManager {
-            get {
-                if (namespaceManager == null) {
-                    namespaceManager = configuration.Container.Resolve<INamespaceManager>();
-                }
-                return namespaceManager;
-            }
+            get;
+            private set;
         }
 
     }

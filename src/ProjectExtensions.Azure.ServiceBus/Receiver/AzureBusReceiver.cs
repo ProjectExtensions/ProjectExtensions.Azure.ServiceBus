@@ -32,8 +32,9 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
         /// ctor
         /// </summary>
         /// <param name="configuration">The configuration data</param>
-        public AzureBusReceiver(IBusConfiguration configuration)
-            : base(configuration) {
+        /// <param name="configurationFactory"></param>
+        public AzureBusReceiver(IBusConfiguration configuration, IServiceBusConfigurationFactory configurationFactory)
+            : base(configuration, configurationFactory) {
             Guard.ArgumentNotNull(configuration, "configuration");
         }
 
