@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using ProjectExtensions.Azure.ServiceBus.Helpers;
+using ProjectExtensions.Azure.ServiceBus.Receiver;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 

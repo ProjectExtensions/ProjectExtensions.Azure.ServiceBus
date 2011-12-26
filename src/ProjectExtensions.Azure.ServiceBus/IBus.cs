@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 
+//DO NOT Change the namespace.
 namespace ProjectExtensions.Azure.ServiceBus {
 
     /// <summary>

@@ -7,6 +7,7 @@ using NLog;
 using System.Linq.Expressions;
 using Microsoft.Practices.TransientFaultHandling;
 using ProjectExtensions.Azure.ServiceBus.Helpers;
+using ProjectExtensions.Azure.ServiceBus.Interfaces;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 

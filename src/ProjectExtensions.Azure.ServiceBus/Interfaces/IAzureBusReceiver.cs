@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ProjectExtensions.Azure.ServiceBus {
+namespace ProjectExtensions.Azure.ServiceBus.Interfaces {
 
     interface IAzureBusReceiver {
         void CancelSubscription(ServiceBusEnpointData value);

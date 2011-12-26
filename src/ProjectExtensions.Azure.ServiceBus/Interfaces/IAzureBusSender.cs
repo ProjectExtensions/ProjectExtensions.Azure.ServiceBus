@@ -2,7 +2,7 @@
 using ProjectExtensions.Azure.ServiceBus.Serialization;
 using System.Collections.Generic;
 
-namespace ProjectExtensions.Azure.ServiceBus {
+namespace ProjectExtensions.Azure.ServiceBus.Interfaces {
 
     interface IAzureBusSender {
         void Close();

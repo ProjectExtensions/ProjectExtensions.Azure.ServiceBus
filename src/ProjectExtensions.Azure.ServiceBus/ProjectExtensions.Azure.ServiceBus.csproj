@@ -86,8 +86,8 @@
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="Helpers\AzureConfigurationHelper.cs" />
     <Compile Include="Helpers\MD5Helper.cs" />
-    <Compile Include="IAzureBusReceiver.cs" />
-    <Compile Include="IAzureBusSender.cs" />
+    <Compile Include="Interfaces\IAzureBusReceiver.cs" />
+    <Compile Include="Interfaces\IAzureBusSender.cs" />
     <Compile Include="IBrokeredMessage.cs" />
     <Compile Include="IBusConfiguration.cs" />
     <Compile Include="IMessageHandler.cs" />
@@ -96,9 +96,9 @@
     <Compile Include="Interfaces\ISubscriptionClient.cs" />
     <Compile Include="IReceivedMessage.cs" />
     <Compile Include="MessageHandlerConfigurationAttribute.cs" />
-    <Compile Include="MessageSentResult.cs" />
+    <Compile Include="Sender\MessageSentResult.cs" />
     <Compile Include="Helpers\ReflectionHelper.cs" />
-    <Compile Include="ReceivedMessage.cs" />
+    <Compile Include="Receiver\ReceivedMessage.cs" />
     <Compile Include="Receiver\AzureBusReceiverState.cs" />
     <Compile Include="Receiver\AzureReceiverHelper.cs" />
     <Compile Include="Receiver\AzureReceiveState.cs" />

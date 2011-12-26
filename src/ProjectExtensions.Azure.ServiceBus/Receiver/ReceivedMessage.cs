@@ -5,7 +5,7 @@ using System.Text;
 using Microsoft.ServiceBus.Messaging;
 using Microsoft.Practices.TransientFaultHandling;
 
-namespace ProjectExtensions.Azure.ServiceBus {
+namespace ProjectExtensions.Azure.ServiceBus.Receiver {
 
     class ReceivedMessage<T> : IReceivedMessage<T> {
 
