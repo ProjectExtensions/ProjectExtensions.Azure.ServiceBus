@@ -8,9 +8,10 @@ using ProjectExtensions.Azure.ServiceBus.Serialization;
 using System.Threading;
 using Microsoft.ServiceBus.Messaging;
 using System.IO;
+using System.Diagnostics;
 
 namespace ProjectExtensions.Azure.ServiceBus.Receiver {
-    
+
     class AzureReceiverHelper {
 
         static Logger logger = LogManager.GetCurrentClassLogger();
@@ -42,8 +43,6 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
         public void ProcessMessagesForSubscription() {
 
             try {
-
-                Guard.ArgumentNotNull(data, "data");
 
                 logger.Info("ProcessMessagesForSubscription Message Start {0} Declared {1} MessageTytpe {2}, IsReusable {3}", data.EndPointData.SubscriptionName,
                         data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
@@ -226,10 +225,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                     stream.Position = 0;
                     object msg = serial.Deserialize(stream, state.Data.EndPointData.MessageType);
 
-                    //TODO create a cache for object creation.
-                    var gt = typeof(ReceivedMessage<>).MakeGenericType(state.Data.EndPointData.MessageType);
-
-                    object receivedMessage = Activator.CreateInstance(gt, new object[] { state.Message, msg, values });
+                    var receivedMessage = state.Data.EndPointData.GetReceivedMessage(new object[] { state.Message, msg, values });
 
                     objectTypeName = receivedMessage.GetType().FullName;
 
