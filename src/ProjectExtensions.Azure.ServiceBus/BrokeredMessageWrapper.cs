@@ -6,7 +6,7 @@ using Microsoft.ServiceBus.Messaging;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 
-    public class BrokeredMessageWrapper : IBrokeredMessage {
+    class BrokeredMessageWrapper : IBrokeredMessage {
 
         BrokeredMessage message;
 
@@ -65,6 +65,9 @@ namespace ProjectExtensions.Azure.ServiceBus {
         public string MessageId {
             get {
                 return message.MessageId;
+            }
+            set {
+                message.MessageId = value;
             }
         }
 
@@ -141,5 +144,10 @@ namespace ProjectExtensions.Azure.ServiceBus {
         public T GetBody<T>() {
             return message.GetBody<T>();
         }
+
+        public BrokeredMessage GetMessage() {
+            return message;
+        }
+
     }
 }

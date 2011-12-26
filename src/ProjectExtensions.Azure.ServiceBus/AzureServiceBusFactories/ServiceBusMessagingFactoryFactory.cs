@@ -7,6 +7,7 @@ using Microsoft.ServiceBus.Messaging;
 using Microsoft.Practices.TransientFaultHandling;
 using Microsoft.ServiceBus;
 using ProjectExtensions.Azure.ServiceBus.Wrappers;
+using System.IO;
 
 namespace ProjectExtensions.Azure.ServiceBus.AzureServiceBusFactories {
 
@@ -31,5 +32,8 @@ namespace ProjectExtensions.Azure.ServiceBus.AzureServiceBusFactories {
             messagingFactory.Close();
         }
 
+        public IBrokeredMessage CreateBrokeredMessage(Stream messageBodyStream) {
+            return new BrokeredMessageWrapper(new BrokeredMessage(messageBodyStream, false));
+        }
     }
 }

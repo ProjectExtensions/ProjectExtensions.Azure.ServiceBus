@@ -31,6 +31,5 @@ namespace ProjectExtensions.Azure.ServiceBus.AzureServiceBusFactories {
             get;
             private set;
         }
-
     }
 }

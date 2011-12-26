@@ -36,6 +36,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         }
         string MessageId {
             get;
+            set;
         }
         IDictionary<string, object> Properties {
             get;

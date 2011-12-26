@@ -94,7 +94,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Sender {
 
             sendAction = ((obj, state, resultCallBack, serializer, metadata) => {
 
-                BrokeredMessage message = null;
+                IBrokeredMessage message = null;
                 Exception failureException = null;
                 bool resultSent = false; //I am not able to determine when the exception block is called.
 
@@ -106,7 +106,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Sender {
                         try {
                             // A new BrokeredMessage instance must be created each time we send it. Reusing the original BrokeredMessage instance may not 
                             // work as the state of its BodyStream cannot be guaranteed to be readable from the beginning.
-                            message = new BrokeredMessage(serializer.Serialize(obj), false);
+                            message = configurationFactory.MessageFactory.CreateBrokeredMessage(serializer.Serialize(obj));
 
                             message.MessageId = Guid.NewGuid().ToString();
                             message.Properties.Add(TYPE_HEADER_NAME, obj.GetType().FullName.Replace('.', '_'));
