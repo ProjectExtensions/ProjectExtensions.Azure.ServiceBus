@@ -18,6 +18,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
         IBusConfiguration config;
         RetryPolicy retryPolicy;
         AzureBusReceiverState data;
+        IServiceBusSerializer serializer;
 
         int failCounter = 0;
 
@@ -27,8 +28,13 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
             }
         }
 
-        public AzureReceiverHelper(IBusConfiguration config, RetryPolicy retryPolicy, AzureBusReceiverState data) {
+        public AzureReceiverHelper(IBusConfiguration config, IServiceBusSerializer serializer, RetryPolicy retryPolicy, AzureBusReceiverState data) {
+            Guard.ArgumentNotNull(config, "config");
+            Guard.ArgumentNotNull(serializer, "serializer");
+            Guard.ArgumentNotNull(retryPolicy, "retryPolicy");
+            Guard.ArgumentNotNull(data, "data");
             this.config = config;
+            this.serializer = serializer;
             this.retryPolicy = retryPolicy;
             this.data = data;
         }
@@ -47,8 +53,6 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
 
                 //set up the methodinfo
                 var methodInfo = data.EndPointData.DeclaredType.GetMethod("Handle", new Type[] { gt });
-
-                var serializer = config.Container.Resolve<IServiceBusSerializer>();
 
                 var waitTimeout = TimeSpan.FromSeconds(30);
 
