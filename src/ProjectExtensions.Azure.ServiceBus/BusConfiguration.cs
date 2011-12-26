@@ -51,7 +51,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// </summary>
         public IBus Bus {
             get {
-                return container.Resolve<IBus>();
+                return container.Bus;
             }
         }
 
@@ -79,7 +79,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// </summary>
         public IServiceBusSerializer DefaultSerializer {
             get {
-                return container.Resolve<IServiceBusSerializer>();
+                return container.DefaultSerializer;
             }
         }
 

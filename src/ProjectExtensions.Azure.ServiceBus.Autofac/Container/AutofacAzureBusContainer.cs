@@ -6,9 +6,9 @@ using ProjectExtensions.Azure.ServiceBus.Container;
 
 namespace ProjectExtensions.Azure.ServiceBus.Autofac.Container {
     /// <summary>
-    /// Autofac support for the azure service bus
+    /// Implementation of <see cref="IAzureBusContainer"/> for Autofac
     /// </summary>
-    public class AutofacAzureBusContainer : IAzureBusContainer {
+    public class AutofacAzureBusContainer : AzureBusContainerBase {
         IContainer container;
         ContainerBuilder builder = new ContainerBuilder();
 
@@ -26,7 +26,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Autofac.Container {
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public T Resolve<T>() where T : class {
+        public override T Resolve<T>() {
             return container.Resolve<T>();
         }
 
@@ -35,7 +35,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Autofac.Container {
         /// </summary>
         /// <param name="t">The type to resolve.</param>
         /// <returns></returns>
-        public object Resolve(Type t) {
+        public override object Resolve(Type t) {
             return container.Resolve(t);
         }
 
@@ -45,7 +45,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Autofac.Container {
         /// <param name="serviceType">The service type.</param>
         /// <param name="implementationType">The implementation type.</param>
         /// <param name="perInstance">True creates an instance each time resolved.  False uses a singleton instance for the entire lifetime of the process.</param>
-        public void Register(Type serviceType, Type implementationType, bool perInstance = false) {
+        public override void Register(Type serviceType, Type implementationType, bool perInstance = false) {
             var reg = builder.RegisterType(implementationType).As(serviceType);
             if (perInstance) {
                 reg.InstancePerDependency();
@@ -58,7 +58,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Autofac.Container {
         /// <summary>
         /// Registers the configuration instance with the bus if it is not already registered
         /// </summary>
-        public void RegisterConfiguration() {
+        public override void RegisterConfiguration() {
             if (!IsRegistered(typeof(IBusConfiguration))) {
                 builder.Register(item => BusConfiguration.Instance).As<IBusConfiguration>().SingleInstance();
             }
@@ -67,7 +67,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Autofac.Container {
         /// <summary>
         /// Build the container if needed.
         /// </summary>
-        public void Build() {
+        public override void Build() {
             if (container == null) {
                 container = builder.Build();
             }
@@ -82,7 +82,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Autofac.Container {
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public bool IsRegistered(Type type) {
+        public override bool IsRegistered(Type type) {
             return container != null && container.IsRegistered(type);
         }
     }

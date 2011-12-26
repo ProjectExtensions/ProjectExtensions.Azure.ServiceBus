@@ -8,10 +8,11 @@ using Ninject.Parameters;
 using ProjectExtensions.Azure.ServiceBus.Container;
 
 namespace ProjectExtensions.Azure.ServiceBus.Ninject.Container {
+    
     /// <summary>
-    /// Ninject support for the Azure service bus.
+    /// Implementation of <see cref="IAzureBusContainer"/> for Ninject.
     /// </summary>
-    public class NinjectAzureBusContainer : IAzureBusContainer {
+    public class NinjectAzureBusContainer : AzureBusContainerBase {
         IKernel container;
 
         /// <summary>
@@ -29,7 +30,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Ninject.Container {
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public T Resolve<T>() where T : class {
+        public override T Resolve<T>() {
             return container.Get<T>();
         }
 
@@ -38,7 +39,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Ninject.Container {
         /// </summary>
         /// <param name="t">The type to resolve</param>
         /// <returns></returns>
-        public object Resolve(Type t) {
+        public override object Resolve(Type t) {
             return container.Get(t);
         }
 
@@ -48,10 +49,11 @@ namespace ProjectExtensions.Azure.ServiceBus.Ninject.Container {
         /// <param name="serviceType">The service type.</param>
         /// <param name="implementationType">The implementation type.</param>
         /// <param name="perInstance">True creates an instance each time resolved.  False uses a singleton instance for the entire lifetime of the process.</param>
-        public void Register(Type serviceType, Type implementationType, bool perInstance = false) {
+        public override void Register(Type serviceType, Type implementationType, bool perInstance = false) {
             if (perInstance) {
                 container.Bind(serviceType).To(implementationType).InTransientScope();
-            } else {
+            }
+            else {
                 container.Bind(serviceType).To(implementationType).InSingletonScope();
             }
         }
@@ -59,7 +61,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Ninject.Container {
         /// <summary>
         /// Registers the configuration instance with the bus if it is not already registered
         /// </summary>
-        public void RegisterConfiguration() {
+        public override void RegisterConfiguration() {
             if (!IsRegistered(typeof(IBusConfiguration))) {
                 container.Bind<IBusConfiguration>().ToConstant(BusConfiguration.Instance).InSingletonScope();
             }
@@ -68,7 +70,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Ninject.Container {
         /// <summary>
         /// Build the container if needed.
         /// </summary>
-        public void Build() {
+        public override void Build() {
             //do nothing
         }
 
@@ -77,7 +79,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Ninject.Container {
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public bool IsRegistered(Type type) {
+        public override bool IsRegistered(Type type) {
             return container.CanResolve(container.CreateRequest(type, null, new List<IParameter>(), false, false));
         }
     }

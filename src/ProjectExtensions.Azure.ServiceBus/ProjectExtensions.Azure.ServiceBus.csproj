@@ -70,6 +70,7 @@
     <Compile Include="AzureServiceBusFactories\ServiceBusMessagingFactoryFactory.cs" />
     <Compile Include="AzureServiceBusFactories\ServiceBusNamespaceManagerFactory.cs" />
     <Compile Include="AzureServiceBusFactories\ServiceBusTokenProvider.cs" />
+    <Compile Include="Container\AzureBusContainerBase.cs" />
     <Compile Include="Interfaces\IMessagingFactory.cs" />
     <Compile Include="Interfaces\INamespaceManager.cs" />
     <Compile Include="Interfaces\IServiceBusConfigurationFactory.cs" />

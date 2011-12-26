@@ -6,7 +6,10 @@ using Microsoft.Practices.Unity;
 using ProjectExtensions.Azure.ServiceBus.Container;
 
 namespace ProjectExtensions.Azure.ServiceBus.Unity.Container {
-    public class UnityAzureBusContainer : IAzureBusContainer {
+    /// <summary>
+    /// Implementation of <see cref="IAzureBusContainer"/> for Unity.
+    /// </summary>
+    public class UnityAzureBusContainer : AzureBusContainerBase {
         IUnityContainer container;
 
         /// <summary>
@@ -21,7 +24,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Unity.Container {
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public T Resolve<T>() where T : class {
+        public override T Resolve<T>() {
             return container.Resolve<T>();
         }
 
@@ -30,7 +33,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Unity.Container {
         /// </summary>
         /// <param name="t">The type to resolve</param>
         /// <returns></returns>
-        public object Resolve(Type t) {
+        public override object Resolve(Type t) {
             return container.Resolve(t);
         }
 
@@ -40,10 +43,11 @@ namespace ProjectExtensions.Azure.ServiceBus.Unity.Container {
         /// <param name="serviceType">The service type.</param>
         /// <param name="implementationType">The implementation type.</param>
         /// <param name="perInstance">True creates an instance each time resolved.  False uses a singleton instance for the entire lifetime of the process.</param>
-        public void Register(Type serviceType, Type implementationType, bool perInstance = false) {
+        public override void Register(Type serviceType, Type implementationType, bool perInstance = false) {
             if (perInstance) {
                 container.RegisterType(serviceType, implementationType, new TransientLifetimeManager());
-            } else {
+            }
+            else {
                 container.RegisterType(serviceType, implementationType, new ContainerControlledLifetimeManager());
             }
         }
@@ -51,7 +55,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Unity.Container {
         /// <summary>
         /// Registers the configuration instance with the bus if it is not already registered
         /// </summary>
-        public void RegisterConfiguration() {
+        public override void RegisterConfiguration() {
             if (!IsRegistered(typeof(IBusConfiguration))) {
                 container.RegisterInstance<IBusConfiguration>(BusConfiguration.Instance, new ContainerControlledLifetimeManager());
             }
@@ -60,7 +64,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Unity.Container {
         /// <summary>
         /// Build the container if needed.
         /// </summary>
-        public void Build() {
+        public override void Build() {
             //do nothing
         }
 
@@ -69,7 +73,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Unity.Container {
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public bool IsRegistered(Type type) {
+        public override bool IsRegistered(Type type) {
             return container.IsRegistered(type);
         }
     }
