@@ -117,7 +117,6 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// Subscribes to recieve published messages of type T.
         /// This method is only necessary if you turned off auto-subscribe
         /// </summary>
-        /// <typeparam name="T">The type of message to subscribe to.</typeparam>
         /// <param name="type">The type to subscribe</param>
         public void Subscribe(Type type) {
             Guard.ArgumentNotNull(type, "type");

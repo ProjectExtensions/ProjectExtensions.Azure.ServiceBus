@@ -11,7 +11,7 @@ namespace ProjectExtensions.Azure.ServiceBus.TransientFaultHandling.ServiceBus {
     /// <summary>
     /// When we verify if an item exits, we consider a 404 to NOT be Transient.
     /// </summary>
-    public class ServiceBusTransientErrorToDetermineExistanceDetectionStrategy : ServiceBusTransientErrorDetectionStrategy {
+    class ServiceBusTransientErrorToDetermineExistanceDetectionStrategy : ServiceBusTransientErrorDetectionStrategy {
 
         protected override bool CheckIsTransientInternal(Exception ex) {
 

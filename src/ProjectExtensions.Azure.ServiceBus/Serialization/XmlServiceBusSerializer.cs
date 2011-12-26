@@ -9,6 +9,9 @@ using System.Xml;
 
 namespace ProjectExtensions.Azure.ServiceBus.Serialization {
 
+    /// <summary>
+    /// Default XmlSerializer that is used when serializing messages.
+    /// </summary>
     public class XmlServiceBusSerializer : ServiceBusSerializerBase {
 
         static Logger logger = LogManager.GetCurrentClassLogger();

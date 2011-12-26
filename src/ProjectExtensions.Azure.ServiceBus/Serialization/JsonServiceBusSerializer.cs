@@ -8,6 +8,9 @@ using NLog;
 
 namespace ProjectExtensions.Azure.ServiceBus.Serialization {
 
+    /// <summary>
+    /// JSon Serializer that may be used to serialize messages
+    /// </summary>
     public class JsonServiceBusSerializer : ServiceBusSerializerBase {
 
         static Logger logger = LogManager.GetCurrentClassLogger();
