@@ -47,10 +47,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                 logger.Info("ProcessMessagesForSubscription Message Start {0} Declared {1} MessageTytpe {2}, IsReusable {3}", data.EndPointData.SubscriptionName,
                         data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
 
-                //TODO create a cache for object creation.
                 var gt = typeof(IReceivedMessage<>).MakeGenericType(data.EndPointData.MessageType);
-
-                //set up the methodinfo
                 var methodInfo = data.EndPointData.DeclaredType.GetMethod("Handle", new Type[] { gt });
 
                 var waitTimeout = TimeSpan.FromSeconds(30);
