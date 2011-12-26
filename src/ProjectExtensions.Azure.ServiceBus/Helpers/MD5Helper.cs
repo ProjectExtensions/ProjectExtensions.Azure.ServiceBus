@@ -3,16 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Security.Cryptography;
-using NLog;
 
-namespace ProjectExtensions.Azure.ServiceBus {
-
-    /// <summary>
-    /// Helper Classes
-    /// </summary>
-    public static class Helpers {
-        
-        static Logger logger = LogManager.GetCurrentClassLogger();
+namespace ProjectExtensions.Azure.ServiceBus.Helpers {
+    
+    class MD5Helper {
 
         /// <summary>
         /// Calculates MD5 hash

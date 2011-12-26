@@ -6,11 +6,29 @@ Follow me or tweet at me on Twitter: @joefeser.
 
 ##Building 
 
-Use ClickToBuild.bat to build.
+Use ClickToBuild.bat to build.  You will need to have the Azure SDK 1.5 installed in order to build.
+
+##Nuget Packages
+
+If you don't use an IoC container in your application or you are happy to use Autofac, download the default Nuget package:
+
+* ProjectExtensions.Azure.ServiceBus
+
+If you want to use a specific IoC container, grab our core package:
+
+* ProjectExtensions.Azure.ServiceBus.Core
+
+You can then either implement IAzureBusContainer for your IoC of choice or grab one of the pre-built options:
+
+* Autofac in ProjectExtensions.Azure.ServiceBus.IOC.Autofac
+* Castle Windsor in ProjectExtensions.Azure.ServiceBus.IOC.CastleWindsor
+* Ninject in ProjectExtensions.Azure.ServiceBus.IOC.Ninject
+* StructureMap in ProjectExtensions.Azure.ServiceBus.IOC.StructureMap
+* Unity in ProjectExtensions.Azure.ServiceBus.IOC.Unity
+
+If you have a favorite IoC container we don't support, let us know, or, better yet, contribute an implementation.
 
 ##Getting started
-
-The Nuget package is ProjectExtensions.Azure.ServiceBus
 
 1. Create a console application
 2. Using NuGet, install the package ProjectExtensions.Azure.ServiceBus.
@@ -102,13 +120,52 @@ Watch your method get called.
 
 Welcome to Azure Service Bus.
 
+##Using an IoC Conatiner Other Than Autofac
+
+Unless otherwise noted, everything works as shown in the getting starting section above.  This section outlines the things you will need to do differently.
+
+1. Install the Nuget packages ProjectExtensions.Azure.ServiceBus.Core and your specific IoC container (e.g. ProjectExtensions.Azure.ServiceBus.IOC.CastleWindsor for Castle Windsor) 
+instead of ProjectExtensions.Azure.ServiceBus
+2. Use the following initialization code at the beginning of your method or in your BootStrapper.  _The code examples shown below are for Castle Windsor.  Code for other containers follows the same pattern._
+
+You will need a couple of using declarations:
+
+```csharp
+using ProjectExtensions.Azure.ServiceBus;
+using ProjectExtensions.Azure.ServiceBus.CastleWindsor.Container;
+```
+
+Basic setup code (assuming you want to put Azure configuration information in your application configuration file):
+
+```csharp
+ProjectExtensions.Azure.ServiceBus.BusConfiguration.WithSettings()
+    .UseCastleWindsorContainer()
+    .ReadFromConfigFile()
+    .ServiceBusApplicationId("AppName")
+    .RegisterAssembly(typeof(TestMessageSubscriber).Assembly)
+    .Configure();
+```
+
+Otherwise, you can configure everything in code:
+
+```csharp
+ProjectExtensions.Azure.ServiceBus.BusConfiguration.WithSettings()
+	.UseCastleWindsorContainer()
+    .ServiceBusApplicationId("AppName")
+    .ServiceBusIssuerKey("[sb password]")
+    .ServiceBusIssuerName("owner")
+    .ServiceBusNamespace("[addresshere]")
+    .RegisterAssembly(typeof(TestMessageSubscriber).Assembly)
+    .Configure();
+```
+
 ##Release Notes
-
-###Coming Soon
-
-* Support for Castle Windsor IOC container
 
 ###Version 0.8.4
 
-* Allow support for other IOC containers to be added
+* Allow support for other IoC containers to be added.  Continue to support Autofac.
+* Support for Castle Windsor IoC.
+* Support for Ninject IoC.
+* Support for StructureMap IoC.
+* Support for Unity IoC.
 * BREAKING CHANGE.  Move Autofac support into seperate DLL.  Existing implementations need to add a reference to ProjectExtensions.Azure.ServiceBus.Autofac and change initialization code as shown in the getting started example.

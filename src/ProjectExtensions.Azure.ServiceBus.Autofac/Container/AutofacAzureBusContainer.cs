@@ -15,7 +15,8 @@ namespace ProjectExtensions.Azure.ServiceBus.Autofac.Container {
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="container">Optional autofac container owned by the calling application.</param>
+        /// <param name="container">Optional autofac container owned by the calling application.
+        /// If one is not provided, a new one will be created.</param>
         public AutofacAzureBusContainer(IContainer container = null) {
             this.container = container;
         }
@@ -23,27 +24,19 @@ namespace ProjectExtensions.Azure.ServiceBus.Autofac.Container {
         /// <summary>
         /// Resolve component type of T with optional arguments.
         /// </summary>
-        /// <param name="parms">Additional parameters to be passed to the constructor.</param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public T Resolve<T>(params KeyValuePair<string, object>[] parms) where T : class {
-            if (parms == null || parms.Length == 0) {
-                return container.Resolve<T>();
-            }
-            return container.Resolve<T>((from p in parms select new NamedParameter(p.Key, p.Value)).ToList());
+        public T Resolve<T>() where T : class {
+            return container.Resolve<T>();
         }
 
         /// <summary>
         /// Resolve component with optional arguments.
         /// </summary>
         /// <param name="t">The type to resolve.</param>
-        /// <param name="parms">Additional parameters to be passed to the constructor.</param>
         /// <returns></returns>
-        public object Resolve(Type t, params KeyValuePair<string, object>[] parms) {
-            if (parms == null || parms.Length == 0) {
-                return container.Resolve(t);
-            }
-            return container.Resolve(t, (from p in parms select new NamedParameter(p.Key, p.Value)).ToList());
+        public object Resolve(Type t) {
+            return container.Resolve(t);
         }
 
         /// <summary>
@@ -63,11 +56,12 @@ namespace ProjectExtensions.Azure.ServiceBus.Autofac.Container {
         }
 
         /// <summary>
-        /// Register the bus
+        /// Registers the configuration instance with the bus if it is not already registered
         /// </summary>
-        /// <param name="busConfiguration">The configuration instance to use on the bus.</param>
-        public void RegisterBus(BusConfiguration busConfiguration) {
-            builder.Register(item => new AzureBus(busConfiguration)).As<IBus>().SingleInstance();
+        public void RegisterConfiguration() {
+            if (!IsRegistered(typeof(IBusConfiguration))) {
+                builder.Register(item => BusConfiguration.Instance).As<IBusConfiguration>().SingleInstance();
+            }
         }
 
         /// <summary>

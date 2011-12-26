@@ -6,6 +6,7 @@ using System.Reflection;
 using NLog;
 using System.Linq.Expressions;
 using Microsoft.Practices.TransientFaultHandling;
+using ProjectExtensions.Azure.ServiceBus.Helpers;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 
@@ -16,7 +17,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
         static Logger logger = LogManager.GetCurrentClassLogger();
 
-        BusConfiguration config;
+        IBusConfiguration config;
         IAzureBusSender sender;
         IAzureBusReceiver receiver;
 
@@ -26,7 +27,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// ctor
         /// </summary>
         /// <param name="config"></param>
-        public AzureBus(BusConfiguration config) {
+        public AzureBus(IBusConfiguration config) {
             Guard.ArgumentNotNull(config, "config");
             this.config = config;
             Configure();
@@ -55,7 +56,6 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="message">The message to publish.</param>
-        /// <param name="metadata">Metadata to sent with the message.</param>
         public void Publish<T>(T message) {
             sender.Send<T>(message, default(IDictionary<string, object>));
         }
@@ -116,7 +116,8 @@ namespace ProjectExtensions.Azure.ServiceBus {
         public void Subscribe(Type type) {
             Guard.ArgumentNotNull(type, "type");
             logger.Info("Subscribe={0}", type.FullName);
-            SubscribeOrUnsubscribeType(type, receiver.CreateSubscription);
+            subscribedTypes.Add(type);
+            SubscribeOrUnsubscribeType(type, config, receiver.CreateSubscription);
         }
 
         /// <summary>
@@ -138,15 +139,15 @@ namespace ProjectExtensions.Azure.ServiceBus {
             if (subscribedTypes.Contains(type)) {
                 subscribedTypes.Remove(type);
             }
-            SubscribeOrUnsubscribeType(type, receiver.CancelSubscription);
+            SubscribeOrUnsubscribeType(type, config, receiver.CancelSubscription);
         }
 
         void Configure() {
             //this fixes a bug in .net 4 that will be fixed in sp1
             using (CloudEnvironment.EnsureSafeHttpContext()) {
                 //set up the server first.
-                sender = BusConfiguration.Container.Resolve<IAzureBusSender>(new KeyValuePair<string, object>("configuration", config));
-                receiver = BusConfiguration.Container.Resolve<IAzureBusReceiver>(new KeyValuePair<string, object>("configuration", config));
+                sender = config.Container.Resolve<IAzureBusSender>();
+                receiver = config.Container.Resolve<IAzureBusReceiver>();
 
                 foreach (var item in config.RegisteredAssemblies) {
                     RegisterAssembly(item);
@@ -157,10 +158,6 @@ namespace ProjectExtensions.Azure.ServiceBus {
             }
         }
 
-        bool IsCompetingHandler(Type type) {
-            return type.GetGenericTypeDefinition() == typeof(IHandleCompetingMessages<>);
-        }
-
         void RegisterAssembly(IEnumerable<Assembly> assemblies) {
             Guard.ArgumentNotNull(assemblies, "assemblies");
             foreach (var item in assemblies) {
@@ -168,7 +165,11 @@ namespace ProjectExtensions.Azure.ServiceBus {
             }
         }
 
-        void SubscribeOrUnsubscribeType(Type type, Action<ServiceBusEnpointData> callback) {
+        internal static bool IsCompetingHandler(Type type) {
+            return type.GetGenericTypeDefinition() == typeof(IHandleCompetingMessages<>);
+        }
+
+        internal static void SubscribeOrUnsubscribeType(Type type, IBusConfiguration config, Action<ServiceBusEnpointData> callback) {
             Guard.ArgumentNotNull(type, "type");
             Guard.ArgumentNotNull(callback, "callback");
 
@@ -181,8 +182,6 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 throw new ApplicationException(string.Format("Type {0} does not implement IHandleMessages or IHandleCompetingMessages", type.FullName));
             }
 
-            subscribedTypes.Add(type);
-
             //for each interface we find, we need to register it with the bus.
             foreach (var foundInterface in interfaces) {
 
@@ -190,7 +189,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 //due to the limits of 50 chars we will take the name and a MD5 for the name.
                 var hashName = implementedMessageType.FullName + "|" + type.FullName;
 
-                var hash = Helpers.CalculateMD5(hashName);
+                var hash = MD5Helper.CalculateMD5(hashName);
                 var fullName = (IsCompetingHandler(foundInterface) ? "C_" : config.ServiceBusApplicationId + "_") + hash;
 
                 var info = new ServiceBusEnpointData() {
@@ -201,20 +200,19 @@ namespace ProjectExtensions.Azure.ServiceBus {
                     ServiceType = foundInterface
                 };
 
-                if (!BusConfiguration.Container.IsRegistered(type)) {
+                if (!config.Container.IsRegistered(type)) {
                     if (info.IsReusable) {
-                        BusConfiguration.Container.Register(type, type);
+                        config.Container.Register(type, type);
                     }
                     else {
-                        BusConfiguration.Container.Register(type, type, true);
+                        config.Container.Register(type, type, true);
                     }
                 }
-
 
                 callback(info);
             }
 
-            BusConfiguration.Container.Build();
+            config.Container.Build();
         }
     }
 }

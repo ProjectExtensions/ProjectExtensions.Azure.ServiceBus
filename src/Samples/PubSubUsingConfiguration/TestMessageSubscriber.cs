@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using ProjectExtensions.Azure.ServiceBus;
 using NLog;
-using Microsoft.ServiceBus.Messaging;
 
 namespace PubSubUsingConfiguration {
 

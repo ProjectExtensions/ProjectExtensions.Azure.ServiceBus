@@ -12,7 +12,9 @@
     <releaseNotes>Added support for pausing after an error for a handler. Added ability to auto DeadLetter after MaxRetries.
     Breaking Change: The IDictionary parameter on the handler has been moved to the message and the second parameter has been removed.</releaseNotes>
     <description>Azure AppFabric ServiceBus wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;</description>
-    <summary>Azure ServiceBus Wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt; (Debug)</summary>
+    <summary>Azure ServiceBus Wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;.  Includes Autofac IoC container support.  
+		If you use a different IoC container, get ProjectExtensions.Azure.ServiceBus.Core and one of the IoC packages (ProjectExtensions.Azure.ServiceBus.IOC.[container])
+		where container is Autofac, CastleWindsor, StructureMap or Unity. (Debug)</summary>
     <dependencies>
       <dependency id="Autofac" version="2.5.2.830" />
       <dependency id="Newtonsoft.Json" version="4.0.3" />

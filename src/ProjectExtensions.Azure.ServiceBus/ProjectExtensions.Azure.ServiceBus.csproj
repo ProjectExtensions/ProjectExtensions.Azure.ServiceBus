@@ -33,16 +33,16 @@
     <DocumentationFile>bin\Release\ProjectExtensions.Azure.ServiceBus.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.ServiceBus, Version=1.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
-      <HintPath>..\..\packages\WindowsAzure.ServiceBus.1.5.0.0\lib\net40-full\Microsoft.ServiceBus.dll</HintPath>
+    <Reference Include="Microsoft.ServiceBus, Version=1.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\WindowsAzure.ServiceBus.1.6.0.0\lib\net40-full\Microsoft.ServiceBus.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.WindowsAzure.StorageClient, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\lib\Microsoft.WindowsAzure.StorageClient.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=4.0.3.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+    <Reference Include="Newtonsoft.Json, Version=4.0.5.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Newtonsoft.Json.4.0.3\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\..\packages\Newtonsoft.Json.4.0.5\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NLog">
       <HintPath>..\..\packages\NLog.2.0.0.2000\lib\net40\NLog.dll</HintPath>
@@ -66,15 +66,23 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="AzureBus.cs" />
-    <Compile Include="AzureBusReceiver.cs" />
-    <Compile Include="AzureBusSender.cs" />
+    <Compile Include="AzureServiceBusFactories\ServiceBusConfigurationFactory.cs" />
+    <Compile Include="AzureServiceBusFactories\ServiceBusMessagingFactoryFactory.cs" />
+    <Compile Include="AzureServiceBusFactories\ServiceBusNamespaceManagerFactory.cs" />
+    <Compile Include="Interfaces\IMessagingFactory.cs" />
+    <Compile Include="Interfaces\INamespaceManager.cs" />
+    <Compile Include="Interfaces\IServiceBusConfigurationFactory.cs" />
+    <Compile Include="Interfaces\ITopicClient.cs" />
+    <Compile Include="Receiver\AzureBusReceiver.cs" />
+    <Compile Include="Sender\AzureBusSender.cs" />
     <Compile Include="AzureSenderReceiverBase.cs" />
     <Compile Include="BrokeredMessageWrapper.cs" />
     <Compile Include="BusConfiguration.cs" />
     <Compile Include="BusConfigurationBuilder.cs" />
     <Compile Include="Container\IAzureBusContainer.cs" />
     <Compile Include="ExtensionMethods.cs" />
-    <Compile Include="Helpers.cs" />
+    <Compile Include="Helpers\AzureConfigurationHelper.cs" />
+    <Compile Include="Helpers\MD5Helper.cs" />
     <Compile Include="IAzureBusReceiver.cs" />
     <Compile Include="IAzureBusSender.cs" />
     <Compile Include="IBrokeredMessage.cs" />
@@ -82,11 +90,15 @@
     <Compile Include="IMessageHandler.cs" />
     <Compile Include="IBus.cs" />
     <Compile Include="IMessageSentResult.cs" />
+    <Compile Include="Interfaces\ISubscriptionClient.cs" />
     <Compile Include="IReceivedMessage.cs" />
     <Compile Include="MessageHandlerConfigurationAttribute.cs" />
     <Compile Include="MessageSentResult.cs" />
-    <Compile Include="ReflectionHelper.cs" />
+    <Compile Include="Helpers\ReflectionHelper.cs" />
     <Compile Include="ReceivedMessage.cs" />
+    <Compile Include="Receiver\AzureBusReceiverState.cs" />
+    <Compile Include="Receiver\AzureReceiverHelper.cs" />
+    <Compile Include="Receiver\AzureReceiveState.cs" />
     <Compile Include="Serialization\IServiceBusSerializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serialization\JsonServiceBusSerializer.cs" />
@@ -123,6 +135,9 @@
     <Compile Include="TransientFaultHandling\RetryManagerImpl.cs" />
     <Compile Include="TransientFaultHandling\RetryPolicyException.cs" />
     <Compile Include="TransientFaultHandling\ServiceBus\ServiceBusTransientErrorDetectionStrategy.cs" />
+    <Compile Include="TransientFaultHandling\ServiceBus\ServiceBusTransientErrorToDetermineExistanceDetectionStrategy.cs" />
+    <Compile Include="Wrappers\SubscriptionClientWrapper.cs" />
+    <Compile Include="Wrappers\TopicClientWrapper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

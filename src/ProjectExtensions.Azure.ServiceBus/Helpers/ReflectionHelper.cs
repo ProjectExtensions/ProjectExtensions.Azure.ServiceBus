@@ -5,7 +5,7 @@ using System.Text;
 using System.Reflection;
 using System.Linq.Expressions;
 
-namespace ProjectExtensions.Azure.ServiceBus {
+namespace ProjectExtensions.Azure.ServiceBus.Helpers {
 
     //http://rogeralsing.com/2008/02/28/linq-expressions-creating-objects/
 

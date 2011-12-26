@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using ProjectExtensions.Azure.ServiceBus.Container;
 using ProjectExtensions.Azure.ServiceBus.Serialization;
 
 namespace ProjectExtensions.Azure.ServiceBus {
     
+    /// <summary>
+    /// Interface for the Bus Configuration
+    /// </summary>
     public interface IBusConfiguration {
 
         /// <summary>
@@ -83,5 +87,20 @@ namespace ProjectExtensions.Azure.ServiceBus {
         string TopicName {
             get;
         }
+
+        /// <summary>
+        /// The IOC Container for the application
+        /// </summary>
+        /// <remarks>The setter can only be called once.  This is normally done via the builder.
+        /// You should not call the setter directly.</remarks>
+        IAzureBusContainer Container {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Apply the configuration
+        /// </summary>
+        void Configure();
     }
 }

@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{E1182B9A-A509-4B56-AA80-7BD15D6B3D94}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>PubSubUsingNinject</RootNamespace>
+    <AssemblyName>PubSubUsingNinject</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.ServiceBus, Version=1.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\packages\WindowsAzure.ServiceBus.1.6.0.0\lib\net40-full\Microsoft.ServiceBus.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\..\packages\Newtonsoft.Json.4.0.5\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Ninject">
+      <HintPath>..\..\..\packages\Ninject.2.2.1.4\lib\net40-Full\Ninject.dll</HintPath>
+    </Reference>
+    <Reference Include="NLog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\NLog.2.0.0.2000\lib\net40\NLog.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\CommonAssemblyInfo.cs">
+      <Link>Properties\CommonAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\PubSubUsingConfiguration\AnotherTestMessage.cs">
+      <Link>AnotherTestMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\PubSubUsingConfiguration\AnotherTestMessageSubscriber.cs">
+      <Link>AnotherTestMessageSubscriber.cs</Link>
+    </Compile>
+    <Compile Include="..\PubSubUsingConfiguration\Program.cs">
+      <Link>Program.cs</Link>
+    </Compile>
+    <Compile Include="..\PubSubUsingConfiguration\TestMessage.cs">
+      <Link>TestMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\PubSubUsingConfiguration\TestMessageSubscriber.cs">
+      <Link>TestMessageSubscriber.cs</Link>
+    </Compile>
+    <Compile Include="Bootstrapper.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\ProjectExtensions.Azure.ServiceBus.Ninject\ProjectExtensions.Azure.ServiceBus.Ninject.csproj">
+      <Project>{18285A92-F031-45A5-97BB-FE3841DAB434}</Project>
+      <Name>ProjectExtensions.Azure.ServiceBus.Ninject</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ProjectExtensions.Azure.ServiceBus\ProjectExtensions.Azure.ServiceBus.csproj">
+      <Project>{8C8A8531-95AE-41CD-B2AC-6651F104245E}</Project>
+      <Name>ProjectExtensions.Azure.ServiceBus</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\PubSubUsingConfiguration\app.config">
+      <Link>app.config</Link>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

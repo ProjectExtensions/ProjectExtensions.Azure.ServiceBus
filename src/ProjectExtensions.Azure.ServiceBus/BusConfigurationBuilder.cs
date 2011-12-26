@@ -6,6 +6,7 @@ using System.Reflection;
 using ProjectExtensions.Azure.ServiceBus.Serialization;
 using System.Configuration;
 using Microsoft.Practices.TransientFaultHandling;
+using ProjectExtensions.Azure.ServiceBus.Helpers;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 
@@ -15,7 +16,6 @@ namespace ProjectExtensions.Azure.ServiceBus {
     public class BusConfigurationBuilder {
         BusConfiguration configuration;
 
-
         internal BusConfigurationBuilder(BusConfiguration configuration) {
             Guard.ArgumentNotNull(configuration, "configuration");
             this.configuration = configuration;
@@ -24,7 +24,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <summary>
         /// Gets the bus configuration associated with the builder
         /// </summary>
-        public BusConfiguration Configuration {
+        public IBusConfiguration Configuration {
             get { return configuration;}
         }
 
@@ -45,7 +45,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
             if (value.Length > 10) {
                 throw new ArgumentOutOfRangeException("The length must not be greater than 10.");
             }
-            Configuration.ServiceBusApplicationId = value;
+            configuration.ServiceBusApplicationId = value;
             return this;
         }
 
@@ -55,7 +55,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <param name="serializer"></param>
         /// <returns></returns>
         public BusConfigurationBuilder DefaultSerializer(IServiceBusSerializer serializer) {
-            Configuration.container.Register(typeof(IServiceBusSerializer), serializer.GetType());
+            configuration.Container.Register(typeof(IServiceBusSerializer), serializer.GetType());
             return this;
         }
 
@@ -66,7 +66,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <returns></returns>
         public BusConfigurationBuilder MaxThreads(byte value) {
             Guard.ArgumentNotZeroOrNegativeValue(value, "value");
-            Configuration.MaxThreads = value;
+            configuration.MaxThreads = value;
             return this;
         }
 
@@ -75,26 +75,26 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// </summary>
         /// <returns></returns>
         public BusConfigurationBuilder ReadFromConfigFile() {
-            var setting = ConfigurationManager.AppSettings["ServiceBusApplicationId"];
-            Configuration.ServiceBusApplicationId = setting;
+            var setting = AzureConfigurationHelper.GetConfig("ServiceBusApplicationId");
+            configuration.ServiceBusApplicationId = setting;
 
-            setting = ConfigurationManager.AppSettings["ServiceBusIssuerKey"];
+            setting = AzureConfigurationHelper.GetConfig("ServiceBusIssuerKey");
             if (string.IsNullOrWhiteSpace(setting)) {
                 throw new ArgumentNullException("ServiceBusIssuerKey", "The ServiceBusIssuerKey must be set.");
             }
-            Configuration.ServiceBusIssuerKey = setting;
+            configuration.ServiceBusIssuerKey = setting;
 
-            setting = ConfigurationManager.AppSettings["ServiceBusIssuerName"];
+            setting = AzureConfigurationHelper.GetConfig("ServiceBusIssuerName");
             if (string.IsNullOrWhiteSpace(setting)) {
                 throw new ArgumentNullException("ServiceBusIssuerName", "The ServiceBusIssuerName must be set.");
             }
-            Configuration.ServiceBusIssuerName = setting;
+            configuration.ServiceBusIssuerName = setting;
 
-            setting = ConfigurationManager.AppSettings["ServiceBusNamespace"];
+            setting = AzureConfigurationHelper.GetConfig("ServiceBusNamespace");
             if (string.IsNullOrWhiteSpace(setting)) {
                 throw new ArgumentNullException("ServiceBusNamespace", "The ServiceBusNamespace must be set.");
             }
-            Configuration.ServiceBusNamespace = setting;
+            configuration.ServiceBusNamespace = setting;
 
             return this;
         }
@@ -106,7 +106,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <returns></returns>
         public BusConfigurationBuilder RegisterAssembly(Assembly assembly) {
             Guard.ArgumentNotNull(assembly, "assembly");
-            Configuration.AddRegisteredAssembly(assembly);
+            configuration.AddRegisteredAssembly(assembly);
             return this;
         }
 
@@ -116,7 +116,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         public BusConfigurationBuilder RegisterSubscriber<T>() {
-            Configuration.AddRegisteredSubscriber(typeof(T));
+            configuration.AddRegisteredSubscriber(typeof(T));
             return this;
         }
 
@@ -127,7 +127,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <returns></returns>
         public BusConfigurationBuilder ServiceBusNamespace(string value) {
             Guard.ArgumentNotNull(value, "value");
-            Configuration.ServiceBusNamespace = value;
+            configuration.ServiceBusNamespace = value;
             return this;
         }
 
@@ -138,7 +138,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <returns></returns>
         public BusConfigurationBuilder ServiceBusIssuerName(string value) {
             Guard.ArgumentNotNull(value, "value");
-            Configuration.ServiceBusIssuerName = value;
+            configuration.ServiceBusIssuerName = value;
             return this;
         }
 
@@ -149,7 +149,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <returns></returns>
         public BusConfigurationBuilder ServiceBusIssuerKey(string value) {
             Guard.ArgumentNotNull(value, "value");
-            Configuration.ServiceBusIssuerKey = value;
+            configuration.ServiceBusIssuerKey = value;
             return this;
         }
 
@@ -160,7 +160,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <returns></returns>
         public BusConfigurationBuilder ServicePath(string value) {
             Guard.ArgumentNotNull(value, "value");
-            Configuration.ServicePath = value;
+            configuration.ServicePath = value;
             return this;
         }
 
@@ -171,7 +171,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <returns></returns>
         public BusConfigurationBuilder TopicName(string value) {
             Guard.ArgumentNotNull(value, "value");
-            Configuration.TopicName = value;
+            configuration.TopicName = value;
             return this;
         }
 
