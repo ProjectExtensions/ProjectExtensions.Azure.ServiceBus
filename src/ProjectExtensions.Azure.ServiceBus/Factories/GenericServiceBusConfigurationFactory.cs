@@ -7,13 +7,13 @@ using Microsoft.Practices.TransientFaultHandling;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 
-namespace ProjectExtensions.Azure.ServiceBus.AzureServiceBusFactories {
+namespace ProjectExtensions.Azure.ServiceBus.Factories {
 
-    class ServiceBusConfigurationFactory : IServiceBusConfigurationFactory {
+    class GenericServiceBusConfigurationFactory : IServiceBusConfigurationFactory {
 
         IBusConfiguration configuration;
 
-        public ServiceBusConfigurationFactory(IBusConfiguration configuration, IMessagingFactory messageFactory, INamespaceManager namespaceManager) {
+        public GenericServiceBusConfigurationFactory(IBusConfiguration configuration, IMessagingFactory messageFactory, INamespaceManager namespaceManager) {
             Guard.ArgumentNotNull(configuration, "configuration");
             Guard.ArgumentNotNull(messageFactory, "messageFactory");
             Guard.ArgumentNotNull(namespaceManager, "namespaceManager");
