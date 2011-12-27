@@ -134,7 +134,14 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
 
                 var helper = new AzureReceiverHelper(configuration, serializer, retryPolicy, state);
                 mappings.Add(helper);
-                helper.ProcessMessagesForSubscription();
+                //helper.ProcessMessagesForSubscription();
+
+                //TODO make a config setting to allow us to run subscriptions on different threads or not.
+                //create a new thread for processing of the messages.
+                var t = new Thread(helper.ProcessMessagesForSubscription);
+                t.Name = value.SubscriptionName;
+                t.IsBackground = false;
+                t.Start();
 
             } //lock end
 
