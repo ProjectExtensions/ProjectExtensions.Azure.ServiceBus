@@ -75,8 +75,8 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                     (
                         (cb) => {
                             if (lastAttemptWasError) {
-                                if (Data.EndPointData.AttributeData.PauseTimeIfErrorWasThrown > 0) {
-                                    Thread.Sleep(Data.EndPointData.AttributeData.PauseTimeIfErrorWasThrown);
+                                if (data.EndPointData.AttributeData.PauseTimeIfErrorWasThrown > 0) {
+                                    Thread.Sleep(data.EndPointData.AttributeData.PauseTimeIfErrorWasThrown);
                                 }
                                 else {
                                     Thread.Sleep(1000);
