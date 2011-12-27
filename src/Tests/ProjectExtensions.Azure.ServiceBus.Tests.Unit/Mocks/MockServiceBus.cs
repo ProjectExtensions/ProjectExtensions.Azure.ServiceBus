@@ -63,8 +63,18 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Send a message onto the service bus to any item that is registered for the type
+        /// </summary>
+        /// <param name="message"></param>
+        public void SendMessage(IBrokeredMessage message) {
+            //throw new NotImplementedException();
+            
+        }
+
         public bool SubscriptionExists(string topicPath, string name) {
             throw new NotImplementedException();
         }
+
     }
 }

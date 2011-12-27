@@ -10,6 +10,8 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
 
     class MockTopicClient : ITopicClient {
 
+        IDictionary<IAsyncResult, IBrokeredMessage> _messages = new Dictionary<IAsyncResult, IBrokeredMessage>();
+
         IMockServiceBus serviceBus;
 
         public MockTopicClient(IMockServiceBus serviceBus) {
@@ -21,12 +23,17 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
             var retVal = new MockIAsyncResult() {
                 AsyncState = state
             };
+            _messages[retVal] = message;
             callback(retVal);
             return retVal;
         }
 
         public void EndSend(IAsyncResult result) {
-            //TODO call the mock service bus
+            IBrokeredMessage message = null;
+            if (!_messages.TryGetValue(result, out message)) {
+                throw new ApplicationException("You must call EndSend with a valid IAsyncResult. Duplicate Calls are not allowed.");
+            }
+            serviceBus.SendMessage(message);
         }
 
         public void Close() {

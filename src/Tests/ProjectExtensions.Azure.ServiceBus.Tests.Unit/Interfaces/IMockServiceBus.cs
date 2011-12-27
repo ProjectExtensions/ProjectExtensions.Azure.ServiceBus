@@ -30,5 +30,12 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Interfaces {
         void MessageDeadLetter(string deadLetterReason, string deadLetterErrorDescription);
 
         bool SubscriptionExists(string topicPath, string name);
+
+        /// <summary>
+        /// send a message and let the receivers get a copy of the message.
+        /// </summary>
+        /// <param name="message"></param>
+        void SendMessage(IBrokeredMessage message);
+
     }
 }
