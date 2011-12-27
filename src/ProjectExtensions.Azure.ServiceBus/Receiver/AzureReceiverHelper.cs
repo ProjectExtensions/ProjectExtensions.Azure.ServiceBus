@@ -90,6 +90,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                             // Make sure we are not told to stop receiving while we were waiting for a new message.
                             if (!data.CancelToken.IsCancellationRequested) {
                                 IBrokeredMessage msg = null;
+                                bool isError = false;
                                 try {
                                     // Complete the asynchronous operation. This may throw an exception that will be handled internally by retry policy.
                                     msg = data.Client.EndReceive(ar);
@@ -104,26 +105,26 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                                             var receiveState = new AzureReceiveState(data, methodInfo, serializer, msg);
                                             processMessage(receiveState);
                                             logger.Debug("ProcessMessagesForSubscription End received new message: {0}", data.EndPointData.SubscriptionName);
-
-                                            // With PeekLock mode, we should mark the processed message as completed.
-                                            if (data.Client.Mode == ReceiveMode.PeekLock) {
-                                                // Mark brokered message as completed at which point it's removed from the queue.
-                                                SafeComplete(msg);
-                                            }
                                         }
                                     }
                                 }
                                 catch (Exception) {
-                                    //do nothing
+                                    isError = true;
                                     throw;
                                 }
                                 finally {
                                     // With PeekLock mode, we should mark the failed message as abandoned.
                                     if (msg != null) {
                                         if (data.Client.Mode == ReceiveMode.PeekLock) {
-                                            // Abandons a brokered message. This will cause Service Bus to unlock the message and make it available 
-                                            // to be received again, either by the same consumer or by another completing consumer.
-                                            SafeAbandon(msg);
+                                            if (isError) {
+                                                // Abandons a brokered message. This will cause Service Bus to unlock the message and make it available 
+                                                // to be received again, either by the same consumer or by another completing consumer.
+                                                SafeAbandon(msg);
+                                            }
+                                            else {
+                                                // Mark brokered message as completed at which point it's removed from the queue.
+                                                SafeComplete(msg);
+                                            }
                                         }
                                         msg.Dispose();
                                     }
