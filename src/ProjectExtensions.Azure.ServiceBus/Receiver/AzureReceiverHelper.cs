@@ -170,7 +170,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                         data.EndPointData.IsReusable,
                         ex.ToString()));
 
-                    if (!data.CancelToken.IsCancellationRequested) {
+                    if (!data.CancelToken.IsCancellationRequested && typeof(ThreadAbortException) != ex.GetType()) {
                         // Continue receiving and processing new messages until we are told to stop regardless of any exceptions.
                         receiveMessage();
                     }
@@ -187,6 +187,9 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                 // Start receiving messages asynchronously.
                 receiveMessage();
             }
+            catch (ThreadAbortException) {
+                //do nothing, let it exit
+            }
             catch (Exception ex) {
                 failCounter++;
                 logger.Error("ProcessMessagesForSubscription: Error during receive during loop. See details and fix: {0}", ex);
@@ -195,7 +198,6 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                     ProcessMessagesForSubscription();
                 }
             }
-
         }
 
         void ProcessMessageCallBack(AzureReceiveState state) {
