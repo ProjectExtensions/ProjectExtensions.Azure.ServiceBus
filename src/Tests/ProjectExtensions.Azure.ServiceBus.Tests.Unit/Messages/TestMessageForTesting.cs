@@ -5,10 +5,19 @@ using System.Text;
 
 namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Messages {
 
-    class TestMessageForTesting {
+    public class TestMessageForTesting {
+
+        static int counter;
 
         public TestMessageForTesting() {
             Id = Guid.NewGuid();
+            counter++;
+            this.Counter = counter;
+        }
+
+        public int Counter {
+            get;
+            set;
         }
 
         public Guid Id {

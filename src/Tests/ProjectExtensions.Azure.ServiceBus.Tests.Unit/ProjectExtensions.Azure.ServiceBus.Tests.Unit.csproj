@@ -70,6 +70,7 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Config.cs" />
+    <Compile Include="Handlers\TestMessageForTestingHandler.cs" />
     <Compile Include="Interfaces\IMockServiceBus.cs" />
     <Compile Include="Messages\TestMessageForTesting.cs" />
     <Compile Include="Mocks\MockBrokeredMessage.cs" />
@@ -77,6 +78,7 @@
     <Compile Include="Mocks\MockMessagingFactory.cs" />
     <Compile Include="Mocks\MockNamespaceManager.cs" />
     <Compile Include="Mocks\MockServiceBus.cs" />
+    <Compile Include="Mocks\MockSubscriptionClient.cs" />
     <Compile Include="Mocks\MockTopicClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SampleTest.cs" />
@@ -85,9 +87,7 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Handlers\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\..\ProjectExtensions.Azure.ServiceBus.Autofac\ProjectExtensions.Azure.ServiceBus.Autofac.csproj">
       <Project>{11192756-9ABB-4C2B-8FE5-2DBD4DC0DC36}</Project>

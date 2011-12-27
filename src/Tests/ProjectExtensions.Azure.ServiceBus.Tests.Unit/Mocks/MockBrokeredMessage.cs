@@ -19,6 +19,27 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
             this.serviceBus = serviceBus;
         }
 
+        public MockBrokeredMessage(IMockServiceBus serviceBus, IBrokeredMessage original) {
+            Guard.ArgumentNotNull(serviceBus, "serviceBus");
+            Guard.ArgumentNotNull(original, "original");
+            this.serviceBus = serviceBus;
+
+            //we only work with the MockBrokeredMessage at this time.  
+
+            var ms = new MemoryStream();
+            var originalStream = original.GetBody<Stream>() as MemoryStream;
+
+            if (originalStream == null) {
+                throw new ApplicationException("We only work with MemoryStream objects at this time.");
+            }
+
+            originalStream.CopyTo(ms);
+            originalStream.Position = 0;
+            ms.Position = 0;
+
+            this.SetBody(ms);
+        }
+
         public string ContentType {
             get;
             set;
@@ -111,15 +132,15 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
         }
 
         public void Abandon() {
-            serviceBus.MessageAbandon();
+            serviceBus.MessageAbandon(this);
         }
 
         public void Complete() {
-            serviceBus.MessageComplete();
+            serviceBus.MessageComplete(this);
         }
 
         public void DeadLetter(string deadLetterReason, string deadLetterErrorDescription) {
-            serviceBus.MessageDeadLetter(deadLetterReason, deadLetterErrorDescription);
+            serviceBus.MessageDeadLetter(this, deadLetterReason, deadLetterErrorDescription);
         }
 
         public void Dispose() {

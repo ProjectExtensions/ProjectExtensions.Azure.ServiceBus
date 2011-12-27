@@ -6,7 +6,7 @@ using Microsoft.ServiceBus.Messaging;
 using ProjectExtensions.Azure.ServiceBus.Interfaces;
 
 namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Interfaces {
-    
+
     interface IMockServiceBus {
 
         SubscriptionDescription CreateSubscription(SubscriptionDescription description, Filter filter);
@@ -23,11 +23,11 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Interfaces {
 
         TopicDescription GetTopic(string path);
 
-        void MessageAbandon();
+        void MessageAbandon(IBrokeredMessage message);
 
-        void MessageComplete();
+        void MessageComplete(IBrokeredMessage message);
 
-        void MessageDeadLetter(string deadLetterReason, string deadLetterErrorDescription);
+        void MessageDeadLetter(IBrokeredMessage message, string deadLetterReason, string deadLetterErrorDescription);
 
         bool SubscriptionExists(string topicPath, string name);
 
@@ -37,5 +37,8 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Interfaces {
         /// <param name="message"></param>
         void SendMessage(IBrokeredMessage message);
 
+        IAsyncResult BeginReceive(ISubscriptionClient client, TimeSpan serverWaitTime, AsyncCallback callback, object state);
+
+        IBrokeredMessage EndReceive(IAsyncResult result);
     }
 }

@@ -7,7 +7,9 @@ using System.Threading;
 namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
 
     class MockIAsyncResult : IAsyncResult {
-        
+
+        WaitHandle handle = null;
+
         public object AsyncState {
             get;
             set;
@@ -15,7 +17,10 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
 
         public WaitHandle AsyncWaitHandle {
             get {
-                return new ManualResetEvent(false);
+                if (handle == null) {
+                    handle = new ManualResetEvent(false);
+                }
+                return handle;
             }
         }
 
