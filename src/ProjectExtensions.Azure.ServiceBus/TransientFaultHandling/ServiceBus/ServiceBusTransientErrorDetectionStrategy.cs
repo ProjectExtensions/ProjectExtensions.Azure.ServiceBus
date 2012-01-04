@@ -39,7 +39,16 @@ namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandl
         /// <returns>True if the specified exception is considered as transient, otherwise false.</returns> 
         public bool IsTransient(Exception ex)
         {
-            return ex != null && (CheckIsTransient(ex) || (ex.InnerException != null && CheckIsTransient(ex.InnerException)));
+            return ex != null && (CheckIsTransientInternal(ex) || (ex.InnerException != null && CheckIsTransientInternal(ex.InnerException)));
+        }
+
+        /// <summary>
+        /// Since we call a static method, we allow you to override the call to change the behavior.
+        /// </summary>
+        /// <param name="ex">The error to check.</param>
+        /// <returns></returns>
+        protected virtual bool CheckIsTransientInternal(Exception ex) {
+           return CheckIsTransient(ex);
         }
 
         // SecuritySafeCritical because it references MessageLockLostException, MessagingCommunicationException, 

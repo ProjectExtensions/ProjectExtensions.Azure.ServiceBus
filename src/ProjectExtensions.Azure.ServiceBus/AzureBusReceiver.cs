@@ -12,6 +12,7 @@ using System.Threading;
 using System.Reflection;
 using NLog;
 using Microsoft.Practices.TransientFaultHandling;
+using System.Net;
 
 
 namespace ProjectExtensions.Azure.ServiceBus {
@@ -51,11 +52,11 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 try {
                     logger.Info("CreateSubscription Try {0} ", value.SubscriptionName);
                     // First, let's see if a item with the specified name already exists.
-                    retryPolicy.ExecuteAction(() => {
+                    verifyRetryPolicy.ExecuteAction(() => {
                         desc = namespaceManager.GetSubscription(topic.Path, value.SubscriptionName);
                     });
 
-                    createNew = (topic == null);
+                    createNew = (desc == null);
                 }
                 catch (MessagingEntityNotFoundException) {
                     logger.Info("CreateSubscription Does Not Exist {0} ", value.SubscriptionName);
