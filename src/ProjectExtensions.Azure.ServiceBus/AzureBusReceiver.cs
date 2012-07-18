@@ -96,6 +96,14 @@ namespace ProjectExtensions.Azure.ServiceBus {
                     }
                 }
 
+                if (desc != null) {
+                    logger.Info("Subscription Message Count Name {0} Declared {1} MessageTytpe {2}, Count {3}",
+                                value.SubscriptionName,
+                                value.DeclaredType.ToString(),
+                                value.MessageType.ToString(),
+                                desc.MessageCount);
+                }
+
                 SubscriptionClient subscriptionClient = null;
                 var rm = ReceiveMode.PeekLock;
 
