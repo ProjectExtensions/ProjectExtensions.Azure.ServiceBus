@@ -4,7 +4,7 @@
 
   <!-- Version Information -->
   <PropertyGroup>
-    <AppVersion>0.8.4</AppVersion>
+    <AppVersion>0.8.7</AppVersion>
     <SchemaVersion>0</SchemaVersion>
     <CompanyName>Project Extensions</CompanyName>
   </PropertyGroup>
