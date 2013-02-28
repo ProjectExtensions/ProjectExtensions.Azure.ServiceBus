@@ -7,7 +7,7 @@ using Microsoft.ServiceBus.Messaging;
 using Microsoft.Practices.TransientFaultHandling;
 
 namespace ProjectExtensions.Azure.ServiceBus.Wrappers {
-    
+
     class SubscriptionClientWrapper : ISubscriptionClient {
 
         SubscriptionClient client;
@@ -37,7 +37,11 @@ namespace ProjectExtensions.Azure.ServiceBus.Wrappers {
         }
 
         public IBrokeredMessage EndReceive(IAsyncResult result) {
-            return new BrokeredMessageWrapper(client.EndReceive(result));
+            var msg = client.EndReceive(result);
+            if (msg != null) {
+                return new BrokeredMessageWrapper(msg);
+            }
+            return null;
         }
 
         public void Close() {
