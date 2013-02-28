@@ -20,7 +20,7 @@
       <dependency id="NLog" version="2.0.0.2000" />
       <dependency id="WindowsAzure.ServiceBus" version="1.5.0.0" />
     </dependencies>
-    <tags>Azure, AppFabric, ServiceBus</tags>
+    <tags>ServiceBus Microsoft Azure AppFabric Messaging PubSub Publish Subscribe</tags>
   </metadata>
   <files>
     <file src="BuildOutput\bin\ProjectExtensions.Azure.ServiceBus.dll" target="lib\net40-full" />
