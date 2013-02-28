@@ -2,15 +2,15 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>ProjectExtensions.Azure.ServiceBus.IOC.Unity</id>
-    <title>Unity Support for Azure AppFabric ServiceBus IHandleMessage&lt;T&gt; wrapper by Project Extensions</title>
-    <version>0.8.7.0</version>
+    <title>Unity Support for Windows Azure Service Bus Message Wrapper by Project Extensions</title>
+    <version>0.9.0.0</version>
     <authors>Project Extensions, Joe Feser</authors>
     <owners>Project Extensions, Joe Feser</owners>
-    <copyright>Copyright (C) Project Extensions and Joe Feser 2011</copyright>
+    <copyright>Copyright (C) Project Extensions and Joe Feser 2013</copyright>
     <projectUrl>https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Unity support for Azure AppFabric ServiceBus wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;</description>
-    <summary>Unity support for Azure ServiceBus Wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;.  You will
+    <description>Unity support for Windows Azure Service Bus wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;</description>
+    <summary>Unity support for Windows Azure Service Bus Wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;.  You will
 		also need ProjectExtensions.Azure.ServiceBus.Core. (Debug)</summary>
     <dependencies>
       <dependency id="Unity" version="2.1.505.0" />

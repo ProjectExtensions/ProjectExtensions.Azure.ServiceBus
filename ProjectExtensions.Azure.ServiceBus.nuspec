@@ -2,17 +2,16 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>ProjectExtensions.Azure.ServiceBus</id>
-    <title>Azure AppFabric ServiceBus IHandleMessage&lt;T&gt; wrapper by Project Extensions</title>
-    <version>0.8.7.0</version>
+    <title>Windows Azure Service Bus Message Wrapper by Project Extensions</title>
+    <version>0.9.0.0</version>
     <authors>Project Extensions, Joe Feser</authors>
     <owners>Project Extensions, Joe Feser</owners>
-    <copyright>Copyright (C) Project Extensions and Joe Feser 2011</copyright>
+    <copyright>Copyright (C) Project Extensions and Joe Feser 2013</copyright>
     <projectUrl>https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <releaseNotes>Added support for pausing after an error for a handler. Added ability to auto DeadLetter after MaxRetries.
-    Breaking Change: The IDictionary parameter on the handler has been moved to the message and the second parameter has been removed.</releaseNotes>
-    <description>Azure AppFabric ServiceBus wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;</description>
-    <summary>Azure ServiceBus Wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;.  Includes Autofac IoC container support.  
+    <releaseNotes>Added support for multiple IOC Containers. Projects now require a reference to ProjectExtensions.Azure.ServiceBus.dll and ProjectExtensions.Azure.ServiceBus.Autofac.dll. Please add manually if your project does not upgrade correctly.</releaseNotes>
+    <description>Windows Azure Service Bus wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;</description>
+    <summary>Windows Azure Service Bus Wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;.  Includes Autofac IoC container support.  
 		If you use a different IoC container, get ProjectExtensions.Azure.ServiceBus.Core and one of the IoC packages (ProjectExtensions.Azure.ServiceBus.IOC.[container])
 		where container is Autofac, CastleWindsor, StructureMap or Unity. (Debug)</summary>
     <dependencies>
@@ -30,6 +29,7 @@
     <file src="BuildOutput\bin\ProjectExtensions.Azure.ServiceBus.Autofac.dll" target="lib\net40-full" />
     <file src="BuildOutput\bin\ProjectExtensions.Azure.ServiceBus.Autofac.pdb" target="lib\net40-full" />
     <file src="BuildOutput\bin\ProjectExtensions.Azure.ServiceBus.Autofac.xml" target="lib\net40-full" />
+    <file src="src\readme.txt" target="" />
     <file src="BuildOutput\src\*.cs" target="src" />
     <file src="BuildOutput\src\ProjectExtensions.Azure.ServiceBus\**\*.cs" target="src\ProjectExtensions.Azure.ServiceBus" />
     <file src="BuildOutput\src\ProjectExtensions.Azure.ServiceBus.Autofac\**\*.cs" target="src\ProjectExtensions.Azure.ServiceBus.Autofac" />
