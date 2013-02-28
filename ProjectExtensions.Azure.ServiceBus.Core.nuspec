@@ -16,7 +16,7 @@
 		Either create your own implementation of IAzureBusContainer or get one of the IoC packages (ProjectExtensions.Azure.ServiceBus.IOC.[container])
 		where container is Autofac, CastleWindsor, Ninject, StructureMap or Unity. (Debug)</summary>
     <dependencies>
-      <dependency id="Newtonsoft.Json" version="4.0.3" />
+      <dependency id="Newtonsoft.Json" version="4.5.11" />
       <dependency id="NLog" version="2.0.0.2000" />
       <dependency id="WindowsAzure.ServiceBus" version="1.5.0.0" />
     </dependencies>
