@@ -15,12 +15,12 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: ComVisible(false)]
-[assembly: AssemblyVersion("0.8.7.0")]
-[assembly: AssemblyFileVersion("0.8.7.0")]
+[assembly: AssemblyVersion("0.9.0.0")]
+[assembly: AssemblyFileVersion("0.9.0.0")]
 [assembly: AssemblyCopyright("Copyright (C) Project Extensions 2013")]
 [assembly: AssemblyConfiguration("Debug")]
 [assembly: AssemblyCompany("Project Extensions")]
-[assembly: AssemblyProduct("Azure ServiceBus Wrapper modeled after the NServiceBus pattern of IHandleMessage<" +
-    "T> (Debug DB: 0)")]
+[assembly: AssemblyProduct("Windows Azure Service Bus Wrapper modeled after the NServiceBus pattern of IHandl" +
+    "eMessage<T> (Debug DB: 0)")]
 
 

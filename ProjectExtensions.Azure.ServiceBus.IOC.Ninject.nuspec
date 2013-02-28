@@ -2,25 +2,26 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>ProjectExtensions.Azure.ServiceBus.IOC.Ninject</id>
-    <title>Ninject Support for Azure AppFabric ServiceBus IHandleMessage&lt;T&gt; wrapper by Project Extensions</title>
-    <version>0.8.7.0</version>
+    <title>Ninject Support for Windows Azure Service Bus Message Wrapper by Project Extensions</title>
+    <version>0.9.0.0</version>
     <authors>Project Extensions, Joe Feser</authors>
     <owners>Project Extensions, Joe Feser</owners>
-    <copyright>Copyright (C) Project Extensions and Joe Feser 2011</copyright>
+    <copyright>Copyright (C) Project Extensions and Joe Feser 2013</copyright>
     <projectUrl>https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Ninject support for Azure AppFabric ServiceBus wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;</description>
-    <summary>Ninject support for Azure ServiceBus Wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;.  You will
+    <description>Ninject support for Windows Azure Service Bus wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;</description>
+    <summary>Ninject support for Windows Azure Service Bus Wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;.  You will
 		also need ProjectExtensions.Azure.ServiceBus.Core. (Debug)</summary>
     <dependencies>
-      <dependency id="Ninject" version="2.1.505.0" />
+      <dependency id="Ninject" version="3.0.1.10" />
     </dependencies>
-    <tags>Azure, AppFabric, ServiceBus</tags>
+    <tags>ServiceBus Microsoft Azure AppFabric Messaging PubSub Publish Subscribe</tags>
   </metadata>
   <files>
     <file src="BuildOutput\bin\ProjectExtensions.Azure.ServiceBus.Ninject.dll" target="lib\net40-full" />
     <file src="BuildOutput\bin\ProjectExtensions.Azure.ServiceBus.Ninject.pdb" target="lib\net40-full" />
     <file src="BuildOutput\bin\ProjectExtensions.Azure.ServiceBus.Ninject.xml" target="lib\net40-full" />
+    <file src="src\readme.txt" target="" />
     <file src="BuildOutput\src\*.cs" target="src" />
     <file src="BuildOutput\src\ProjectExtensions.Azure.ServiceBus.Ninject\**\*.cs" target="src\ProjectExtensions.Azure.ServiceBus.Ninject" />
   </files>
