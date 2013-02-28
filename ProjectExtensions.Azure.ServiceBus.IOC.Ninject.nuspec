@@ -13,7 +13,7 @@
     <summary>Ninject support for Windows Azure Service Bus Wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;.  You will
 		also need ProjectExtensions.Azure.ServiceBus.Core. (Debug)</summary>
     <dependencies>
-      <dependency id="Ninject" version="2.1.505.0" />
+      <dependency id="Ninject" version="3.0.1.10" />
     </dependencies>
     <tags>Azure, AppFabric, ServiceBus</tags>
   </metadata>
