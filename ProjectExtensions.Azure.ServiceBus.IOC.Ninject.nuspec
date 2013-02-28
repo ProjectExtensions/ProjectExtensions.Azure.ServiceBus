@@ -15,7 +15,7 @@
     <dependencies>
       <dependency id="Ninject" version="3.0.1.10" />
     </dependencies>
-    <tags>Azure, AppFabric, ServiceBus</tags>
+    <tags>ServiceBus Microsoft Azure AppFabric Messaging PubSub Publish Subscribe</tags>
   </metadata>
   <files>
     <file src="BuildOutput\bin\ProjectExtensions.Azure.ServiceBus.Ninject.dll" target="lib\net40-full" />

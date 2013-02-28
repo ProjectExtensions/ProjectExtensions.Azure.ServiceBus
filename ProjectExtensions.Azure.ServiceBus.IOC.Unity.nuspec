@@ -15,7 +15,7 @@
     <dependencies>
       <dependency id="Unity" version="2.1.505.0" />
     </dependencies>
-    <tags>Azure, AppFabric, ServiceBus</tags>
+    <tags>ServiceBus Microsoft Azure AppFabric Messaging PubSub Publish Subscribe</tags>
   </metadata>
   <files>
     <file src="BuildOutput\bin\ProjectExtensions.Azure.ServiceBus.Unity.dll" target="lib\net40-full" />
