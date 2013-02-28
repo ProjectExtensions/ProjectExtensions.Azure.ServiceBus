@@ -6,7 +6,7 @@ using System.Web;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 
-    public static class CloudEnvironment {
+    static class CloudEnvironment {
     
         /// <summary>
         /// Ensures that the HttpContext object is safe to use in the given context and returns an object that rolls the HttpContext object back to its original state.

@@ -28,13 +28,18 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
 
         List<AzureReceiverHelper> mappings = new List<AzureReceiverHelper>();
 
+        IServiceBusSerializer serializer;
+
         /// <summary>
         /// ctor
         /// </summary>
         /// <param name="configuration">The configuration data</param>
-        public AzureBusReceiver(IBusConfiguration configuration)
-            : base(configuration) {
-            Guard.ArgumentNotNull(configuration, "configuration");
+        /// <param name="configurationFactory"></param>
+        /// <param name="serializer"></param>
+        public AzureBusReceiver(IBusConfiguration configuration, IServiceBusConfigurationFactory configurationFactory, IServiceBusSerializer serializer)
+            : base(configuration, configurationFactory) {
+            Guard.ArgumentNotNull(serializer, "serializer");
+            this.serializer = serializer;
         }
 
         /// <summary>
@@ -127,9 +132,16 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                     EndPointData = value
                 };
 
-                var helper = new AzureReceiverHelper(configuration, retryPolicy, state);
+                var helper = new AzureReceiverHelper(configuration, serializer, retryPolicy, state);
                 mappings.Add(helper);
-                helper.ProcessMessagesForSubscription();
+                //helper.ProcessMessagesForSubscription();
+
+                //TODO make a config setting to allow us to run subscriptions on different threads or not.
+                //create a new thread for processing of the messages.
+                var t = new Thread(helper.ProcessMessagesForSubscription);
+                t.Name = value.SubscriptionName;
+                t.IsBackground = false;
+                t.Start();
 
             } //lock end
 

@@ -3,22 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ProjectExtensions.Azure.ServiceBus.Interfaces;
-using Microsoft.Practices.TransientFaultHandling;
 using Microsoft.ServiceBus;
-using Microsoft.ServiceBus.Messaging;
+using Microsoft.Practices.TransientFaultHandling;
 
 namespace ProjectExtensions.Azure.ServiceBus.AzureServiceBusFactories {
 
-    class ServiceBusConfigurationFactory : IServiceBusConfigurationFactory {
+    class ServiceBusTokenProvider : IServiceBusTokenProvider {
 
         IBusConfiguration configuration;
-        IMessagingFactory messageFactory;
-        INamespaceManager namespaceManager;
         string servicePath;
         Uri serviceUri;
         TokenProvider tokenProvider;
 
-        public ServiceBusConfigurationFactory(IBusConfiguration configuration) {
+        public ServiceBusTokenProvider(IBusConfiguration configuration) {
             Guard.ArgumentNotNull(configuration, "configuration");
 
             this.configuration = configuration;
@@ -26,30 +23,9 @@ namespace ProjectExtensions.Azure.ServiceBus.AzureServiceBusFactories {
             if (!string.IsNullOrWhiteSpace(configuration.ServicePath)) {
                 servicePath = configuration.ServicePath;
             }
-
         }
 
-        public IMessagingFactory MessageFactory {
-            get {
-                if (messageFactory == null) {
-                    messageFactory = configuration.Container.Resolve<IMessagingFactory>();
-                    messageFactory.Initialize(ServiceUri, TokenProvider);
-                }
-                return messageFactory;
-            }
-        }
-
-        public INamespaceManager NamespaceManager {
-            get {
-                if (namespaceManager == null) {
-                    namespaceManager = configuration.Container.Resolve<INamespaceManager>();
-                    namespaceManager.Initialize(ServiceUri, TokenProvider);
-                }
-                return namespaceManager;
-            }
-        }
-
-        TokenProvider TokenProvider {
+        public TokenProvider TokenProvider {
             get {
                 if (tokenProvider == null) {
                     tokenProvider = TokenProvider.CreateSharedSecretTokenProvider(configuration.ServiceBusIssuerName, configuration.ServiceBusIssuerKey);
@@ -58,7 +34,7 @@ namespace ProjectExtensions.Azure.ServiceBus.AzureServiceBusFactories {
             }
         }
 
-        Uri ServiceUri {
+        public Uri ServiceUri {
             get {
                 if (serviceUri == null) {
                     serviceUri = ServiceBusEnvironment.CreateServiceUri("sb", configuration.ServiceBusNamespace, servicePath);

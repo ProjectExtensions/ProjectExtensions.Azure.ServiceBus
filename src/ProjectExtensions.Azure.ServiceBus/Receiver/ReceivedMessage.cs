@@ -5,19 +5,19 @@ using System.Text;
 using Microsoft.ServiceBus.Messaging;
 using Microsoft.Practices.TransientFaultHandling;
 
-namespace ProjectExtensions.Azure.ServiceBus {
+namespace ProjectExtensions.Azure.ServiceBus.Receiver {
 
-    public class ReceivedMessage<T> : IReceivedMessage<T> {
+    class ReceivedMessage<T> : IReceivedMessage<T> {
 
-        BrokeredMessageWrapper brokeredMessage;
+        IBrokeredMessage brokeredMessage;
         T message;
         IDictionary<string, object> metadata;
 
-        public ReceivedMessage(BrokeredMessage brokeredMessage, T message, IDictionary<string, object> metadata) {
+        public ReceivedMessage(IBrokeredMessage brokeredMessage, T message, IDictionary<string, object> metadata) {
             Guard.ArgumentNotNull(brokeredMessage, "brokeredMessage");
             Guard.ArgumentNotNull(message, "message");
             Guard.ArgumentNotNull(metadata, "metadata");
-            this.brokeredMessage = new BrokeredMessageWrapper(brokeredMessage);
+            this.brokeredMessage = brokeredMessage;
             this.message = message;
             this.metadata = metadata;
         }

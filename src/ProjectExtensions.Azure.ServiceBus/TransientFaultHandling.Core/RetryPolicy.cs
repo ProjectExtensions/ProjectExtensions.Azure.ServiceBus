@@ -292,6 +292,7 @@ namespace Microsoft.Practices.TransientFaultHandling
                             }
                             else
                             {
+
                                 // Perform an extra check in the delay interval. Should prevent from accidentally ending up with the value of -1 that will block a thread indefinitely. 
                                 // In addition, any other negative numbers will cause an ArgumentOutOfRangeException fault that will be thrown by Thread.Sleep.
                                 if (delay.TotalMilliseconds < 0) {

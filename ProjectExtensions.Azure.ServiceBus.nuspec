@@ -3,7 +3,7 @@
   <metadata>
     <id>ProjectExtensions.Azure.ServiceBus</id>
     <title>Azure AppFabric ServiceBus IHandleMessage&lt;T&gt; wrapper by Project Extensions</title>
-    <version>0.8.4.0</version>
+    <version>0.8.7.0</version>
     <authors>Project Extensions, Joe Feser</authors>
     <owners>Project Extensions, Joe Feser</owners>
     <copyright>Copyright (C) Project Extensions and Joe Feser 2011</copyright>
@@ -17,7 +17,7 @@
 		where container is Autofac, CastleWindsor, StructureMap or Unity. (Debug)</summary>
     <dependencies>
       <dependency id="Autofac" version="2.5.2.830" />
-      <dependency id="Newtonsoft.Json" version="4.0.3" />
+      <dependency id="Newtonsoft.Json" version="4.0.5" />
       <dependency id="NLog" version="2.0.0.2000" />
       <dependency id="WindowsAzure.ServiceBus" version="1.5.0.0" />
     </dependencies>

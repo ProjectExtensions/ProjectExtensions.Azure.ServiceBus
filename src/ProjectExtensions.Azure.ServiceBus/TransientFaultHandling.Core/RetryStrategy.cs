@@ -22,6 +22,9 @@ namespace Microsoft.Practices.TransientFaultHandling
     /// <returns>Returns a callback delegate that will be invoked whenever to retry should be attempt.</returns>
     public delegate bool ShouldRetry(int retryCount, Exception lastException, out TimeSpan delay);
 
+    /// <summary>
+    /// Base Abstract RetryStrategy
+    /// </summary>
     public abstract class RetryStrategy
     {
         #region Public members

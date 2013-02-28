@@ -34,11 +34,12 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// Base class used to send and receive messages.
         /// </summary>
         /// <param name="configuration"></param>
-        public AzureSenderReceiverBase(IBusConfiguration configuration) {
+        /// <param name="configurationFactory"></param>
+        public AzureSenderReceiverBase(IBusConfiguration configuration, IServiceBusConfigurationFactory configurationFactory) {
             Guard.ArgumentNotNull(configuration, "configuration");
+            Guard.ArgumentNotNull(configurationFactory, "configurationFactory");
             this.configuration = configuration;
-
-            configurationFactory = configuration.Container.Resolve<IServiceBusConfigurationFactory>();
+            this.configurationFactory = configurationFactory;
             EnsureTopic(configuration.TopicName);
         }
 

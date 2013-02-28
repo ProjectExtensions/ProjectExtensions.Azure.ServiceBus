@@ -2,21 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ProjectExtensions.Azure.ServiceBus.Serialization;
 
-namespace ProjectExtensions.Azure.ServiceBus.Container
-{
+namespace ProjectExtensions.Azure.ServiceBus.Container {
     /// <summary>
     /// Generic IOC container interface
     /// </summary>
     public interface IAzureBusContainer {
         /// <summary>
-        /// Resolve component type of T with optional arguments.
+        /// Resolve component type of T.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         T Resolve<T>() where T : class;
         /// <summary>
-        /// Resolve component with optional arguments.
+        /// Resolve component.
         /// </summary>
         /// <param name="t">The type to resolve</param>
         /// <returns></returns>
@@ -43,6 +43,20 @@ namespace ProjectExtensions.Azure.ServiceBus.Container
         /// <param name="type"></param>
         /// <returns></returns>
         bool IsRegistered(Type type);
+
+        /// <summary>
+        /// Return the Service Bus
+        /// </summary>
+        IBus Bus {
+            get;
+        }
+
+        /// <summary>
+        /// Resolve the Default Serializer
+        /// </summary>
+        IServiceBusSerializer DefaultSerializer {
+            get;
+        }
 
     }
 }

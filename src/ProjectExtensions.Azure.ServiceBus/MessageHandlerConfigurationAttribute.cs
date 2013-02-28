@@ -27,6 +27,9 @@ namespace ProjectExtensions.Azure.ServiceBus {
         int prefetchCount;
         bool prefetchCountSet;
 
+        /// <summary>
+        /// Create a new instance of the Attribute with the default settings.
+        /// </summary>
         public MessageHandlerConfigurationAttribute() {
             EnableBatchedOperations = true;
         }
@@ -149,22 +152,26 @@ namespace ProjectExtensions.Azure.ServiceBus {
             set;
         }
 
-        public bool DefaultMessageTimeToLiveSet() {
+        internal bool DefaultMessageTimeToLiveSet() {
             return defaultMessageTimeToLiveSet;
         }
 
-        public bool LockDurationSet() {
+        internal bool LockDurationSet() {
             return lockDurationSet;
         }
 
-        public bool MaxDeliveryCountSet() {
+        internal bool MaxDeliveryCountSet() {
             return maxDeliveryCountSet;
         }
 
-        public bool PrefetchCountSet() {
+        internal bool PrefetchCountSet() {
             return prefetchCountSet;
         }
 
+        /// <summary>
+        /// Override of ToString();
+        /// </summary>
+        /// <returns>Data about the attribute normally used for debugging.</returns>
         public override string ToString() {
             var retVal = new StringBuilder();
             retVal.Append("DefaultMessageTimeToLive: ").Append(this.DefaultMessageTimeToLive);

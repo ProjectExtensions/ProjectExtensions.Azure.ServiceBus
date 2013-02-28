@@ -8,9 +8,10 @@ using ProjectExtensions.Azure.ServiceBus.Serialization;
 using System.Threading;
 using Microsoft.ServiceBus.Messaging;
 using System.IO;
+using System.Diagnostics;
 
 namespace ProjectExtensions.Azure.ServiceBus.Receiver {
-    
+
     class AzureReceiverHelper {
 
         static Logger logger = LogManager.GetCurrentClassLogger();
@@ -18,6 +19,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
         IBusConfiguration config;
         RetryPolicy retryPolicy;
         AzureBusReceiverState data;
+        IServiceBusSerializer serializer;
 
         int failCounter = 0;
 
@@ -27,8 +29,13 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
             }
         }
 
-        public AzureReceiverHelper(IBusConfiguration config, RetryPolicy retryPolicy, AzureBusReceiverState data) {
+        public AzureReceiverHelper(IBusConfiguration config, IServiceBusSerializer serializer, RetryPolicy retryPolicy, AzureBusReceiverState data) {
+            Guard.ArgumentNotNull(config, "config");
+            Guard.ArgumentNotNull(serializer, "serializer");
+            Guard.ArgumentNotNull(retryPolicy, "retryPolicy");
+            Guard.ArgumentNotNull(data, "data");
             this.config = config;
+            this.serializer = serializer;
             this.retryPolicy = retryPolicy;
             this.data = data;
         }
@@ -37,18 +44,11 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
 
             try {
 
-                Guard.ArgumentNotNull(data, "data");
-
                 logger.Info("ProcessMessagesForSubscription Message Start {0} Declared {1} MessageTytpe {2}, IsReusable {3}", data.EndPointData.SubscriptionName,
                         data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
 
-                //TODO create a cache for object creation.
                 var gt = typeof(IReceivedMessage<>).MakeGenericType(data.EndPointData.MessageType);
-
-                //set up the methodinfo
                 var methodInfo = data.EndPointData.DeclaredType.GetMethod("Handle", new Type[] { gt });
-
-                var serializer = config.Container.Resolve<IServiceBusSerializer>();
 
                 var waitTimeout = TimeSpan.FromSeconds(30);
 
@@ -75,8 +75,8 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                     (
                         (cb) => {
                             if (lastAttemptWasError) {
-                                if (Data.EndPointData.AttributeData.PauseTimeIfErrorWasThrown > 0) {
-                                    Thread.Sleep(Data.EndPointData.AttributeData.PauseTimeIfErrorWasThrown);
+                                if (data.EndPointData.AttributeData.PauseTimeIfErrorWasThrown > 0) {
+                                    Thread.Sleep(data.EndPointData.AttributeData.PauseTimeIfErrorWasThrown);
                                 }
                                 else {
                                     Thread.Sleep(1000);
@@ -89,7 +89,8 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                             messageReceived = false;
                             // Make sure we are not told to stop receiving while we were waiting for a new message.
                             if (!data.CancelToken.IsCancellationRequested) {
-                                BrokeredMessage msg = null;
+                                IBrokeredMessage msg = null;
+                                bool isError = false;
                                 try {
                                     // Complete the asynchronous operation. This may throw an exception that will be handled internally by retry policy.
                                     msg = data.Client.EndReceive(ar);
@@ -104,26 +105,26 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                                             var receiveState = new AzureReceiveState(data, methodInfo, serializer, msg);
                                             processMessage(receiveState);
                                             logger.Debug("ProcessMessagesForSubscription End received new message: {0}", data.EndPointData.SubscriptionName);
-
-                                            // With PeekLock mode, we should mark the processed message as completed.
-                                            if (data.Client.Mode == ReceiveMode.PeekLock) {
-                                                // Mark brokered message as completed at which point it's removed from the queue.
-                                                SafeComplete(msg);
-                                            }
                                         }
                                     }
                                 }
                                 catch (Exception) {
-                                    //do nothing
+                                    isError = true;
                                     throw;
                                 }
                                 finally {
                                     // With PeekLock mode, we should mark the failed message as abandoned.
                                     if (msg != null) {
                                         if (data.Client.Mode == ReceiveMode.PeekLock) {
-                                            // Abandons a brokered message. This will cause Service Bus to unlock the message and make it available 
-                                            // to be received again, either by the same consumer or by another completing consumer.
-                                            SafeAbandon(msg);
+                                            if (isError) {
+                                                // Abandons a brokered message. This will cause Service Bus to unlock the message and make it available 
+                                                // to be received again, either by the same consumer or by another completing consumer.
+                                                SafeAbandon(msg);
+                                            }
+                                            else {
+                                                // Mark brokered message as completed at which point it's removed from the queue.
+                                                SafeComplete(msg);
+                                            }
                                         }
                                         msg.Dispose();
                                     }
@@ -170,7 +171,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                         data.EndPointData.IsReusable,
                         ex.ToString()));
 
-                    if (!data.CancelToken.IsCancellationRequested) {
+                    if (!data.CancelToken.IsCancellationRequested && typeof(ThreadAbortException) != ex.GetType()) {
                         // Continue receiving and processing new messages until we are told to stop regardless of any exceptions.
                         receiveMessage();
                     }
@@ -187,6 +188,9 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                 // Start receiving messages asynchronously.
                 receiveMessage();
             }
+            catch (ThreadAbortException) {
+                //do nothing, let it exit
+            }
             catch (Exception ex) {
                 failCounter++;
                 logger.Error("ProcessMessagesForSubscription: Error during receive during loop. See details and fix: {0}", ex);
@@ -195,7 +199,6 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                     ProcessMessagesForSubscription();
                 }
             }
-
         }
 
         void ProcessMessageCallBack(AzureReceiveState state) {
@@ -222,10 +225,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                     stream.Position = 0;
                     object msg = serial.Deserialize(stream, state.Data.EndPointData.MessageType);
 
-                    //TODO create a cache for object creation.
-                    var gt = typeof(ReceivedMessage<>).MakeGenericType(state.Data.EndPointData.MessageType);
-
-                    object receivedMessage = Activator.CreateInstance(gt, new object[] { state.Message, msg, values });
+                    var receivedMessage = state.Data.EndPointData.GetReceivedMessage(new object[] { state.Message, msg, values });
 
                     objectTypeName = receivedMessage.GetType().FullName;
 
@@ -257,7 +257,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                 state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
         }
 
-        static bool SafeDeadLetter(BrokeredMessage msg, string reason) {
+        static bool SafeDeadLetter(IBrokeredMessage msg, string reason) {
             try {
                 // Mark brokered message as complete.
                 msg.DeadLetter(reason, "Max retries Exceeded.");
@@ -277,7 +277,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
             return false;
         }
 
-        static bool SafeComplete(BrokeredMessage msg) {
+        static bool SafeComplete(IBrokeredMessage msg) {
             try {
                 // Mark brokered message as complete.
                 msg.Complete();
@@ -297,7 +297,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
             return false;
         }
 
-        static bool SafeAbandon(BrokeredMessage msg) {
+        static bool SafeAbandon(IBrokeredMessage msg) {
             try {
                 // Abandons a brokered message. This will cause the Service Bus to unlock the message and make it available to be received again, 
                 // either by the same consumer or by another competing consumer.

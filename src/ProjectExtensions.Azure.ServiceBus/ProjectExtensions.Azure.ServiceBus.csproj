@@ -66,12 +66,15 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="AzureBus.cs" />
-    <Compile Include="AzureServiceBusFactories\ServiceBusConfigurationFactory.cs" />
+    <Compile Include="Factories\GenericServiceBusConfigurationFactory.cs" />
     <Compile Include="AzureServiceBusFactories\ServiceBusMessagingFactoryFactory.cs" />
     <Compile Include="AzureServiceBusFactories\ServiceBusNamespaceManagerFactory.cs" />
+    <Compile Include="AzureServiceBusFactories\ServiceBusTokenProvider.cs" />
+    <Compile Include="Container\AzureBusContainerBase.cs" />
     <Compile Include="Interfaces\IMessagingFactory.cs" />
     <Compile Include="Interfaces\INamespaceManager.cs" />
     <Compile Include="Interfaces\IServiceBusConfigurationFactory.cs" />
+    <Compile Include="Interfaces\IServiceBusTokenProvider.cs" />
     <Compile Include="Interfaces\ITopicClient.cs" />
     <Compile Include="Receiver\AzureBusReceiver.cs" />
     <Compile Include="Sender\AzureBusSender.cs" />
@@ -83,8 +86,8 @@
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="Helpers\AzureConfigurationHelper.cs" />
     <Compile Include="Helpers\MD5Helper.cs" />
-    <Compile Include="IAzureBusReceiver.cs" />
-    <Compile Include="IAzureBusSender.cs" />
+    <Compile Include="Interfaces\IAzureBusReceiver.cs" />
+    <Compile Include="Interfaces\IAzureBusSender.cs" />
     <Compile Include="IBrokeredMessage.cs" />
     <Compile Include="IBusConfiguration.cs" />
     <Compile Include="IMessageHandler.cs" />
@@ -93,9 +96,9 @@
     <Compile Include="Interfaces\ISubscriptionClient.cs" />
     <Compile Include="IReceivedMessage.cs" />
     <Compile Include="MessageHandlerConfigurationAttribute.cs" />
-    <Compile Include="MessageSentResult.cs" />
+    <Compile Include="Sender\MessageSentResult.cs" />
     <Compile Include="Helpers\ReflectionHelper.cs" />
-    <Compile Include="ReceivedMessage.cs" />
+    <Compile Include="Receiver\ReceivedMessage.cs" />
     <Compile Include="Receiver\AzureBusReceiverState.cs" />
     <Compile Include="Receiver\AzureReceiverHelper.cs" />
     <Compile Include="Receiver\AzureReceiveState.cs" />

@@ -3,12 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace ProjectExtensions.Azure.ServiceBus {
+namespace ProjectExtensions.Azure.ServiceBus.Sender {
 
-    /// <summary>
-    /// Result of a call to SendAsyc on the message bus
-    /// </summary>
-    public class MessageSentResult<T> : IMessageSentResult<T> {
+    class MessageSentResult<T> : IMessageSentResult<T> {
 
         public bool IsSuccess {
             get;

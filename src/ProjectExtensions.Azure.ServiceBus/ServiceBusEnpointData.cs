@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Reflection;
+using ProjectExtensions.Azure.ServiceBus.Helpers;
+using ProjectExtensions.Azure.ServiceBus.Receiver;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 
@@ -48,6 +51,19 @@ namespace ProjectExtensions.Azure.ServiceBus {
         public Type MessageType {
             get;
             set;
+        }
+
+        ObjectActivator activator = null;
+
+        public object GetReceivedMessage(object[] obj) {
+            if (activator == null) {
+                var genericType = typeof(ReceivedMessage<>).MakeGenericType(MessageType);
+                //object receivedMessage = Activator.CreateInstance(gt, new object[] { state.Message, msg, values });
+                ConstructorInfo ctor = genericType.GetConstructors().First();
+                activator = ReflectionHelper.GetActivator(ctor);
+            }
+            //create an instance:
+            return activator(obj);
         }
     }
 }

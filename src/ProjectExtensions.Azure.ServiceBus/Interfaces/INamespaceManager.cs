@@ -12,8 +12,6 @@ namespace ProjectExtensions.Azure.ServiceBus.Interfaces {
     /// </summary>
     interface INamespaceManager {
 
-        void Initialize(Uri serviceUri, TokenProvider tokenProvider);
-
         SubscriptionDescription CreateSubscription(SubscriptionDescription description, Filter filter);
         TopicDescription CreateTopic(TopicDescription description);
 

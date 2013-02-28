@@ -7,13 +7,14 @@ using NLog;
 using System.Linq.Expressions;
 using Microsoft.Practices.TransientFaultHandling;
 using ProjectExtensions.Azure.ServiceBus.Helpers;
+using ProjectExtensions.Azure.ServiceBus.Interfaces;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 
     /// <summary>
     /// Implementation of IBus
     /// </summary>
-    public class AzureBus : IBus {
+    class AzureBus : IBus {
 
         static Logger logger = LogManager.GetCurrentClassLogger();
 
@@ -27,9 +28,15 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// ctor
         /// </summary>
         /// <param name="config"></param>
-        public AzureBus(IBusConfiguration config) {
+        /// <param name="sender"></param>
+        /// <param name="receiver"></param>
+        public AzureBus(IBusConfiguration config, IAzureBusSender sender, IAzureBusReceiver receiver) {
             Guard.ArgumentNotNull(config, "config");
+            Guard.ArgumentNotNull(sender, "sender");
+            Guard.ArgumentNotNull(receiver, "receiver");
             this.config = config;
+            this.sender = sender;
+            this.receiver = receiver;
             Configure();
         }
 
@@ -111,7 +118,6 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// Subscribes to recieve published messages of type T.
         /// This method is only necessary if you turned off auto-subscribe
         /// </summary>
-        /// <typeparam name="T">The type of message to subscribe to.</typeparam>
         /// <param name="type">The type to subscribe</param>
         public void Subscribe(Type type) {
             Guard.ArgumentNotNull(type, "type");
@@ -145,10 +151,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         void Configure() {
             //this fixes a bug in .net 4 that will be fixed in sp1
             using (CloudEnvironment.EnsureSafeHttpContext()) {
-                //set up the server first.
-                sender = config.Container.Resolve<IAzureBusSender>();
-                receiver = config.Container.Resolve<IAzureBusReceiver>();
-
+ 
                 foreach (var item in config.RegisteredAssemblies) {
                     RegisterAssembly(item);
                 }

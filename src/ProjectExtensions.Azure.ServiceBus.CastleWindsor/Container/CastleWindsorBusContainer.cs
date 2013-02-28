@@ -10,7 +10,7 @@ namespace ProjectExtensions.Azure.ServiceBus.CastleWindsor.Container {
     /// <summary>
     /// Implementation of <see cref="IAzureBusContainer"/> for Castle Windsor.
     /// </summary>
-    public class CastleWindsorBusContainer : IAzureBusContainer {
+    public class CastleWindsorBusContainer : AzureBusContainerBase {
         IWindsorContainer container;
   
         /// <summary>
@@ -26,7 +26,7 @@ namespace ProjectExtensions.Azure.ServiceBus.CastleWindsor.Container {
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public T Resolve<T>() where T : class {
+        public override T Resolve<T>()  {
             return container.Resolve<T>();
         }
 
@@ -35,7 +35,7 @@ namespace ProjectExtensions.Azure.ServiceBus.CastleWindsor.Container {
         /// </summary>
         /// <param name="t">The type to resolve</param>
         /// <returns></returns>
-        public object Resolve(Type t) {
+        public override object Resolve(Type t) {
             return container.Resolve(t);
         }
 
@@ -45,7 +45,7 @@ namespace ProjectExtensions.Azure.ServiceBus.CastleWindsor.Container {
         /// <param name="serviceType">The service type.</param>
         /// <param name="implementationType">The implementation type.</param>
         /// <param name="perInstance">True creates an instance each time resolved.  False uses a singleton instance for the entire lifetime of the process.</param>
-        public void Register(Type serviceType, Type implementationType, bool perInstance = false) {
+        public override void Register(Type serviceType, Type implementationType, bool perInstance = false) {
             if (perInstance) {
                 container.Register(Component.For(serviceType).ImplementedBy(implementationType).LifestyleTransient());
             } else {
@@ -56,7 +56,7 @@ namespace ProjectExtensions.Azure.ServiceBus.CastleWindsor.Container {
         /// <summary>
         /// Registers the configuration instance with the bus if it is not already registered
         /// </summary>
-        public void RegisterConfiguration() {
+        public override void RegisterConfiguration() {
             if (!IsRegistered(typeof(IBusConfiguration))) {
                 container.Register(Component.For<IBusConfiguration>().Instance(BusConfiguration.Instance).LifestyleSingleton());
             }
@@ -65,7 +65,7 @@ namespace ProjectExtensions.Azure.ServiceBus.CastleWindsor.Container {
         /// <summary>
         /// Build the container if needed.
         /// </summary>
-        public void Build() {
+        public override void Build() {
             //do nothing
         }
 
@@ -74,7 +74,7 @@ namespace ProjectExtensions.Azure.ServiceBus.CastleWindsor.Container {
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public bool IsRegistered(Type type) {
+        public override bool IsRegistered(Type type) {
             return container.Kernel.HasComponent(type.FullName);
         }
     }

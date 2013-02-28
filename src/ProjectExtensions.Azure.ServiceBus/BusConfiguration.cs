@@ -10,6 +10,7 @@ using ProjectExtensions.Azure.ServiceBus.Receiver;
 using ProjectExtensions.Azure.ServiceBus.Sender;
 using ProjectExtensions.Azure.ServiceBus.Interfaces;
 using ProjectExtensions.Azure.ServiceBus.AzureServiceBusFactories;
+using ProjectExtensions.Azure.ServiceBus.Factories;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 
@@ -51,7 +52,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// </summary>
         public IBus Bus {
             get {
-                return container.Resolve<IBus>();
+                return container.Bus;
             }
         }
 
@@ -79,7 +80,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// </summary>
         public IServiceBusSerializer DefaultSerializer {
             get {
-                return container.Resolve<IServiceBusSerializer>();
+                return container.DefaultSerializer;
             }
         }
 
@@ -176,7 +177,11 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 container.Register(typeof(IAzureBusSender), typeof(AzureBusSender));
             }
             if (!container.IsRegistered(typeof(IServiceBusConfigurationFactory))) {
-                container.Register(typeof(IServiceBusConfigurationFactory), typeof(ServiceBusConfigurationFactory));
+                container.Register(typeof(IServiceBusConfigurationFactory), typeof(GenericServiceBusConfigurationFactory));
+            }
+            //Only used by Azure since we can't create an instance of the Token without calling AppFabric.
+            if (!container.IsRegistered(typeof(IServiceBusTokenProvider))) {
+                container.Register(typeof(IServiceBusTokenProvider), typeof(ServiceBusTokenProvider));
             }
             if (!container.IsRegistered(typeof(INamespaceManager))) {
                 container.Register(typeof(INamespaceManager), typeof(ServiceBusNamespaceManagerFactory));

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.ServiceBus.Messaging;
 using Microsoft.ServiceBus;
+using System.IO;
 
 namespace ProjectExtensions.Azure.ServiceBus.Interfaces {
 
@@ -11,6 +12,6 @@ namespace ProjectExtensions.Azure.ServiceBus.Interfaces {
         ISubscriptionClient CreateSubscriptionClient(string topicPath, string name, ReceiveMode receiveMode);
         ITopicClient CreateTopicClient(string path);
         void Close();
-        void Initialize(Uri serviceUri, TokenProvider tokenProvider);
+        IBrokeredMessage CreateBrokeredMessage(Stream messageBodyStream);
     }
 }

@@ -31,6 +31,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Autofac">
+      <HintPath>..\..\..\packages\Autofac.2.5.2.830\lib\NET40\Autofac.dll</HintPath>
+    </Reference>
+    <Reference Include="Autofac.Configuration">
+      <HintPath>..\..\..\packages\Autofac.2.5.2.830\lib\NET40\Autofac.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ServiceBus, Version=1.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\WindowsAzure.ServiceBus.1.6.0.0\lib\net40-full\Microsoft.ServiceBus.dll</HintPath>
+    </Reference>
     <Reference Include="Moq">
       <HintPath>..\..\..\packages\Moq.4.0.10827\lib\NET40\Moq.dll</HintPath>
     </Reference>
@@ -48,6 +57,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -58,10 +69,34 @@
     <Compile Include="..\..\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Config.cs" />
+    <Compile Include="Handlers\TestMessageForTestingHandler.cs" />
+    <Compile Include="Interfaces\IMockServiceBus.cs" />
+    <Compile Include="Messages\TestMessageForTesting.cs" />
+    <Compile Include="Mocks\MockBrokeredMessage.cs" />
+    <Compile Include="Mocks\MockIAsyncResult.cs" />
+    <Compile Include="Mocks\MockMessagingFactory.cs" />
+    <Compile Include="Mocks\MockNamespaceManager.cs" />
+    <Compile Include="Mocks\MockServiceBus.cs" />
+    <Compile Include="Mocks\MockSubscriptionClient.cs" />
+    <Compile Include="Mocks\MockTopicClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SampleTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\..\ProjectExtensions.Azure.ServiceBus.Autofac\ProjectExtensions.Azure.ServiceBus.Autofac.csproj">
+      <Project>{11192756-9ABB-4C2B-8FE5-2DBD4DC0DC36}</Project>
+      <Name>ProjectExtensions.Azure.ServiceBus.Autofac</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ProjectExtensions.Azure.ServiceBus\ProjectExtensions.Azure.ServiceBus.csproj">
+      <Project>{8C8A8531-95AE-41CD-B2AC-6651F104245E}</Project>
+      <Name>ProjectExtensions.Azure.ServiceBus</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -6,7 +6,7 @@ using Microsoft.ServiceBus.Messaging;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 
-    public class BrokeredMessageWrapper : IBrokeredMessage {
+    class BrokeredMessageWrapper : IBrokeredMessage {
 
         BrokeredMessage message;
 
@@ -66,6 +66,15 @@ namespace ProjectExtensions.Azure.ServiceBus {
             get {
                 return message.MessageId;
             }
+            set {
+                message.MessageId = value;
+            }
+        }
+
+        public IDictionary<string, object> Properties {
+            get {
+                return message.Properties;
+            }
         }
 
         public string ReplyTo {
@@ -115,5 +124,30 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 return message.To;
             }
         }
+
+        public void Abandon() {
+            message.Abandon();
+        }
+
+        public void Complete() {
+            message.Complete();
+        }
+
+        public void DeadLetter(string deadLetterReason, string deadLetterErrorDescription) {
+            message.DeadLetter(deadLetterReason, deadLetterErrorDescription);
+        }
+
+        public void Dispose() {
+            message.Dispose();
+        }
+
+        public T GetBody<T>() {
+            return message.GetBody<T>();
+        }
+
+        public BrokeredMessage GetMessage() {
+            return message;
+        }
+
     }
 }

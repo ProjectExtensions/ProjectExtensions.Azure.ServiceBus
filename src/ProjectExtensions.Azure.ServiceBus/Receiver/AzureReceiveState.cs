@@ -12,7 +12,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
     class AzureReceiveState {
 
         public AzureReceiveState(AzureBusReceiverState data, MethodInfo methodInfo,
-            IServiceBusSerializer serializer, BrokeredMessage message) {
+            IServiceBusSerializer serializer, IBrokeredMessage message) {
             Guard.ArgumentNotNull(data, "data");
             Guard.ArgumentNotNull(methodInfo, "methodInfo");
             Guard.ArgumentNotNull(serializer, "serializer");
@@ -35,7 +35,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
             get;
             set;
         }
-        public BrokeredMessage Message {
+        public IBrokeredMessage Message {
             get;
             set;
         }
