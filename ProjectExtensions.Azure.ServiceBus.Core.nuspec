@@ -26,6 +26,7 @@
     <file src="BuildOutput\bin\ProjectExtensions.Azure.ServiceBus.dll" target="lib\net40-full" />
     <file src="BuildOutput\bin\ProjectExtensions.Azure.ServiceBus.pdb" target="lib\net40-full" />
     <file src="BuildOutput\bin\ProjectExtensions.Azure.ServiceBus.xml" target="lib\net40-full" />
+    <file src="src\readme.txt" target="" />
     <file src="BuildOutput\src\*.cs" target="src" />
     <file src="BuildOutput\src\ProjectExtensions.Azure.ServiceBus\**\*.cs" target="src\ProjectExtensions.Azure.ServiceBus" />
   </files>

@@ -5,3 +5,7 @@ If your project does not compile, make sure you have a reference to both Project
 
 We now have support for addtional containers. If you wish to use AutoFac, Castle Windsor, NInject, StructureMap or Unity, 
 You will want to Install the Package ProjectExtensions.Azure.ServiceBus.Core along with the correct container.
+
+Getting started can be found here (readme.md)
+
+https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus

@@ -21,6 +21,7 @@
     <file src="BuildOutput\bin\ProjectExtensions.Azure.ServiceBus.Autofac.dll" target="lib\net40-full" />
     <file src="BuildOutput\bin\ProjectExtensions.Azure.ServiceBus.Autofac.pdb" target="lib\net40-full" />
     <file src="BuildOutput\bin\ProjectExtensions.Azure.ServiceBus.Autofac.xml" target="lib\net40-full" />
+    <file src="src\readme.txt" target="" />
     <file src="BuildOutput\src\*.cs" target="src" />
     <file src="BuildOutput\src\ProjectExtensions.Azure.ServiceBus.Autofac\**\*.cs" target="src\ProjectExtensions.Azure.ServiceBus.Autofac" />
   </files>

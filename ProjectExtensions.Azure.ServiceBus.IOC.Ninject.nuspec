@@ -21,6 +21,7 @@
     <file src="BuildOutput\bin\ProjectExtensions.Azure.ServiceBus.Ninject.dll" target="lib\net40-full" />
     <file src="BuildOutput\bin\ProjectExtensions.Azure.ServiceBus.Ninject.pdb" target="lib\net40-full" />
     <file src="BuildOutput\bin\ProjectExtensions.Azure.ServiceBus.Ninject.xml" target="lib\net40-full" />
+    <file src="src\readme.txt" target="" />
     <file src="BuildOutput\src\*.cs" target="src" />
     <file src="BuildOutput\src\ProjectExtensions.Azure.ServiceBus.Ninject\**\*.cs" target="src\ProjectExtensions.Azure.ServiceBus.Ninject" />
   </files>

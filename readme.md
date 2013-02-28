@@ -161,7 +161,7 @@ ProjectExtensions.Azure.ServiceBus.BusConfiguration.WithSettings()
 
 ##Release Notes
 
-###Version 0.8.4
+###Version 0.9.0
 
 * Allow support for other IoC containers to be added.  Continue to support Autofac.
 * Support for Castle Windsor IoC.
