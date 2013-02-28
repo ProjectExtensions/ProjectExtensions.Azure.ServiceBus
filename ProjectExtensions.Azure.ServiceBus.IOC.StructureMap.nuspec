@@ -13,7 +13,7 @@
     <summary>StructureMap support for Windows Azure Service Bus Wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;.  You will
 		also need ProjectExtensions.Azure.ServiceBus.Core. (Debug)</summary>
     <dependencies>
-      <dependency id="structuremap" version="2.6.3" />
+      <dependency id="structuremap" version="2.6.4.0" />
     </dependencies>
     <tags>Azure, AppFabric, ServiceBus</tags>
   </metadata>
