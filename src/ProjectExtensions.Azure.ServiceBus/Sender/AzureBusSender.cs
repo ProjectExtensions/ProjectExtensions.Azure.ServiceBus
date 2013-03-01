@@ -56,7 +56,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Sender {
             SendAsync<T>(obj, null, (result) => {
                 waitObject.Set();
                 failureException = result.ThrownException;
-            }, metadata);
+            }, serializer, metadata);
 
             // Wait until the messaging operations are completed.
             bool completed = waitObject.WaitOne(sentTimeout);
