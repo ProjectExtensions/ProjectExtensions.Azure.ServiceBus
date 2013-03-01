@@ -1,3 +1,4 @@
+using Amazon.ServiceBus.DistributedMessages.Serializers;
 using ProjectExtensions.Azure.ServiceBus;
 using ProjectExtensions.Azure.ServiceBus.Autofac.Container;
 
@@ -8,6 +9,7 @@ namespace PubSubUsingConfiguration {
                 .UseAutofacContainer()
                 .ReadFromConfigFile()
                 .ServiceBusApplicationId("AppName")
+                .DefaultSerializer(new GZipXmlSerializer())
                 //.ServiceBusIssuerKey("[sb password]")
                 //.ServiceBusIssuerName("owner")
                 //.ServiceBusNamespace("[addresshere]")

@@ -68,6 +68,7 @@
     <Compile Include="AnotherTestMessage.cs" />
     <Compile Include="AnotherTestMessageSubscriber.cs" />
     <Compile Include="Bootstrapper.cs" />
+    <Compile Include="GZipXmlSerializer.cs" />
     <Compile Include="TestMessageSubscriber.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
