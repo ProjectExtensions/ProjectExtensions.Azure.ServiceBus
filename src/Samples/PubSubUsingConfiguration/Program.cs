@@ -45,7 +45,7 @@ namespace PubSubUsingConfiguration {
                 scope.Complete();
             }
 
-            for (int i = 0; i < 20; i++) {
+            for (int i = 1; i <= 20; i++) {
                 var sw = new Stopwatch();
                 sw.Start();
                 var message1 = new TestMessage() {
@@ -61,7 +61,7 @@ namespace PubSubUsingConfiguration {
                 Console.WriteLine("sync:" + sw.Elapsed);
             }
 
-            for (int i = 0; i < 20; i++) {
+            for (int i = 1; i <= 20; i++) {
                 var message2 = new AnotherTestMessage() {
                     Value = i,
                     MessageId = DateTime.Now.ToString()
