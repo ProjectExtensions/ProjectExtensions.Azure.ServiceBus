@@ -10,8 +10,8 @@
     <projectUrl>https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Autofac support for Windows Azure Service Bus wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;</description>
-    <summary>Autofac support for Windows Azure Service Bus Wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;.  You will
-		also need ProjectExtensions.Azure.ServiceBus.Core. (Debug)</summary>
+    <summary>Autofac support for Windows Azure Service Bus Wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;. You will
+    also need ProjectExtensions.Azure.ServiceBus.Core. (Debug)</summary>
     <dependencies>
       <dependency id="Autofac" version="2.5.2.830" />
     </dependencies>

@@ -11,9 +11,9 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <releaseNotes>Added support for multiple IOC Containers. Projects now require a reference to ProjectExtensions.Azure.ServiceBus.dll and ProjectExtensions.Azure.ServiceBus.Autofac.dll. Please add manually if your project does not upgrade correctly.</releaseNotes>
     <description>Windows Azure Service Bus wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;</description>
-    <summary>Windows Azure Service Bus Wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;.  Includes Autofac IoC container support.  
-		If you use a different IoC container, get ProjectExtensions.Azure.ServiceBus.Core and one of the IoC packages (ProjectExtensions.Azure.ServiceBus.IOC.[container])
-		where container is Autofac, CastleWindsor, StructureMap or Unity. (Debug)</summary>
+    <summary>Windows Azure Service Bus Wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;. Includes Autofac IoC container support. 
+    If you use a different IoC container, get ProjectExtensions.Azure.ServiceBus.Core and one of the IoC packages (ProjectExtensions.Azure.ServiceBus.IOC.[container])
+    where container is Autofac, CastleWindsor, StructureMap or Unity. (Debug)</summary>
     <dependencies>
       <dependency id="Autofac" version="2.5.2.830" />
       <dependency id="Newtonsoft.Json" version="4.5.11" />

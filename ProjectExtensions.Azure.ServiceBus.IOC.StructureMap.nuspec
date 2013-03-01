@@ -10,8 +10,8 @@
     <projectUrl>https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>StructureMap support for Windows Azure Service Bus wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;</description>
-    <summary>StructureMap support for Windows Azure Service Bus Wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;.  You will
-		also need ProjectExtensions.Azure.ServiceBus.Core. (Debug)</summary>
+    <summary>StructureMap support for Windows Azure Service Bus Wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;. You will
+    also need ProjectExtensions.Azure.ServiceBus.Core. (Debug)</summary>
     <dependencies>
       <dependency id="structuremap" version="2.6.4.0" />
     </dependencies>
