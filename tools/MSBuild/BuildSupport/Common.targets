@@ -195,7 +195,7 @@
     <XmlMassUpdate ContentFile="$(HelpDir)\Web.config"
                NamespaceDefinitions="msb=http://schemas.microsoft.com/developer/msbuild/2003"
                ContentRoot="configuration"
-               SubstitutionsFile="$(ToolsDir)\MSBuild\BuildSupport\Onpoint.targets.properties"
+               SubstitutionsFile="$(ToolsDir)\MSBuild\BuildSupport\Common.targets.properties"
                SubstitutionsRoot="/msb:Project/msb:ProjectExtensions/msb:helpWebConfigContent" />
   </Target>
 
@@ -287,10 +287,11 @@
 
   <Target Name="PublishNugetPackage" Outputs="%(NugetItem.Identity)" Condition="$(PublishNugetPackage)">
     <Message Importance="high" Text="Publish packages %(NugetItem.NugetPackageSummary) to %(NugetItem.NugetPushUrl) with symbols=%(NugetItem.NugetPublishSymbols)"/>
-    <Exec WorkingDirectory="$(NuGetPackageDir)" Command="$(NuGet) push %(NugetItem.NugetPackageId).$(AppVersion).$(BuildNumber).nupkg  -source %(NugetItem.NugetPushUrl)"/>
+    <Exec WorkingDirectory="$(NuGetPackageDir)" Command="$(NuGet) push %(NugetItem.NugetPackageId).$(AppVersion).$(BuildNumber).nupkg"/>
     <!--Publish the symbols-->
+    <!--
     <Exec WorkingDirectory="$(NuGetPackageDir)" Command="$(NuGet) push %(NugetItem.NugetPackageId).$(AppVersion).$(BuildNumber).symbols.nupkg -source http://nuget.gw.symbolsource.org/Public/NuGet " Condition="%(NugetItem.NugetPublishSymbols)"/>
-
+    -->
   </Target>
   
 </Project>
