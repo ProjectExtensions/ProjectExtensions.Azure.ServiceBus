@@ -11,6 +11,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Autofac.Container {
     public class AutofacAzureBusContainer : AzureBusContainerBase {
         IContainer container;
         ContainerBuilder builder = new ContainerBuilder();
+        List<Type> registeredTypes = new List<Type>();
 
         /// <summary>
         /// Constructor.
@@ -53,6 +54,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Autofac.Container {
             else {
                 reg.SingleInstance();
             }
+            registeredTypes.Add(serviceType);
         }
 
         /// <summary>
@@ -75,6 +77,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Autofac.Container {
                 builder.Update(container);
             }
             builder = new ContainerBuilder();
+            registeredTypes.Clear();
         }
 
         /// <summary>
@@ -83,7 +86,12 @@ namespace ProjectExtensions.Azure.ServiceBus.Autofac.Container {
         /// <param name="type"></param>
         /// <returns></returns>
         public override bool IsRegistered(Type type) {
-            return container != null && container.IsRegistered(type);
+            if (container != null) {
+                return container.IsRegistered(type) || registeredTypes.Contains(type);
+            }
+            else {
+                return registeredTypes.Contains(type);
+            }
         }
     }
 }
