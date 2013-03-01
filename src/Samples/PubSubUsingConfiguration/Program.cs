@@ -96,7 +96,7 @@ namespace PubSubUsingConfiguration {
             fileTarget.Layout = "${date:format=HH\\:mm\\:ss} ${message}";
 
             // Step 4. Define rules
-            LoggingRule rule = new LoggingRule("*", LogLevel.Debug, consoleTarget);
+            LoggingRule rule = new LoggingRule("*", LogLevel.Info, consoleTarget);
             config.LoggingRules.Add(rule);
 
             rule = new LoggingRule("*", LogLevel.Debug, fileTarget);
