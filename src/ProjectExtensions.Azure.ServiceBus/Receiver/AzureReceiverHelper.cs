@@ -115,10 +115,10 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                                         if (!data.CancelToken.IsCancellationRequested) {
                                             // Process the received message.
                                             messageReceived = true;
-                                            logger.Debug("ProcessMessagesForSubscription Start received new message: {0}", data.EndPointData.SubscriptionName);
+                                            logger.Debug("ProcessMessagesForSubscription Start received new message: {0}", data.EndPointData.SubscriptionNameDebug);
                                             var receiveState = new AzureReceiveState(data, methodInfo, serializer, msg);
                                             processMessage(receiveState);
-                                            logger.Debug("ProcessMessagesForSubscription End received new message: {0}", data.EndPointData.SubscriptionName);
+                                            logger.Debug("ProcessMessagesForSubscription End received new message: {0}", data.EndPointData.SubscriptionNameDebug);
                                         }
                                     }
                                 }
@@ -234,7 +234,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
             bool createNew = false;
 
             try {
-                logger.Info("CreateSubscription Try {0} ", value.SubscriptionName);
+                logger.Info("CreateSubscription Try {0} ", value.SubscriptionNameDebug);
                 // First, let's see if a item with the specified name already exists.
                 verifyRetryPolicy.ExecuteAction(() => {
                     desc = configurationFactory.NamespaceManager.GetSubscription(topic.Path, value.SubscriptionName);
@@ -243,7 +243,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                 createNew = (desc == null);
             }
             catch (MessagingEntityNotFoundException) {
-                logger.Info("CreateSubscription Does Not Exist {0} ", value.SubscriptionName);
+                logger.Info("CreateSubscription Does Not Exist {0} ", value.SubscriptionNameDebug);
                 // Looks like the item does not exist. We should create a new one.
                 createNew = true;
             }
@@ -265,14 +265,14 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                 }
 
                 try {
-                    logger.Info("CreateSubscription {0} ", value.SubscriptionName);
+                    logger.Info("CreateSubscription {0} ", value.SubscriptionNameDebug);
                     var filter = new SqlFilter(string.Format(AzureSenderReceiverBase.TYPE_HEADER_NAME + " = '{0}'", value.MessageType.FullName.Replace('.', '_')));
                     retryPolicy.ExecuteAction(() => {
                         desc = configurationFactory.NamespaceManager.CreateSubscription(descriptionToCreate, filter);
                     });
                 }
                 catch (MessagingEntityAlreadyExistsException) {
-                    logger.Info("CreateSubscription {0} ", value.SubscriptionName);
+                    logger.Info("CreateSubscription {0} ", value.SubscriptionNameDebug);
                     // A item under the same name was already created by someone else, perhaps by another instance. Let's just use it.
                     retryPolicy.ExecuteAction(() => {
                         desc = configurationFactory.NamespaceManager.GetSubscription(topic.Path, value.SubscriptionName);
@@ -344,18 +344,18 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
 
                     objectTypeName = receivedMessage.GetType().FullName;
 
-                    logger.Debug("ProcessMessage invoke callback message start Type={0} message={1} Thread={2} MessageId={3}", objectTypeName, state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
+                    logger.Debug("ProcessMessage invoke callback message start Type={0} message={1} Thread={2} MessageId={3}", objectTypeName, state.Data.EndPointData.SubscriptionNameDebug, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
 
                     var handler = config.Container.Resolve(state.Data.EndPointData.DeclaredType);
 
                     logger.Debug("ProcessMessage reflection callback message start MethodInfo Type={0} Declared={1} handler={2} MethodInfo={3} Thread={4} MessageId={5}", objectTypeName, state.Data.EndPointData.DeclaredType, handler.GetType().FullName, state.MethodInfo.Name, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
 
                     state.MethodInfo.Invoke(handler, new object[] { receivedMessage });
-                    logger.Debug("ProcessMessage invoke callback message end Type={0} message={1} Thread={2} MessageId={3}", objectTypeName, state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
+                    logger.Debug("ProcessMessage invoke callback message end Type={0} message={1} Thread={2} MessageId={3}", objectTypeName, state.Data.EndPointData.SubscriptionNameDebug, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
                 }
             }
             catch (Exception ex) {
-                logger.Error("ProcessMessage invoke callback message failed Type={0} message={1} Thread={2} MessageId={3} Exception={4}", objectTypeName, state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId, ex.ToString());
+                logger.Error("ProcessMessage invoke callback message failed Type={0} message={1} Thread={2} MessageId={3} Exception={4}", objectTypeName, state.Data.EndPointData.SubscriptionNameDebug, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId, ex.ToString());
 
                 if (state.Message.DeliveryCount >= state.Data.EndPointData.AttributeData.MaxRetries) {
                     if (state.Data.EndPointData.AttributeData.DeadLetterAfterMaxRetries) {
@@ -369,7 +369,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
             }
 
             logger.Debug("ProcessMessage End received new message={0} Thread={1} MessageId={2}",
-                state.Data.EndPointData.SubscriptionName, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
+                state.Data.EndPointData.SubscriptionNameDebug, Thread.CurrentThread.ManagedThreadId, state.Message.MessageId);
         }
 
         static bool SafeDeadLetter(IBrokeredMessage msg, string reason) {
