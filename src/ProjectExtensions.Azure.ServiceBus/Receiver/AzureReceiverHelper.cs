@@ -182,7 +182,6 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                     if (!data.CancelToken.IsCancellationRequested && typeof(ThreadAbortException) != ex.GetType()) {
 
                         //The subscription may have been deleted. If it was, then we want to recreate it.
-                        //TODO recreate subscription and reset client.
                         var subException = ex as MessagingEntityNotFoundException;
 
                         if (subException != null && subException.Detail != null && subException.Detail.Message.IndexOf("40400") > -1) {
