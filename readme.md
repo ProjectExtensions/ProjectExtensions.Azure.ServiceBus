@@ -50,7 +50,7 @@ public class TestMessage {
 }
 ```
 
-5\. Create a Handler that will receive notifications when the message is placed on the bus. The Custom Attribute is optional but configures the Service Bus Subscription:
+5\. Create a Handler that will receive notifications when the message is placed on the bus. The custom attribute is optional but configures the Service Bus Subscription:
 
 ```csharp
 [MessageHandlerConfiguration(
