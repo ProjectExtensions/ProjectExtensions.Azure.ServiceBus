@@ -50,9 +50,16 @@ public class TestMessage {
 }
 ```
 
-5\. Create a Handler that will receive notifications when the message is placed on the bus:
+5\. Create a Handler that will receive notifications when the message is placed on the bus. The Custom Attribute is optional but configures the Service Bus Subscription:
 
 ```csharp
+[MessageHandlerConfiguration(
+    DefaultMessageTimeToLive = 240, //Time in minutes before your message is deleted from the subscription if you don't receive it.
+    LockDuration = 120, //Time that you wish to lock the message before it is marked to be received by another subscriber.
+    MaxRetries = 2, //Number of times to retry calling your handler before the message is deleted or placed in the DeadLetterAfterMaxRetries if configured.
+    PrefetchCount = 10, //Number of messages to pre-fetch. Used for high throughput 
+    ReceiveMode = ReceiveMode.PeekLock, //PeekLock or Receive and Delete
+    Singleton = true)] //If it is a singleton, the instance will be created once, otherwise it will be created for each message received. Recommended to set to true.
 public class TestMessageSubscriber : IHandleMessages<TestMessage> {
 
     static Logger logger = LogManager.GetCurrentClassLogger();
