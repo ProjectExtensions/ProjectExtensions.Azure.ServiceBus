@@ -63,7 +63,6 @@ public class TestMessageSubscriber : IHandleMessages<TestMessage> {
 }
 ```
 
-
 6\. Place initialization code at the beginning of your method or in your BootStrapper.  You will need a couple of using declarations:
 
 ```csharp
