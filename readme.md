@@ -77,7 +77,7 @@ Basic setup code (assuming you want to put Azure configuration information in yo
 ProjectExtensions.Azure.ServiceBus.BusConfiguration.WithSettings()
     .UseAutofacContainer()
     .ReadFromConfigFile()
-    .ServiceBusApplicationId("AppName")
+    .ServiceBusApplicationId("AppName") //Multiple applications can be used in the same service bus namespace. It is converted to lower case.
     .RegisterAssembly(typeof(TestMessageSubscriber).Assembly)
     .Configure();
 ```
@@ -87,7 +87,7 @@ And configuration:
 ```xml
 <add key="ServiceBusIssuerKey" value="base64hash" />
 <add key="ServiceBusIssuerName" value="owner" />
-//https://addresshere.servicebus.windows.net/
+<!--https://addresshere.servicebus.windows.net/-->
 <add key="ServiceBusNamespace" value="namespace set up in service bus (addresshere) portion" />
 ```
 
@@ -107,13 +107,29 @@ ProjectExtensions.Azure.ServiceBus.BusConfiguration.WithSettings()
 7\. Put some messages on the Bus:
 
 ```csharp
+//Blocking (Synchronous calls)
 for (int i = 0; i < 20; i++) {
     var message1 = new TestMessage() {
         Value = i,
         MessageId = DateTime.Now.ToString()
     };
-    BusConfiguration.Instance.Bus.Publish(message1, null);
+    BusConfiguration.Instance.Bus.Publish(message1, null); //Optional Dictionary of name value pairs to pass with the massage. Can be used for filtering
 }
+
+//Async calls
+for (int i = 0; i < 20; i++) {
+    var message1 = new TestMessage() {
+        Value = i,
+        MessageId = DateTime.Now.ToString()
+    };
+    BusConfiguration.Instance.Bus.PublishAsync(message2, (result) => {
+        if (!result.IsSuccess) { 
+            //message failed. Handle it
+        }
+        Debug.WriteLine("async:" + result.TimeSpent);
+    }, null); //Optional Dictionary of name value pairs to pass with the massage. Can be used for filtering
+}
+
 ```
 
 Watch your method get called.

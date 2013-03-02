@@ -23,7 +23,7 @@ Once you create the namespace, if you click on the "Access Key" button on the bo
 BusConfiguration.WithSettings()
     .UseAutofacContainer()
     .ReadFromConfigFile()
-    .ServiceBusApplicationId("AppName")
+    .ServiceBusApplicationId("AppName") //Multiple applications can be used in the same service bus namespace. It is converted to lower case.
     .DefaultSerializer(new GZipXmlSerializer())
     //.ServiceBusIssuerKey("[sb password]")
     //.ServiceBusIssuerName("owner")
