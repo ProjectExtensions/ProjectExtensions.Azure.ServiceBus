@@ -192,3 +192,14 @@ Click on the "Zip" Icon at the top of the page to download the latest source cod
 * BREAKING CHANGE. Move Autofac support into seperate DLL. Existing implementations need to add a reference to ProjectExtensions.Azure.ServiceBus.Autofac and change initialization code as shown in the getting started example.
 * BREAKING CHANGE. WithSettings No longer accepts the AutoFac Container as a parameter. This change was made to support the other containers.
 * BREAKING CHANGE. You must add .UseAutofacContainer() after WithSettings(). If you wich to use your existing container, You would pass it into this method call.
+
+###Version 0.9.1
+
+* Fixed bug in AutoFac registration of a Default Serializer.
+* Fixed bug in AutoFac registration of a any items internally registered on the default container.
+* Fixed bug in Publish method that ignored the serializer passed in and defaulted back to default serializer.
+
+###Version 0.9.2
+
+* Added self healing of deleted topic during application execution. Error is still thrown since no subscribers will exist.
+* Added self healing of deleted subscriptions during application execution. Any messages sent to the topic while your client subscription is deleted will not be received. The sender does not understand how many receivers exist and therefor does not know that the message needs to be resent.
