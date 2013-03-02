@@ -61,78 +61,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                     value.IsReusable,
                     value.AttributeData != null ? value.AttributeData.ToString() : string.Empty);
 
-                SubscriptionDescription desc = null;
-
-                bool createNew = false;
-
-                try {
-                    logger.Info("CreateSubscription Try {0} ", value.SubscriptionName);
-                    // First, let's see if a item with the specified name already exists.
-                    verifyRetryPolicy.ExecuteAction(() => {
-                        desc = configurationFactory.NamespaceManager.GetSubscription(topic.Path, value.SubscriptionName);
-                    });
-
-                    createNew = (desc == null);
-                }
-                catch (MessagingEntityNotFoundException) {
-                    logger.Info("CreateSubscription Does Not Exist {0} ", value.SubscriptionName);
-                    // Looks like the item does not exist. We should create a new one.
-                    createNew = true;
-                }
-
-                // If a item with the specified name doesn't exist, it will be auto-created.
-                if (createNew) {
-                    var descriptionToCreate = new SubscriptionDescription(topic.Path, value.SubscriptionName);
-
-                    if (value.AttributeData != null) {
-                        var attr = value.AttributeData;
-                        if (attr.DefaultMessageTimeToLiveSet()) {
-                            descriptionToCreate.DefaultMessageTimeToLive = new TimeSpan(0, 0, attr.DefaultMessageTimeToLive);
-                        }
-                        descriptionToCreate.EnableBatchedOperations = attr.EnableBatchedOperations;
-                        descriptionToCreate.EnableDeadLetteringOnMessageExpiration = attr.EnableDeadLetteringOnMessageExpiration;
-                        if (attr.LockDurationSet()) {
-                            descriptionToCreate.LockDuration = new TimeSpan(0, 0, attr.LockDuration);
-                        }
-                    }
-
-                    try {
-                        logger.Info("CreateSubscription {0} ", value.SubscriptionName);
-                        var filter = new SqlFilter(string.Format(TYPE_HEADER_NAME + " = '{0}'", value.MessageType.FullName.Replace('.', '_')));
-                        retryPolicy.ExecuteAction(() => {
-                            desc = configurationFactory.NamespaceManager.CreateSubscription(descriptionToCreate, filter);
-                        });
-                    }
-                    catch (MessagingEntityAlreadyExistsException) {
-                        logger.Info("CreateSubscription {0} ", value.SubscriptionName);
-                        // A item under the same name was already created by someone else, perhaps by another instance. Let's just use it.
-                        retryPolicy.ExecuteAction(() => {
-                            desc = configurationFactory.NamespaceManager.GetSubscription(topic.Path, value.SubscriptionName);
-                        });
-                    }
-                }
-
-                ISubscriptionClient subscriptionClient = null;
-                var rm = ReceiveMode.PeekLock;
-
-                if (value.AttributeData != null) {
-                    rm = value.AttributeData.ReceiveMode;
-                }
-
-                retryPolicy.ExecuteAction(() => {
-                    subscriptionClient = configurationFactory.MessageFactory.CreateSubscriptionClient(topic.Path, value.SubscriptionName, rm);
-                });
-
-                if (value.AttributeData != null && value.AttributeData.PrefetchCountSet()) {
-                    subscriptionClient.PrefetchCount = value.AttributeData.PrefetchCount;
-                }
-
-                var state = new AzureBusReceiverState() {
-                    Client = subscriptionClient,
-                    EndPointData = value
-                };
-
-                var helper = new AzureReceiverHelper(configuration, serializer, retryPolicy, state);
+                var helper = new AzureReceiverHelper(topic, configurationFactory, configuration, serializer, retryPolicy, value);
                 mappings.Add(helper);
                 //helper.ProcessMessagesForSubscription();
 
@@ -203,14 +132,14 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
         /// <param name="disposing"></param>
         public override void Dispose(bool disposing) {
             foreach (var item in mappings) {
-                item.Data.Client.Close();
+                if (item.Data.Client != null) {
+                    item.Data.Client.Close();
+                }
                 if (item is IDisposable) {
                     (item as IDisposable).Dispose();
                 }
-                item.Data.Client = null;
             }
             mappings.Clear();
         }
-
     }
 }

@@ -9,6 +9,8 @@ using System.Threading;
 using Microsoft.ServiceBus.Messaging;
 using System.IO;
 using System.Diagnostics;
+using ProjectExtensions.Azure.ServiceBus.TransientFaultHandling.ServiceBus;
+using ProjectExtensions.Azure.ServiceBus.Interfaces;
 
 namespace ProjectExtensions.Azure.ServiceBus.Receiver {
 
@@ -16,10 +18,15 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
 
         static Logger logger = LogManager.GetCurrentClassLogger();
 
-        IBusConfiguration config;
-        RetryPolicy retryPolicy;
+        static RetryPolicy<ServiceBusTransientErrorToDetermineExistanceDetectionStrategy> verifyRetryPolicy
+            = new RetryPolicy<ServiceBusTransientErrorToDetermineExistanceDetectionStrategy>(10, RetryStrategy.DefaultMinBackoff, TimeSpan.FromSeconds(2.0), RetryStrategy.DefaultClientBackoff);
+
+        readonly TopicDescription topic;
+        readonly IServiceBusConfigurationFactory configurationFactory;
+        readonly IBusConfiguration config;
+        readonly RetryPolicy retryPolicy;
         AzureBusReceiverState data;
-        IServiceBusSerializer serializer;
+        readonly IServiceBusSerializer serializer;
 
         int failCounter = 0;
 
@@ -29,15 +36,94 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
             }
         }
 
-        public AzureReceiverHelper(IBusConfiguration config, IServiceBusSerializer serializer, RetryPolicy retryPolicy, AzureBusReceiverState data) {
+        public AzureReceiverHelper(TopicDescription topic, IServiceBusConfigurationFactory configurationFactory, IBusConfiguration config, IServiceBusSerializer serializer, RetryPolicy retryPolicy, ServiceBusEnpointData data) {
+            Guard.ArgumentNotNull(topic, "topic");
+            Guard.ArgumentNotNull(configurationFactory, "configurationFactory");
             Guard.ArgumentNotNull(config, "config");
             Guard.ArgumentNotNull(serializer, "serializer");
             Guard.ArgumentNotNull(retryPolicy, "retryPolicy");
             Guard.ArgumentNotNull(data, "data");
+            this.topic = topic;
+            this.configurationFactory = configurationFactory;
             this.config = config;
             this.serializer = serializer;
             this.retryPolicy = retryPolicy;
-            this.data = data;
+
+            Configure(data);
+        }
+
+        private void Configure(ServiceBusEnpointData value) {
+
+            SubscriptionDescription desc = null;
+
+            bool createNew = false;
+
+            try {
+                logger.Info("CreateSubscription Try {0} ", value.SubscriptionName);
+                // First, let's see if a item with the specified name already exists.
+                verifyRetryPolicy.ExecuteAction(() => {
+                    desc = configurationFactory.NamespaceManager.GetSubscription(topic.Path, value.SubscriptionName);
+                });
+
+                createNew = (desc == null);
+            }
+            catch (MessagingEntityNotFoundException) {
+                logger.Info("CreateSubscription Does Not Exist {0} ", value.SubscriptionName);
+                // Looks like the item does not exist. We should create a new one.
+                createNew = true;
+            }
+
+            // If a item with the specified name doesn't exist, it will be auto-created.
+            if (createNew) {
+                var descriptionToCreate = new SubscriptionDescription(topic.Path, value.SubscriptionName);
+
+                if (value.AttributeData != null) {
+                    var attr = value.AttributeData;
+                    if (attr.DefaultMessageTimeToLiveSet()) {
+                        descriptionToCreate.DefaultMessageTimeToLive = new TimeSpan(0, 0, attr.DefaultMessageTimeToLive);
+                    }
+                    descriptionToCreate.EnableBatchedOperations = attr.EnableBatchedOperations;
+                    descriptionToCreate.EnableDeadLetteringOnMessageExpiration = attr.EnableDeadLetteringOnMessageExpiration;
+                    if (attr.LockDurationSet()) {
+                        descriptionToCreate.LockDuration = new TimeSpan(0, 0, attr.LockDuration);
+                    }
+                }
+
+                try {
+                    logger.Info("CreateSubscription {0} ", value.SubscriptionName);
+                    var filter = new SqlFilter(string.Format(AzureSenderReceiverBase.TYPE_HEADER_NAME + " = '{0}'", value.MessageType.FullName.Replace('.', '_')));
+                    retryPolicy.ExecuteAction(() => {
+                        desc = configurationFactory.NamespaceManager.CreateSubscription(descriptionToCreate, filter);
+                    });
+                }
+                catch (MessagingEntityAlreadyExistsException) {
+                    logger.Info("CreateSubscription {0} ", value.SubscriptionName);
+                    // A item under the same name was already created by someone else, perhaps by another instance. Let's just use it.
+                    retryPolicy.ExecuteAction(() => {
+                        desc = configurationFactory.NamespaceManager.GetSubscription(topic.Path, value.SubscriptionName);
+                    });
+                }
+            }
+
+            ISubscriptionClient subscriptionClient = null;
+            var rm = ReceiveMode.PeekLock;
+
+            if (value.AttributeData != null) {
+                rm = value.AttributeData.ReceiveMode;
+            }
+
+            retryPolicy.ExecuteAction(() => {
+                subscriptionClient = configurationFactory.MessageFactory.CreateSubscriptionClient(topic.Path, value.SubscriptionName, rm);
+            });
+
+            if (value.AttributeData != null && value.AttributeData.PrefetchCountSet()) {
+                subscriptionClient.PrefetchCount = value.AttributeData.PrefetchCount;
+            }
+
+            this.data = new AzureBusReceiverState() {
+                EndPointData = value,
+                Client = subscriptionClient
+            };
         }
 
         public void ProcessMessagesForSubscription() {
