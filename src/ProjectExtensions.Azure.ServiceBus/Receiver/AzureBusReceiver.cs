@@ -132,12 +132,16 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
         /// <param name="disposing"></param>
         public override void Dispose(bool disposing) {
             foreach (var item in mappings) {
-                if (item.Data.Client != null) {
-                    item.Data.Client.Close();
-                }
-                if (item is IDisposable) {
-                    (item as IDisposable).Dispose();
-                }
+                ExtensionMethods.ExecuteAndReturn(() => {
+                    if (item.Data.Client != null) {
+                        item.Data.Client.Close();
+                    }
+                });
+                ExtensionMethods.ExecuteAndReturn(() => {
+                    if (item is IDisposable) {
+                        (item as IDisposable).Dispose();
+                    }
+                });
             }
             mappings.Clear();
         }

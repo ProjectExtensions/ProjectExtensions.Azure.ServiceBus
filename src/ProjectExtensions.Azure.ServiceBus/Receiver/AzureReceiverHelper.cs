@@ -26,6 +26,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
         readonly IBusConfiguration config;
         readonly RetryPolicy retryPolicy;
         AzureBusReceiverState data;
+        ServiceBusEnpointData endpoint;
         readonly IServiceBusSerializer serializer;
 
         int failCounter = 0;
@@ -36,94 +37,21 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
             }
         }
 
-        public AzureReceiverHelper(TopicDescription topic, IServiceBusConfigurationFactory configurationFactory, IBusConfiguration config, IServiceBusSerializer serializer, RetryPolicy retryPolicy, ServiceBusEnpointData data) {
+        public AzureReceiverHelper(TopicDescription topic, IServiceBusConfigurationFactory configurationFactory, IBusConfiguration config, IServiceBusSerializer serializer, RetryPolicy retryPolicy, ServiceBusEnpointData endpoint) {
             Guard.ArgumentNotNull(topic, "topic");
             Guard.ArgumentNotNull(configurationFactory, "configurationFactory");
             Guard.ArgumentNotNull(config, "config");
             Guard.ArgumentNotNull(serializer, "serializer");
             Guard.ArgumentNotNull(retryPolicy, "retryPolicy");
-            Guard.ArgumentNotNull(data, "data");
+            Guard.ArgumentNotNull(endpoint, "endpoint");
             this.topic = topic;
             this.configurationFactory = configurationFactory;
             this.config = config;
             this.serializer = serializer;
             this.retryPolicy = retryPolicy;
+            this.endpoint = endpoint;
 
-            Configure(data);
-        }
-
-        private void Configure(ServiceBusEnpointData value) {
-
-            SubscriptionDescription desc = null;
-
-            bool createNew = false;
-
-            try {
-                logger.Info("CreateSubscription Try {0} ", value.SubscriptionName);
-                // First, let's see if a item with the specified name already exists.
-                verifyRetryPolicy.ExecuteAction(() => {
-                    desc = configurationFactory.NamespaceManager.GetSubscription(topic.Path, value.SubscriptionName);
-                });
-
-                createNew = (desc == null);
-            }
-            catch (MessagingEntityNotFoundException) {
-                logger.Info("CreateSubscription Does Not Exist {0} ", value.SubscriptionName);
-                // Looks like the item does not exist. We should create a new one.
-                createNew = true;
-            }
-
-            // If a item with the specified name doesn't exist, it will be auto-created.
-            if (createNew) {
-                var descriptionToCreate = new SubscriptionDescription(topic.Path, value.SubscriptionName);
-
-                if (value.AttributeData != null) {
-                    var attr = value.AttributeData;
-                    if (attr.DefaultMessageTimeToLiveSet()) {
-                        descriptionToCreate.DefaultMessageTimeToLive = new TimeSpan(0, 0, attr.DefaultMessageTimeToLive);
-                    }
-                    descriptionToCreate.EnableBatchedOperations = attr.EnableBatchedOperations;
-                    descriptionToCreate.EnableDeadLetteringOnMessageExpiration = attr.EnableDeadLetteringOnMessageExpiration;
-                    if (attr.LockDurationSet()) {
-                        descriptionToCreate.LockDuration = new TimeSpan(0, 0, attr.LockDuration);
-                    }
-                }
-
-                try {
-                    logger.Info("CreateSubscription {0} ", value.SubscriptionName);
-                    var filter = new SqlFilter(string.Format(AzureSenderReceiverBase.TYPE_HEADER_NAME + " = '{0}'", value.MessageType.FullName.Replace('.', '_')));
-                    retryPolicy.ExecuteAction(() => {
-                        desc = configurationFactory.NamespaceManager.CreateSubscription(descriptionToCreate, filter);
-                    });
-                }
-                catch (MessagingEntityAlreadyExistsException) {
-                    logger.Info("CreateSubscription {0} ", value.SubscriptionName);
-                    // A item under the same name was already created by someone else, perhaps by another instance. Let's just use it.
-                    retryPolicy.ExecuteAction(() => {
-                        desc = configurationFactory.NamespaceManager.GetSubscription(topic.Path, value.SubscriptionName);
-                    });
-                }
-            }
-
-            ISubscriptionClient subscriptionClient = null;
-            var rm = ReceiveMode.PeekLock;
-
-            if (value.AttributeData != null) {
-                rm = value.AttributeData.ReceiveMode;
-            }
-
-            retryPolicy.ExecuteAction(() => {
-                subscriptionClient = configurationFactory.MessageFactory.CreateSubscriptionClient(topic.Path, value.SubscriptionName, rm);
-            });
-
-            if (value.AttributeData != null && value.AttributeData.PrefetchCountSet()) {
-                subscriptionClient.PrefetchCount = value.AttributeData.PrefetchCount;
-            }
-
-            this.data = new AzureBusReceiverState() {
-                EndPointData = value,
-                Client = subscriptionClient
-            };
+            Configure(endpoint);
         }
 
         public void ProcessMessagesForSubscription() {
@@ -250,14 +178,27 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                 recoverReceive = ((ex) => {
                     // Just log an exception. Do not allow an unhandled exception to terminate the message receive loop abnormally.
                     lastAttemptWasError = true;
-                    logger.Error(string.Format("ProcessMessagesForSubscription Message Error={0} Declared={1} MessageTytpe={2} IsReusable={3} Error={4}",
-                        data.EndPointData.SubscriptionName,
-                        data.EndPointData.DeclaredType.ToString(),
-                        data.EndPointData.MessageType.ToString(),
-                        data.EndPointData.IsReusable,
-                        ex.ToString()));
 
                     if (!data.CancelToken.IsCancellationRequested && typeof(ThreadAbortException) != ex.GetType()) {
+
+                        //The subscription may have been deleted. If it was, then we want to recreate it.
+                        //TODO recreate subscription and reset client.
+                        var subException = ex as MessagingEntityNotFoundException;
+
+                        if (subException != null && subException.Detail != null && subException.Detail.Message.IndexOf("40400") > -1) {
+                            logger.Info("Subscription was deleted. Attempting to Recreate.");
+                            Configure(endpoint);
+                            logger.Info("Subscription was deleted. Recreated.");
+                        }
+                        else {
+                            logger.Error(string.Format("ProcessMessagesForSubscription Message Error={0} Declared={1} MessageTytpe={2} IsReusable={3} Error={4}",
+                                data.EndPointData.SubscriptionName,
+                                data.EndPointData.DeclaredType.ToString(),
+                                data.EndPointData.MessageType.ToString(),
+                                data.EndPointData.IsReusable,
+                                ex.ToString()));                        
+                        }
+
                         // Continue receiving and processing new messages until we are told to stop regardless of any exceptions.
                         receiveMessage();
                     }
@@ -284,6 +225,95 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                     //try again
                     ProcessMessagesForSubscription();
                 }
+            }
+        }
+
+        void Configure(ServiceBusEnpointData value) {
+
+            SubscriptionDescription desc = null;
+
+            bool createNew = false;
+
+            try {
+                logger.Info("CreateSubscription Try {0} ", value.SubscriptionName);
+                // First, let's see if a item with the specified name already exists.
+                verifyRetryPolicy.ExecuteAction(() => {
+                    desc = configurationFactory.NamespaceManager.GetSubscription(topic.Path, value.SubscriptionName);
+                });
+
+                createNew = (desc == null);
+            }
+            catch (MessagingEntityNotFoundException) {
+                logger.Info("CreateSubscription Does Not Exist {0} ", value.SubscriptionName);
+                // Looks like the item does not exist. We should create a new one.
+                createNew = true;
+            }
+
+            // If a item with the specified name doesn't exist, it will be auto-created.
+            if (createNew) {
+                var descriptionToCreate = new SubscriptionDescription(topic.Path, value.SubscriptionName);
+
+                if (value.AttributeData != null) {
+                    var attr = value.AttributeData;
+                    if (attr.DefaultMessageTimeToLiveSet()) {
+                        descriptionToCreate.DefaultMessageTimeToLive = new TimeSpan(0, 0, attr.DefaultMessageTimeToLive);
+                    }
+                    descriptionToCreate.EnableBatchedOperations = attr.EnableBatchedOperations;
+                    descriptionToCreate.EnableDeadLetteringOnMessageExpiration = attr.EnableDeadLetteringOnMessageExpiration;
+                    if (attr.LockDurationSet()) {
+                        descriptionToCreate.LockDuration = new TimeSpan(0, 0, attr.LockDuration);
+                    }
+                }
+
+                try {
+                    logger.Info("CreateSubscription {0} ", value.SubscriptionName);
+                    var filter = new SqlFilter(string.Format(AzureSenderReceiverBase.TYPE_HEADER_NAME + " = '{0}'", value.MessageType.FullName.Replace('.', '_')));
+                    retryPolicy.ExecuteAction(() => {
+                        desc = configurationFactory.NamespaceManager.CreateSubscription(descriptionToCreate, filter);
+                    });
+                }
+                catch (MessagingEntityAlreadyExistsException) {
+                    logger.Info("CreateSubscription {0} ", value.SubscriptionName);
+                    // A item under the same name was already created by someone else, perhaps by another instance. Let's just use it.
+                    retryPolicy.ExecuteAction(() => {
+                        desc = configurationFactory.NamespaceManager.GetSubscription(topic.Path, value.SubscriptionName);
+                    });
+                }
+            }
+
+            ISubscriptionClient subscriptionClient = null;
+            var rm = ReceiveMode.PeekLock;
+
+            if (value.AttributeData != null) {
+                rm = value.AttributeData.ReceiveMode;
+            }
+
+            retryPolicy.ExecuteAction(() => {
+                subscriptionClient = configurationFactory.MessageFactory.CreateSubscriptionClient(topic.Path, value.SubscriptionName, rm);
+            });
+
+            if (value.AttributeData != null && value.AttributeData.PrefetchCountSet()) {
+                subscriptionClient.PrefetchCount = value.AttributeData.PrefetchCount;
+            }
+
+            if (data == null) {
+                data = new AzureBusReceiverState() {
+                    EndPointData = value,
+                    Client = subscriptionClient
+                };
+            }
+            else {
+                //we need to clean up the deleted subscription
+                var oldClient = this.data.Client;
+
+                data.Client = subscriptionClient;
+
+                //now lets dispose the client.
+                ExtensionMethods.ExecuteAndReturn(() => {
+                    if (oldClient != null) {
+                        oldClient.Close();
+                    }
+                });
             }
         }
 
