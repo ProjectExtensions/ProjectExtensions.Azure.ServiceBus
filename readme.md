@@ -95,7 +95,7 @@ Otherwise, you can configure everything in code:
 
 ```csharp
 ProjectExtensions.Azure.ServiceBus.BusConfiguration.WithSettings()
-	.UseAutofacContainer()
+    .UseAutofacContainer()
     .ServiceBusApplicationId("AppName")
     .ServiceBusIssuerKey("[sb password]")
     .ServiceBusIssuerName("owner")
@@ -150,7 +150,7 @@ Otherwise, you can configure everything in code:
 
 ```csharp
 ProjectExtensions.Azure.ServiceBus.BusConfiguration.WithSettings()
-	.UseCastleWindsorContainer()
+    .UseCastleWindsorContainer()
     .ServiceBusApplicationId("AppName")
     .ServiceBusIssuerKey("[sb password]")
     .ServiceBusIssuerName("owner")
@@ -163,9 +163,11 @@ ProjectExtensions.Azure.ServiceBus.BusConfiguration.WithSettings()
 
 ###Version 0.9.0
 
-* Allow support for other IoC containers to be added.  Continue to support Autofac.
+* Allow support for other IoC containers to be added. Continue to support Autofac.
 * Support for Castle Windsor IoC.
 * Support for Ninject IoC.
 * Support for StructureMap IoC.
 * Support for Unity IoC.
-* BREAKING CHANGE.  Move Autofac support into seperate DLL.  Existing implementations need to add a reference to ProjectExtensions.Azure.ServiceBus.Autofac and change initialization code as shown in the getting started example.
+* BREAKING CHANGE. Move Autofac support into seperate DLL. Existing implementations need to add a reference to ProjectExtensions.Azure.ServiceBus.Autofac and change initialization code as shown in the getting started example.
+* BREAKING CHANGE. WithSettings No longer accepts the AutoFac Container as a parameter. This change was made to support the other containers.
+* BREAKING CHANGE. You must add .UseAutofacContainer() after WithSettings(). If you wich to use your existing container, You would pass it into this method call.
