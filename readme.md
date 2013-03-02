@@ -175,6 +175,12 @@ ProjectExtensions.Azure.ServiceBus.BusConfiguration.WithSettings()
     .Configure();
 ```
 
+You may also download the repository and check out the Samples in the /src/samples folder.
+
+The Sample used to build this document can be found in the PubSubUsingConfiguration example.
+
+Click on the "Zip" Icon at the top of the page to download the latest source code.
+
 ##Release Notes
 
 ###Version 0.9.0

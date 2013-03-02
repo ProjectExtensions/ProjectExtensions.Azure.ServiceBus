@@ -39,3 +39,9 @@ You will want to Install the Package ProjectExtensions.Azure.ServiceBus.Core alo
 Getting started can be found here (readme.md)
 
 https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus
+
+You may also download the repository and check out the Samples in the /src/samples folder.
+
+The Sample used to build this document can be found in the PubSubUsingConfiguration example.
+
+https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus/archive/master.zip
