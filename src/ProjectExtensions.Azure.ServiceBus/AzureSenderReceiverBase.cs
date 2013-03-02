@@ -80,7 +80,6 @@ namespace ProjectExtensions.Azure.ServiceBus {
                     });
                 }
             }
-
         }
 
         public void Dispose() {

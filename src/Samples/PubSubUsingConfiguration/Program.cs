@@ -55,7 +55,7 @@ namespace PubSubUsingConfiguration {
                 //BusConfiguration.Instance.Bus.PublishAsync(message1, (result) => {
                 //    Console.WriteLine(result.TimeSpent);
                 //}, null);
-                BusConfiguration.Instance.Bus.Publish(message1, null);
+                BusConfiguration.Instance.Bus.Publish(message1, null); //Optional Dictionary of name value pairs to pass with the massage. Can be used for filtering
                 sw.Stop();
                 Debug.WriteLine("sync:" + sw.Elapsed);
                 Console.WriteLine("sync:" + sw.Elapsed);
@@ -67,9 +67,12 @@ namespace PubSubUsingConfiguration {
                     MessageId = DateTime.Now.ToString()
                 };
                 BusConfiguration.Instance.Bus.PublishAsync(message2, (result) => {
+                    if (!result.IsSuccess) { 
+                        //message failed.
+                    }
                     Debug.WriteLine("async:" + result.TimeSpent);
                     Console.WriteLine("async:" + result.TimeSpent);
-                }, null);
+                }, null); //Optional Dictionary of name value pairs to pass with the massage. Can be used for filtering
             }
 
             Console.WriteLine("You must wait for the messages to be processed");

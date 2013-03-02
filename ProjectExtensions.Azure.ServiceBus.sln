@@ -40,6 +40,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Info", "Info", "{5C4E4883-A
 		ProjectExtensions.Azure.ServiceBus.IOC.StructureMap.nuspec = ProjectExtensions.Azure.ServiceBus.IOC.StructureMap.nuspec
 		ProjectExtensions.Azure.ServiceBus.IOC.Unity.nuspec = ProjectExtensions.Azure.ServiceBus.IOC.Unity.nuspec
 		ProjectExtensions.Azure.ServiceBus.nuspec = ProjectExtensions.Azure.ServiceBus.nuspec
+		readme.md = readme.md
 		src\readme.txt = src\readme.txt
 	EndProjectSection
 EndProject

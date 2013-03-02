@@ -10,6 +10,7 @@ using Microsoft.Practices.TransientFaultHandling;
 using System.Diagnostics;
 using System.Threading;
 using ProjectExtensions.Azure.ServiceBus.Interfaces;
+using ProjectExtensions.Azure.ServiceBus.Exceptions;
 
 namespace ProjectExtensions.Azure.ServiceBus.Sender {
 
@@ -177,6 +178,17 @@ namespace ProjectExtensions.Azure.ServiceBus.Sender {
                         logger.Error<Exception>("Send failed {0}", ex);
 
                         sw.Stop();
+
+                        //see if the reason is the topic was deleted and if it was, create the topic and set a new error since there will be no receivers.
+
+                        var topicException = ex as MessagingEntityNotFoundException;
+                        if (topicException != null && topicException.Detail != null && topicException.Detail.Message.IndexOf("40400") > -1) {
+                            logger.Info("Topic was deleted. Attempting to Recreate.");
+                            EnsureTopic(this.configuration.TopicName);
+                            failureException = new TopicDeletedException();
+                            logger.Info("Topic was deleted. Recreate Complete.");
+                        }
+
                         if (!resultSent) {
                             resultSent = true;
                             ExtensionMethods.ExecuteAndReturn(() => resultCallBack(new MessageSentResult<T>() {
