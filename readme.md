@@ -52,6 +52,8 @@ public class TestMessage {
 
 5\. Create a Handler that will receive notifications when the message is placed on the bus. The custom attribute is optional but configures the Service Bus Subscription:
 
+Note: If your constructor for your message takes in parameters from your DI container that implement IDisposable, you must set Singleton = true or you will leak memory.
+
 ```csharp
 [MessageHandlerConfiguration(
     DefaultMessageTimeToLive = 240, //Time in minutes before your message is deleted from the subscription if you don't receive it.
@@ -63,6 +65,8 @@ public class TestMessage {
 public class TestMessageSubscriber : IHandleMessages<TestMessage> {
 
     static Logger logger = LogManager.GetCurrentClassLogger();
+
+    //You may optionally create a constructor that takes in parameters that can be resolved from your DI container.
 
     public void Handle(IReceivedMessage<TestMessage> message) {
         logger.Log(LogLevel.Info, "Message received: {0} {1}", message.Message.Value, message.Message.MessageId);
