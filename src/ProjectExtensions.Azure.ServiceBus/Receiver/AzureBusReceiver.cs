@@ -61,7 +61,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                     value.IsReusable,
                     value.AttributeData != null ? value.AttributeData.ToString() : string.Empty);
 
-                var helper = new AzureReceiverHelper(topic, configurationFactory, configuration, serializer, retryPolicy, value);
+                var helper = new AzureReceiverHelper(topic, configurationFactory, configuration, serializer, verifyRetryPolicy, retryPolicy, value);
                 mappings.Add(helper);
                 //helper.ProcessMessagesForSubscription();
 

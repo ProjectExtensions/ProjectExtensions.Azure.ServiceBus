@@ -18,13 +18,11 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
 
         static Logger logger = LogManager.GetCurrentClassLogger();
 
-        static RetryPolicy<ServiceBusTransientErrorToDetermineExistanceDetectionStrategy> verifyRetryPolicy
-            = new RetryPolicy<ServiceBusTransientErrorToDetermineExistanceDetectionStrategy>(10, RetryStrategy.DefaultMinBackoff, TimeSpan.FromSeconds(2.0), RetryStrategy.DefaultClientBackoff);
-
         readonly TopicDescription topic;
         readonly IServiceBusConfigurationFactory configurationFactory;
         readonly IBusConfiguration config;
         readonly RetryPolicy retryPolicy;
+        readonly RetryPolicy verifyRetryPolicy;
         AzureBusReceiverState data;
         ServiceBusEnpointData endpoint;
         readonly IServiceBusSerializer serializer;
@@ -37,7 +35,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
             }
         }
 
-        public AzureReceiverHelper(TopicDescription topic, IServiceBusConfigurationFactory configurationFactory, IBusConfiguration config, IServiceBusSerializer serializer, RetryPolicy retryPolicy, ServiceBusEnpointData endpoint) {
+        public AzureReceiverHelper(TopicDescription topic, IServiceBusConfigurationFactory configurationFactory, IBusConfiguration config, IServiceBusSerializer serializer, RetryPolicy verifyRetryPolicy, RetryPolicy retryPolicy, ServiceBusEnpointData endpoint) {
             Guard.ArgumentNotNull(topic, "topic");
             Guard.ArgumentNotNull(configurationFactory, "configurationFactory");
             Guard.ArgumentNotNull(config, "config");
@@ -48,6 +46,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
             this.configurationFactory = configurationFactory;
             this.config = config;
             this.serializer = serializer;
+            this.verifyRetryPolicy = verifyRetryPolicy;
             this.retryPolicy = retryPolicy;
             this.endpoint = endpoint;
 
