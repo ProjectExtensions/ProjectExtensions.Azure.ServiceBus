@@ -22,6 +22,10 @@ You must add .UseAutofacContainer() passing in the optional container that used 
 
 The ServiceBusNamespace Is the namespace that you configure in the Azure Portal.
 
+You can read about how to set up the Windows Azure Namespace here:
+
+https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus/wiki/Setting-Up-Windows-Azure-Service-Bus
+
 It is the test1234 portion of sb://test1234.servicebus.windows.net
 
 Once you create the namespace, if you click on the "Access Key" button on the bottom of the screen, the owner and sb password will be provided

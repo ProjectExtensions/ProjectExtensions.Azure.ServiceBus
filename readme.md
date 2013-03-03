@@ -28,6 +28,10 @@ You can then either implement IAzureBusContainer for your IoC of choice or grab 
 
 If you have a favorite IoC container we don't support, let us know, or, better yet, contribute an implementation.
 
+##Setting up a Windows Azure Service Bus
+
+You may find step be step instructions [here](https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus/wiki/Setting-Up-Windows-Azure-Service-Bus) on how to create the namespace needed to send messages.
+
 ##Getting started
 
 1. Create a console application
