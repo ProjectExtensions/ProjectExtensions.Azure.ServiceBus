@@ -20,6 +20,20 @@ You must add .UseAutofacContainer() passing in the optional container that used 
 
 **Information**
 
+Getting started can be found here
+
+https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus
+
+And our Wiki is here:
+
+https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus/wiki/
+
+You may also download the repository and check out the Samples in the /src/samples folder.
+
+The Sample used to build this document can be found in the PubSubUsingConfiguration example.
+
+https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus/archive/master.zip
+
 The ServiceBusNamespace Is the namespace that you configure in the Azure Portal.
 
 You can read about how to set up the Windows Azure Namespace here:
@@ -76,16 +90,6 @@ Set this property using this custom attribute on your message handler.
 
 We now have support for addtional containers. If you wish to use AutoFac, Castle Windsor, NInject, StructureMap or Unity, 
 You will want to Install the Package ProjectExtensions.Azure.ServiceBus.Core along with the correct container.
-
-Getting started can be found here (readme.md)
-
-https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus
-
-You may also download the repository and check out the Samples in the /src/samples folder.
-
-The Sample used to build this document can be found in the PubSubUsingConfiguration example.
-
-https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus/archive/master.zip
 
 
 
