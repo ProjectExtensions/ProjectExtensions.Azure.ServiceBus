@@ -12,7 +12,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit {
 
         [Test]
         public void Test() {
-            Thread.Sleep(30000);
+            //Thread.Sleep(30000);
             Assert.IsTrue(true);
         }
 

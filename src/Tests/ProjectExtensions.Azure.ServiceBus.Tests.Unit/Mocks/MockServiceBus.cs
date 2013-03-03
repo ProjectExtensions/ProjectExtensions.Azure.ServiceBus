@@ -29,6 +29,8 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
         }
 
         public void Initialize() {
+            receiver = config.Container.Resolve<IAzureBusReceiver>();
+            sender = config.Container.Resolve<IAzureBusSender>();
             Configure();
         }
 
@@ -47,10 +49,6 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
                 Description = description,
                 Type = theType
             });
-
-            if (receiver == null) {
-                receiver = config.Container.Resolve<IAzureBusReceiver>();
-            }
 
             ServiceBusEnpointData endpoint = null;
             if (_endpointMap.TryGetValue(description, out endpoint)) {
@@ -218,22 +216,18 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
         }
 
         public void Publish<T>(T message) {
-            EnsureSender();
             sender.Send<T>(message);
         }
 
         public void Publish<T>(T message, IDictionary<string, object> metadata = null) {
-            EnsureSender();
             sender.Send<T>(message, metadata);
         }
 
         public void PublishAsync<T>(T message, Action<IMessageSentResult<T>> resultCallBack, IDictionary<string, object> metadata = null) {
-            EnsureSender();
             sender.SendAsync<T>(message, null, resultCallBack, metadata);
         }
 
         public void PublishAsync<T>(T message, object state, Action<IMessageSentResult<T>> resultCallBack, IDictionary<string, object> metadata = null) {
-            EnsureSender();
             sender.SendAsync<T>(message, state, resultCallBack, metadata);
         }
 
@@ -334,12 +328,6 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
                 foreach (var item in config.RegisteredSubscribers) {
                     Subscribe(item);
                 }
-            }
-        }
-
-        private void EnsureSender() {
-            if (sender == null) {
-                sender = config.Container.Resolve<IAzureBusSender>();
             }
         }
 
