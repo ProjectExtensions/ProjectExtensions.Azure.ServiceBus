@@ -24,7 +24,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Sender {
         public AzureBusSender(IBusConfiguration configuration, IServiceBusConfigurationFactory configurationFactory)
             : base(configuration, configurationFactory) {
             retryPolicy.ExecuteAction(() => {
-                client = configurationFactory.MessageFactory.CreateTopicClient(topic.Path);
+                client = configurationFactory.MessageFactory.CreateTopicClient(defaultTopic.Path);
             });
         }
 

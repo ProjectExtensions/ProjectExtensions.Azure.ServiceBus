@@ -61,7 +61,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                     value.IsReusable,
                     value.AttributeData != null ? value.AttributeData.ToString() : string.Empty);
 
-                var helper = new AzureReceiverHelper(topic, configurationFactory, configuration, serializer, verifyRetryPolicy, retryPolicy, value);
+                var helper = new AzureReceiverHelper(defaultTopic, configurationFactory, configuration, serializer, verifyRetryPolicy, retryPolicy, value);
                 mappings.Add(helper);
                 //helper.ProcessMessagesForSubscription();
 
@@ -106,9 +106,9 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                     }
                 }
 
-                if (configurationFactory.NamespaceManager.SubscriptionExists(topic.Path, value.SubscriptionName)) {
+                if (configurationFactory.NamespaceManager.SubscriptionExists(defaultTopic.Path, value.SubscriptionName)) {
                     var filter = new SqlFilter(string.Format(TYPE_HEADER_NAME + " = '{0}'", value.MessageType.FullName.Replace('.', '_')));
-                    retryPolicy.ExecuteAction(() => configurationFactory.NamespaceManager.DeleteSubscription(topic.Path, value.SubscriptionName));
+                    retryPolicy.ExecuteAction(() => configurationFactory.NamespaceManager.DeleteSubscription(defaultTopic.Path, value.SubscriptionName));
                     logger.Info("CancelSubscription Deleted {0}", value.SubscriptionNameDebug);
                 }
             });
