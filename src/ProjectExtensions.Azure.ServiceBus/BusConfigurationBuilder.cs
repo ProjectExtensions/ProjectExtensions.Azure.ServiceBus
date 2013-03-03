@@ -7,6 +7,7 @@ using ProjectExtensions.Azure.ServiceBus.Serialization;
 using System.Configuration;
 using Microsoft.Practices.TransientFaultHandling;
 using ProjectExtensions.Azure.ServiceBus.Helpers;
+using ProjectExtensions.Azure.ServiceBus.Interfaces;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 
@@ -25,7 +26,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// Gets the bus configuration associated with the builder
         /// </summary>
         public IBusConfiguration Configuration {
-            get { return configuration;}
+            get { return configuration; }
         }
 
         /// <summary>
@@ -60,7 +61,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         }
 
         /// <summary>
-        /// Set the Max Threads that will pull from the bus.
+        /// Set the Max Threads that will pull from the bus. (Not Implemented)
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -100,6 +101,58 @@ namespace ProjectExtensions.Azure.ServiceBus {
         }
 
         /// <summary>
+        /// Read From ConfigurationSettings. You would call this instead of calling ReadFromConfigFile
+        /// </summary>
+        /// <param name="settings"></param>
+        /// <returns></returns>
+        public BusConfigurationBuilder ReadFromConfigurationSettings(IServiceBusSetupConfiguration settings) {
+
+            //do the three required items first.
+            configuration.ServiceBusIssuerKey = settings.ServiceBusIssuerKey;
+            if (string.IsNullOrWhiteSpace(configuration.ServiceBusIssuerKey)) {
+                throw new ArgumentNullException("ServiceBusIssuerKey", "The ServiceBusIssuerKey must be set.");
+            }
+
+            configuration.ServiceBusIssuerName = settings.ServiceBusIssuerName;
+            if (string.IsNullOrWhiteSpace(configuration.ServiceBusIssuerName)) {
+                throw new ArgumentNullException("ServiceBusIssuerName", "The ServiceBusIssuerName must be set.");
+            }
+
+            configuration.ServiceBusNamespace = settings.ServiceBusNamespace;
+            if (string.IsNullOrWhiteSpace(configuration.ServiceBusNamespace)) {
+                throw new ArgumentNullException("ServiceBusNamespace", "The ServiceBusNamespace must be set.");
+            }
+
+            //Now go and do all of the other properties.
+
+            if (settings.DefaultSerializer != null) {
+                this.DefaultSerializer(settings.DefaultSerializer);
+            }
+
+            if (!string.IsNullOrWhiteSpace(settings.ServiceBusApplicationId)) {
+                this.ServiceBusApplicationId(settings.ServiceBusApplicationId);
+            }
+
+            if (!string.IsNullOrWhiteSpace(settings.ServicePath)) {
+                this.ServicePath(settings.ServicePath);
+            }
+
+            if (!string.IsNullOrWhiteSpace(settings.TopicName)) {
+                this.TopicName(settings.TopicName);
+            }
+
+            foreach (var item in settings.AssembliesToRegister) {
+                this.RegisterAssembly(item);
+            }
+
+            foreach (var item in settings.TypesToRegister) {
+                this.RegisterSubscriber(item);
+            }
+
+            return this;
+        }
+
+        /// <summary>
         /// Auto discover all of the Subscribers in the assembly.
         /// </summary>
         /// <param name="assembly"></param>
@@ -117,6 +170,16 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <returns></returns>
         public BusConfigurationBuilder RegisterSubscriber<T>() {
             configuration.AddRegisteredSubscriber(typeof(T));
+            return this;
+        }
+
+        /// <summary>
+        /// Register just one subscriber.
+        /// </summary>
+        /// <param name="t">The type to register.</param>
+        /// <returns></returns>
+        public BusConfigurationBuilder RegisterSubscriber(Type t) {
+            configuration.AddRegisteredSubscriber(t);
             return this;
         }
 
