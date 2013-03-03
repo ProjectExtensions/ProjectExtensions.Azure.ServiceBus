@@ -34,6 +34,8 @@ You may find step be step instructions [here](https://github.com/ProjectExtensio
 
 ##Getting started
 
+Read more in teh Wiki [here](https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus/wiki/)
+
 1. Create a console application
 2. Using NuGet, install the package ProjectExtensions.Azure.ServiceBus.
 3. Optionally Add a reference to NLog
@@ -53,13 +55,11 @@ public class TestMessage {
     }
 }
 ```
-
 5\. Create a Handler that will receive notifications when the message is placed on the bus. The custom attribute is optional but configures the Service Bus Subscription:
 
 Note: If your constructor for your message takes in parameters from your DI container that implement IDisposable, you must set Singleton = true or you will leak memory.
 
 Please see [this](https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus/wiki/Configuration-%22MessageHandlerConfiguration%22) for more information on the MessageHandlerConfiguration custom attribute
-
 ```csharp
 [MessageHandlerConfiguration(
     DefaultMessageTimeToLive = 240, //Time in minutes before your message is deleted from the subscription if you don't receive it.
@@ -79,9 +79,7 @@ public class TestMessageSubscriber : IHandleMessages<TestMessage> {
     }
 }
 ```
-
 6\. Place initialization code at the beginning of your method or in your BootStrapper.  You will need a couple of using declarations:
-
 ```csharp
 using ProjectExtensions.Azure.ServiceBus;
 using ProjectExtensions.Azure.ServiceBus.Autofac.Container;
@@ -166,7 +164,6 @@ You will need a couple of using declarations:
 using ProjectExtensions.Azure.ServiceBus;
 using ProjectExtensions.Azure.ServiceBus.CastleWindsor.Container;
 ```
-
 Basic setup code (assuming you want to put Azure configuration information in your application configuration file):
 
 ```csharp
@@ -190,9 +187,7 @@ ProjectExtensions.Azure.ServiceBus.BusConfiguration.WithSettings()
     .RegisterAssembly(typeof(TestMessageSubscriber).Assembly)
     .Configure();
 ```
-
 Or if you prefer to configure everything and pass it in all at once you can use this method:
-
 ```csharp
 
 //You can easily read your settings from Azure or a database and then pass them in.
@@ -214,7 +209,6 @@ BusConfiguration.WithSettings()
     .ReadFromConfigurationSettings(setup)
     .Configure();
 ```
-
 You may also download the repository and check out the Samples in the /src/samples folder.
 
 The Sample used to build this document can be found in the PubSubUsingConfiguration example.
