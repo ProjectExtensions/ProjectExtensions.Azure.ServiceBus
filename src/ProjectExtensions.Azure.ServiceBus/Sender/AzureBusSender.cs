@@ -19,19 +19,19 @@ namespace ProjectExtensions.Azure.ServiceBus.Sender {
     /// </summary>
     class AzureBusSender : AzureSenderReceiverBase, IAzureBusSender {
         static Logger logger = LogManager.GetCurrentClassLogger();
-        ITopicClient client;
+        ITopicClient defaultClient;
 
         public AzureBusSender(IBusConfiguration configuration, IServiceBusConfigurationFactory configurationFactory)
             : base(configuration, configurationFactory) {
             retryPolicy.ExecuteAction(() => {
-                client = configurationFactory.MessageFactory.CreateTopicClient(defaultTopic.Path);
+                defaultClient = configurationFactory.MessageFactory.CreateTopicClient(defaultTopic.Path);
             });
         }
 
         public void Close() {
-            if (client != null) {
-                client.Close();
-                client = null;
+            if (defaultClient != null) {
+                defaultClient.Close();
+                defaultClient = null;
             }
         }
 
@@ -121,7 +121,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Sender {
                             logger.Debug("sendAction BeginSend Type={0} Serializer={1} MessageId={2}", obj.GetType().FullName, serializer.GetType().FullName, message.MessageId);
 
                             // Send the event asynchronously.
-                            client.BeginSend(message, cb, null);
+                            defaultClient.BeginSend(message, cb, null);
                         }
                         catch (Exception ex) {
                             failureException = ex;
@@ -133,7 +133,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Sender {
                             failureException = null; //we may retry so we must null out the error.
                             // Complete the asynchronous operation. This may throw an exception that will be handled internally by the retry policy.
                             logger.Debug("sendAction EndSend Begin Type={0} Serializer={1} MessageId={2}", obj.GetType().FullName, serializer.GetType().FullName, message.MessageId);
-                            client.EndSend(ar);
+                            defaultClient.EndSend(ar);
                             logger.Debug("sendAction EndSend End Type={0} Serializer={1} MessageId={2}", obj.GetType().FullName, serializer.GetType().FullName, message.MessageId);
                         }
                         catch (Exception ex) {
