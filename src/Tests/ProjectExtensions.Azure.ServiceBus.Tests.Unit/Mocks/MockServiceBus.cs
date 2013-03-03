@@ -8,15 +8,24 @@ using ProjectExtensions.Azure.ServiceBus.Interfaces;
 using Microsoft.Practices.TransientFaultHandling;
 using System.Threading;
 using System.Threading.Tasks;
+using ProjectExtensions.Azure.ServiceBus.Helpers;
 
 namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
 
     class MockServiceBus : IMockServiceBus {
 
+        IBusConfiguration config;
+        IAzureBusSender sender;
         IDictionary<string, TopicDescription> _topics = new Dictionary<string, TopicDescription>(StringComparer.OrdinalIgnoreCase);
         IDictionary<string, ITopicClient> _topicClients = new Dictionary<string, ITopicClient>(StringComparer.OrdinalIgnoreCase);
         List<SubscriptionDescriptionState> _subscriptions = new List<SubscriptionDescriptionState>();
         IDictionary<IAsyncResult, SubscriptionDescriptionState> _messages = new Dictionary<IAsyncResult, SubscriptionDescriptionState>();
+
+        public MockServiceBus(IBusConfiguration config) {
+            Guard.ArgumentNotNull(config, "config");
+            this.config = config;
+            Configure();
+        }
 
         public SubscriptionDescription CreateSubscription(SubscriptionDescription description, Filter filter) {
             SqlFilter sf = filter as SqlFilter;
@@ -49,7 +58,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
         public ITopicClient CreateTopicClient(string path) {
             ITopicClient retVal = null;
             if (!_topicClients.TryGetValue(path, out retVal)) {
-                retVal = new MockTopicClient(this);
+                retVal = new MockTopicClient(this, path);
                 _topicClients[path] = retVal;
             }
             return retVal;
@@ -176,6 +185,146 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
 
             return retVal;
         }
+
+        public void RegisterAssembly(System.Reflection.Assembly assembly) {
+            Guard.ArgumentNotNull(assembly, "assembly");
+            //logger.Info("RegisterAssembly={0}", assembly.FullName);
+
+            foreach (var type in assembly.GetTypes()) {
+                var interfaces = type.GetInterfaces()
+                                .Where(i => i.IsGenericType && (i.GetGenericTypeDefinition() == typeof(IHandleMessages<>) || i.GetGenericTypeDefinition() == typeof(IHandleCompetingMessages<>)))
+                                .ToList();
+                if (interfaces.Count > 0) {
+                    Subscribe(type);
+                }
+            }
+        }
+
+        public void Publish<T>(T message) {
+            if (sender == null) {
+                sender = config.Container.Resolve<IAzureBusSender>();
+            }
+            sender.Send<T>(message);
+        }
+
+        public void Publish<T>(T message, IDictionary<string, object> metadata = null) {
+            if (sender == null) {
+                sender = config.Container.Resolve<IAzureBusSender>();
+            }
+            sender.Send<T>(message, metadata);
+        }
+
+        public void PublishAsync<T>(T message, Action<IMessageSentResult<T>> resultCallBack, IDictionary<string, object> metadata = null) {
+            if (sender == null) {
+                sender = config.Container.Resolve<IAzureBusSender>();
+            }
+            sender.SendAsync<T>(message, null, resultCallBack, metadata);
+        }
+
+        public void PublishAsync<T>(T message, object state, Action<IMessageSentResult<T>> resultCallBack, IDictionary<string, object> metadata = null) {
+            if (sender == null) {
+                sender = config.Container.Resolve<IAzureBusSender>();
+            }
+            sender.SendAsync<T>(message, state, resultCallBack, metadata);
+        }
+
+        /// <summary>
+        /// Subscribes to recieve published messages of type T.
+        /// This method is only necessary if you turned off auto-subscribe
+        /// </summary>
+        /// <typeparam name="T">The type of message to subscribe to.</typeparam>
+        public void Subscribe<T>() {
+            Subscribe(typeof(T));
+        }
+
+        /// <summary>
+        /// Subscribes to recieve published messages of type T.
+        /// This method is only necessary if you turned off auto-subscribe
+        /// </summary>
+        /// <param name="type">The type to subscribe</param>
+        public void Subscribe(Type type) {
+            Guard.ArgumentNotNull(type, "type");
+
+            var interfaces = type.GetInterfaces()
+                .Where(i => i.IsGenericType && (i.GetGenericTypeDefinition() == typeof(IHandleMessages<>) || i.GetGenericTypeDefinition() == typeof(IHandleCompetingMessages<>)))
+                .ToList();
+
+            //for each interface we find, we need to register it with the bus.
+            foreach (var foundInterface in interfaces) {
+
+                var implementedMessageType = foundInterface.GetGenericArguments()[0];
+                //due to the limits of 50 chars we will take the name and a MD5 for the name.
+                var hashName = implementedMessageType.FullName + "|" + type.FullName;
+
+                var hash = MD5Helper.CalculateMD5(hashName);
+                var fullName = (IsCompetingHandler(foundInterface) ? "C_" : config.ServiceBusApplicationId + "_") + hash;
+
+                var info = new ServiceBusEnpointData() {
+                    AttributeData = type.GetCustomAttributes(typeof(MessageHandlerConfigurationAttribute), false).FirstOrDefault() as MessageHandlerConfigurationAttribute,
+                    DeclaredType = type,
+                    MessageType = implementedMessageType,
+                    SubscriptionName = fullName,
+                    ServiceType = foundInterface
+                };
+
+                if (!config.Container.IsRegistered(type)) {
+                    if (info.IsReusable) {
+                        config.Container.Register(type, type);
+                    }
+                    else {
+                        config.Container.Register(type, type, true);
+                    }
+                }
+
+                //TODO verify if this is the correct subscription type
+                var filter = new SqlFilter(string.Format(AzureSenderReceiverBase.TYPE_HEADER_NAME + " = '{0}'", implementedMessageType.FullName.Replace('.', '_')));
+
+                CreateSubscription(new SubscriptionDescription(config.TopicName, fullName), filter);
+            }
+
+            config.Container.Build();
+        }
+
+        /// <summary>
+        /// Unsubscribes from receiving published messages of the specified type
+        /// </summary>
+        /// <typeparam name="T">The type of message to unsubscribe from</typeparam>
+        public void Unsubscribe<T>() {
+            Unsubscribe(typeof(T));
+        }
+
+        /// <summary>
+        /// Unsubscribes from receiving published messages of the specified type.
+        /// </summary>
+        /// <param name="type">The type of message to unsubscribe from</param>
+        public void Unsubscribe(Type type) {
+            Guard.ArgumentNotNull(type, "type");
+            //logger.Info("Unsubscribe={0}", type.FullName);
+
+            var subscription = _subscriptions.FirstOrDefault(item => item.Type == type);
+
+            if (subscription != null) {
+                _subscriptions.Remove(subscription);
+            }
+        }
+
+        internal static bool IsCompetingHandler(Type type) {
+            return type.GetGenericTypeDefinition() == typeof(IHandleCompetingMessages<>);
+        }
+
+        private void Configure() {
+            //this fixes a bug in .net 4 that will be fixed in sp1
+            using (CloudEnvironment.EnsureSafeHttpContext()) {
+
+                foreach (var item in config.RegisteredAssemblies) {
+                    RegisterAssembly(item);
+                }
+                foreach (var item in config.RegisteredSubscribers) {
+                    Subscribe(item);
+                }
+            }
+        }
+
     }
 
     class SubscriptionDescriptionState {

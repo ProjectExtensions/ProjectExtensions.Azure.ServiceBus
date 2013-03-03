@@ -7,7 +7,7 @@ using ProjectExtensions.Azure.ServiceBus.Interfaces;
 
 namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Interfaces {
 
-    interface IMockServiceBus {
+    interface IMockServiceBus : IBus {
 
         SubscriptionDescription CreateSubscription(SubscriptionDescription description, Filter filter);
 

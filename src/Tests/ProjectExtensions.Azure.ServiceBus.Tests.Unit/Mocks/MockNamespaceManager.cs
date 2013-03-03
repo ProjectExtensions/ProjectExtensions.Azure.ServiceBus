@@ -13,9 +13,10 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
 
         IMockServiceBus serviceBus;
 
-        public MockNamespaceManager(IMockServiceBus serviceBus) {
+        public MockNamespaceManager(IBus serviceBus) {
             Guard.ArgumentNotNull(serviceBus, "serviceBus");
-            this.serviceBus = serviceBus;
+            this.serviceBus = serviceBus as IMockServiceBus;
+            Guard.ArgumentNotNull(this.serviceBus, "serviceBus");
         }
 
         public SubscriptionDescription CreateSubscription(SubscriptionDescription description, Filter filter) {

@@ -16,11 +16,12 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
         string name;
         ReceiveMode receiveMode;
 
-        public MockSubscriptionClient(IMockServiceBus serviceBus, string topicPath, string name, ReceiveMode receiveMode) {
+        public MockSubscriptionClient(IBus serviceBus, string topicPath, string name, ReceiveMode receiveMode) {
             Guard.ArgumentNotNull(serviceBus, "serviceBus");
             Guard.ArgumentNotNull(topicPath, "topicPath");
             Guard.ArgumentNotNull(name, "name");
-            this.serviceBus = serviceBus;
+            this.serviceBus = serviceBus as IMockServiceBus;
+            Guard.ArgumentNotNull(this.serviceBus, "serviceBus");
             this.topicPath = topicPath;
             this.name = name;
             this.receiveMode = receiveMode;
