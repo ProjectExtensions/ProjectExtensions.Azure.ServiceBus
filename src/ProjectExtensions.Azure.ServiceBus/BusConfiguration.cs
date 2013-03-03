@@ -47,13 +47,15 @@ namespace ProjectExtensions.Azure.ServiceBus {
             }
         }
 
+        //we are changing this to be built on the configure because once it is resolved once, nothing can change.
+        //we don't allow the configuration to be changed on it so there is no point to resolving every time.
+
         /// <summary>
         /// The Service Bus
         /// </summary>
         public IBus Bus {
-            get {
-                return container.Bus;
-            }
+            get;
+            private set;
         }
 
         /// <summary>
@@ -195,7 +197,8 @@ namespace ProjectExtensions.Azure.ServiceBus {
             container.Build();
             
             //Set the Bus property so that the receiver will register the end points
-            var prime = this.Bus;
+            this.Bus = container.Bus;
+            this.Bus.Initialize();
         }
 
         /// <summary>

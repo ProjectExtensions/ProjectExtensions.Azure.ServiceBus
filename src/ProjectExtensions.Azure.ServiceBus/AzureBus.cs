@@ -37,6 +37,9 @@ namespace ProjectExtensions.Azure.ServiceBus {
             this.config = config;
             this.sender = sender;
             this.receiver = receiver;
+        }
+
+        public void Initialize() {
             Configure();
         }
 
