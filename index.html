@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Projectextensions.azure.servicebus : ProjectExtensions.Azure.ServiceBus" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Projectextensions.azure.servicebus</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus">View on GitHub</a>
+
+          <h1 id="project_title">Projectextensions.azure.servicebus</h1>
+          <h2 id="project_tagline">ProjectExtensions.Azure.ServiceBus</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>ProjectExtensions.Azure.ServiceBus</h1>
+
+<p>An easier way to work with the Azure service bus.</p>
+
+<p>Follow me or tweet at me on Twitter: <a href="https://github.com/joefeser" class="user-mention">@joefeser</a>.</p>
+
+<h2>Building</h2>
+
+<p>Use ClickToBuild.bat to build.  You will need to have the Azure SDK 1.5 installed in order to build.</p>
+
+<h2>Nuget Packages</h2>
+
+<p>If you don't use an IoC container in your application or you are happy to use Autofac, download the default Nuget package:</p>
+
+<ul>
+<li>ProjectExtensions.Azure.ServiceBus</li>
+</ul><p>If you want to use a specific IoC container, grab our core package:</p>
+
+<ul>
+<li>ProjectExtensions.Azure.ServiceBus.Core</li>
+</ul><p>You can then either implement IAzureBusContainer for your IoC of choice or grab one of the pre-built options:</p>
+
+<ul>
+<li>Autofac in ProjectExtensions.Azure.ServiceBus.IOC.Autofac</li>
+<li>Castle Windsor in ProjectExtensions.Azure.ServiceBus.IOC.CastleWindsor</li>
+<li>Ninject in ProjectExtensions.Azure.ServiceBus.IOC.Ninject</li>
+<li>StructureMap in ProjectExtensions.Azure.ServiceBus.IOC.StructureMap</li>
+<li>Unity in ProjectExtensions.Azure.ServiceBus.IOC.Unity</li>
+</ul><p>If you have a favorite IoC container we don't support, let us know, or, better yet, contribute an implementation.</p>
+
+<h2>Getting started</h2>
+
+<ol>
+<li>Create a console application</li>
+<li>Using NuGet, install the package ProjectExtensions.Azure.ServiceBus.</li>
+<li>Optionally Add a reference to NLog</li>
+<li>Create a Message Class that you wish to handle:</li>
+</ol><div class="highlight"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">TestMessage</span> <span class="p">{</span>
+
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">MessageId</span> <span class="p">{</span>
+        <span class="k">get</span><span class="p">;</span>
+        <span class="k">set</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="kt">int</span> <span class="n">Value</span> <span class="p">{</span>
+        <span class="k">get</span><span class="p">;</span>
+        <span class="k">set</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>5. Create a Handler that will receive notifications when the message is placed on the bus. The custom attribute is optional but configures the Service Bus Subscription:</p>
+
+<div class="highlight"><pre><span class="na">[MessageHandlerConfiguration(</span>
+<span class="na">    DefaultMessageTimeToLive = 240, //Time in minutes before your message is deleted from the subscription if you don't receive it.</span>
+<span class="na">    LockDuration = 120, //Time that you wish to lock the message before it is marked to be received by another subscriber.</span>
+<span class="na">    MaxRetries = 2, //Number of times to retry calling your handler before the message is deleted or placed in the DeadLetterAfterMaxRetries if configured.</span>
+<span class="na">    PrefetchCount = 10, //Number of messages to pre-fetch. Used for high throughput </span>
+<span class="na">    ReceiveMode = ReceiveMode.PeekLock, //PeekLock or Receive and Delete</span>
+<span class="na">    Singleton = true)]</span> <span class="c1">//If it is a singleton, the instance will be created once, otherwise it will be created for each message received. Recommended to set to true.</span>
+<span class="k">public</span> <span class="k">class</span> <span class="nc">TestMessageSubscriber</span> <span class="p">:</span> <span class="n">IHandleMessages</span><span class="p">&lt;</span><span class="n">TestMessage</span><span class="p">&gt;</span> <span class="p">{</span>
+
+    <span class="k">static</span> <span class="n">Logger</span> <span class="n">logger</span> <span class="p">=</span> <span class="n">LogManager</span><span class="p">.</span><span class="n">GetCurrentClassLogger</span><span class="p">();</span>
+
+    <span class="k">public</span> <span class="k">void</span> <span class="nf">Handle</span><span class="p">(</span><span class="n">IReceivedMessage</span><span class="p">&lt;</span><span class="n">TestMessage</span><span class="p">&gt;</span> <span class="n">message</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">logger</span><span class="p">.</span><span class="n">Log</span><span class="p">(</span><span class="n">LogLevel</span><span class="p">.</span><span class="n">Info</span><span class="p">,</span> <span class="s">"Message received: {0} {1}"</span><span class="p">,</span> <span class="n">message</span><span class="p">.</span><span class="n">Message</span><span class="p">.</span><span class="n">Value</span><span class="p">,</span> <span class="n">message</span><span class="p">.</span><span class="n">Message</span><span class="p">.</span><span class="n">MessageId</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>6. Place initialization code at the beginning of your method or in your BootStrapper.  You will need a couple of using declarations:</p>
+
+<div class="highlight"><pre><span class="k">using</span> <span class="nn">ProjectExtensions.Azure.ServiceBus</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">ProjectExtensions.Azure.ServiceBus.Autofac.Container</span><span class="p">;</span>
+</pre></div>
+
+<p>Basic setup code (assuming you want to put Azure configuration information in your application configuration file):</p>
+
+<div class="highlight"><pre><span class="n">ProjectExtensions</span><span class="p">.</span><span class="n">Azure</span><span class="p">.</span><span class="n">ServiceBus</span><span class="p">.</span><span class="n">BusConfiguration</span><span class="p">.</span><span class="n">WithSettings</span><span class="p">()</span>
+    <span class="p">.</span><span class="n">UseAutofacContainer</span><span class="p">()</span>
+    <span class="p">.</span><span class="n">ReadFromConfigFile</span><span class="p">()</span>
+    <span class="p">.</span><span class="n">ServiceBusApplicationId</span><span class="p">(</span><span class="s">"AppName"</span><span class="p">)</span> <span class="c1">//Multiple applications can be used in the same service bus namespace. It is converted to lower case.</span>
+    <span class="p">.</span><span class="n">RegisterAssembly</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">TestMessageSubscriber</span><span class="p">).</span><span class="n">Assembly</span><span class="p">)</span>
+    <span class="p">.</span><span class="n">Configure</span><span class="p">();</span>
+</pre></div>
+
+<p>And configuration:</p>
+
+<div class="highlight"><pre><span class="nt">&lt;add</span> <span class="na">key=</span><span class="s">"ServiceBusIssuerKey"</span> <span class="na">value=</span><span class="s">"base64hash"</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;add</span> <span class="na">key=</span><span class="s">"ServiceBusIssuerName"</span> <span class="na">value=</span><span class="s">"owner"</span> <span class="nt">/&gt;</span>
+<span class="c">&lt;!--https://addresshere.servicebus.windows.net/--&gt;</span>
+<span class="nt">&lt;add</span> <span class="na">key=</span><span class="s">"ServiceBusNamespace"</span> <span class="na">value=</span><span class="s">"namespace set up in service bus (addresshere) portion"</span> <span class="nt">/&gt;</span>
+</pre></div>
+
+<p>Otherwise, you can configure everything in code:</p>
+
+<div class="highlight"><pre><span class="n">ProjectExtensions</span><span class="p">.</span><span class="n">Azure</span><span class="p">.</span><span class="n">ServiceBus</span><span class="p">.</span><span class="n">BusConfiguration</span><span class="p">.</span><span class="n">WithSettings</span><span class="p">()</span>
+    <span class="p">.</span><span class="n">UseAutofacContainer</span><span class="p">()</span>
+    <span class="p">.</span><span class="n">ServiceBusApplicationId</span><span class="p">(</span><span class="s">"AppName"</span><span class="p">)</span>
+    <span class="p">.</span><span class="n">ServiceBusIssuerKey</span><span class="p">(</span><span class="s">"[sb password]"</span><span class="p">)</span>
+    <span class="p">.</span><span class="n">ServiceBusIssuerName</span><span class="p">(</span><span class="s">"owner"</span><span class="p">)</span>
+    <span class="p">.</span><span class="n">ServiceBusNamespace</span><span class="p">(</span><span class="s">"[addresshere]"</span><span class="p">)</span>
+    <span class="p">.</span><span class="n">RegisterAssembly</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">TestMessageSubscriber</span><span class="p">).</span><span class="n">Assembly</span><span class="p">)</span>
+    <span class="p">.</span><span class="n">Configure</span><span class="p">();</span>
+</pre></div>
+
+<p>7. Put some messages on the Bus:</p>
+
+<div class="highlight"><pre><span class="c1">//Blocking (Synchronous calls)</span>
+<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span> <span class="n">i</span> <span class="p">&lt;</span> <span class="m">20</span><span class="p">;</span> <span class="n">i</span><span class="p">++)</span> <span class="p">{</span>
+    <span class="kt">var</span> <span class="n">message1</span> <span class="p">=</span> <span class="k">new</span> <span class="n">TestMessage</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">Value</span> <span class="p">=</span> <span class="n">i</span><span class="p">,</span>
+        <span class="n">MessageId</span> <span class="p">=</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">Now</span><span class="p">.</span><span class="n">ToString</span><span class="p">()</span>
+    <span class="p">};</span>
+    <span class="n">BusConfiguration</span><span class="p">.</span><span class="n">Instance</span><span class="p">.</span><span class="n">Bus</span><span class="p">.</span><span class="n">Publish</span><span class="p">(</span><span class="n">message1</span><span class="p">,</span> <span class="k">null</span><span class="p">);</span> <span class="c1">//Optional Dictionary of name value pairs to pass with the massage. Can be used for filtering</span>
+<span class="p">}</span>
+
+<span class="c1">//Async calls</span>
+<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span> <span class="n">i</span> <span class="p">&lt;</span> <span class="m">20</span><span class="p">;</span> <span class="n">i</span><span class="p">++)</span> <span class="p">{</span>
+    <span class="kt">var</span> <span class="n">message1</span> <span class="p">=</span> <span class="k">new</span> <span class="n">TestMessage</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">Value</span> <span class="p">=</span> <span class="n">i</span><span class="p">,</span>
+        <span class="n">MessageId</span> <span class="p">=</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">Now</span><span class="p">.</span><span class="n">ToString</span><span class="p">()</span>
+    <span class="p">};</span>
+    <span class="n">BusConfiguration</span><span class="p">.</span><span class="n">Instance</span><span class="p">.</span><span class="n">Bus</span><span class="p">.</span><span class="n">PublishAsync</span><span class="p">(</span><span class="n">message2</span><span class="p">,</span> <span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(!</span><span class="n">result</span><span class="p">.</span><span class="n">IsSuccess</span><span class="p">)</span> <span class="p">{</span> 
+            <span class="c1">//message failed. Handle it</span>
+        <span class="p">}</span>
+        <span class="n">Debug</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">"async:"</span> <span class="p">+</span> <span class="n">result</span><span class="p">.</span><span class="n">TimeSpent</span><span class="p">);</span>
+    <span class="p">},</span> <span class="k">null</span><span class="p">);</span> <span class="c1">//Optional Dictionary of name value pairs to pass with the massage. Can be used for filtering</span>
+<span class="p">}</span>
+
+</pre></div>
+
+<p>Watch your method get called.</p>
+
+<p>Welcome to Azure Service Bus.</p>
+
+<h2>Using an IoC Conatiner Other Than Autofac</h2>
+
+<p>Unless otherwise noted, everything works as shown in the getting starting section above.  This section outlines the things you will need to do differently.</p>
+
+<ol>
+<li>Install the Nuget packages ProjectExtensions.Azure.ServiceBus.Core and your specific IoC container (e.g. ProjectExtensions.Azure.ServiceBus.IOC.CastleWindsor for Castle Windsor) 
+instead of ProjectExtensions.Azure.ServiceBus</li>
+<li>Use the following initialization code at the beginning of your method or in your BootStrapper.  <em>The code examples shown below are for Castle Windsor.  Code for other containers follows the same pattern.</em>
+</li>
+</ol><p>You will need a couple of using declarations:</p>
+
+<div class="highlight"><pre><span class="k">using</span> <span class="nn">ProjectExtensions.Azure.ServiceBus</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">ProjectExtensions.Azure.ServiceBus.CastleWindsor.Container</span><span class="p">;</span>
+</pre></div>
+
+<p>Basic setup code (assuming you want to put Azure configuration information in your application configuration file):</p>
+
+<div class="highlight"><pre><span class="n">ProjectExtensions</span><span class="p">.</span><span class="n">Azure</span><span class="p">.</span><span class="n">ServiceBus</span><span class="p">.</span><span class="n">BusConfiguration</span><span class="p">.</span><span class="n">WithSettings</span><span class="p">()</span>
+    <span class="p">.</span><span class="n">UseCastleWindsorContainer</span><span class="p">()</span>
+    <span class="p">.</span><span class="n">ReadFromConfigFile</span><span class="p">()</span>
+    <span class="p">.</span><span class="n">ServiceBusApplicationId</span><span class="p">(</span><span class="s">"AppName"</span><span class="p">)</span>
+    <span class="p">.</span><span class="n">RegisterAssembly</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">TestMessageSubscriber</span><span class="p">).</span><span class="n">Assembly</span><span class="p">)</span>
+    <span class="p">.</span><span class="n">Configure</span><span class="p">();</span>
+</pre></div>
+
+<p>Otherwise, you can configure everything in code:</p>
+
+<div class="highlight"><pre><span class="n">ProjectExtensions</span><span class="p">.</span><span class="n">Azure</span><span class="p">.</span><span class="n">ServiceBus</span><span class="p">.</span><span class="n">BusConfiguration</span><span class="p">.</span><span class="n">WithSettings</span><span class="p">()</span>
+    <span class="p">.</span><span class="n">UseCastleWindsorContainer</span><span class="p">()</span>
+    <span class="p">.</span><span class="n">ServiceBusApplicationId</span><span class="p">(</span><span class="s">"AppName"</span><span class="p">)</span>
+    <span class="p">.</span><span class="n">ServiceBusIssuerKey</span><span class="p">(</span><span class="s">"[sb password]"</span><span class="p">)</span>
+    <span class="p">.</span><span class="n">ServiceBusIssuerName</span><span class="p">(</span><span class="s">"owner"</span><span class="p">)</span>
+    <span class="p">.</span><span class="n">ServiceBusNamespace</span><span class="p">(</span><span class="s">"[addresshere]"</span><span class="p">)</span>
+    <span class="p">.</span><span class="n">RegisterAssembly</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="n">TestMessageSubscriber</span><span class="p">).</span><span class="n">Assembly</span><span class="p">)</span>
+    <span class="p">.</span><span class="n">Configure</span><span class="p">();</span>
+</pre></div>
+
+<p>You may also download the repository and check out the Samples in the /src/samples folder.</p>
+
+<p>The Sample used to build this document can be found in the PubSubUsingConfiguration example.</p>
+
+<p>Click on the "Zip" Icon at the top of the page to download the latest source code.</p>
+
+<h2>Release Notes</h2>
+
+<h3>Version 0.9.0</h3>
+
+<ul>
+<li>Allow support for other IoC containers to be added. Continue to support Autofac.</li>
+<li>Support for Castle Windsor IoC.</li>
+<li>Support for Ninject IoC.</li>
+<li>Support for StructureMap IoC.</li>
+<li>Support for Unity IoC.</li>
+<li>BREAKING CHANGE. Move Autofac support into seperate DLL. Existing implementations need to add a reference to ProjectExtensions.Azure.ServiceBus.Autofac and change initialization code as shown in the getting started example.</li>
+<li>BREAKING CHANGE. WithSettings No longer accepts the AutoFac Container as a parameter. This change was made to support the other containers.</li>
+<li>BREAKING CHANGE. You must add .UseAutofacContainer() after WithSettings(). If you wich to use your existing container, You would pass it into this method call.</li>
+</ul><h3>Version 0.9.1</h3>
+
+<ul>
+<li>Fixed bug in AutoFac registration of a Default Serializer.</li>
+<li>Fixed bug in AutoFac registration of a any items internally registered on the default container.</li>
+<li>Fixed bug in Publish method that ignored the serializer passed in and defaulted back to default serializer.</li>
+</ul><h3>Version 0.9.2</h3>
+
+<ul>
+<li>Added self healing of deleted topic during application execution. Error is still thrown since no subscribers will exist.</li>
+<li>Added self healing of deleted subscriptions during application execution. Any messages sent to the topic while your client subscription is deleted will not be received. The sender does not understand how many receivers exist and therefor does not know that the message needs to be resent.</li>
+</ul>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Projectextensions.azure.servicebus maintained by <a href="https://github.com/ProjectExtensions">ProjectExtensions</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
