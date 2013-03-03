@@ -72,9 +72,11 @@
     <Compile Include="AzureServiceBusFactories\ServiceBusNamespaceManagerFactory.cs" />
     <Compile Include="AzureServiceBusFactories\ServiceBusTokenProvider.cs" />
     <Compile Include="Container\AzureBusContainerBase.cs" />
+    <Compile Include="Helpers\BusHelper.cs" />
     <Compile Include="Interfaces\IMessagingFactory.cs" />
     <Compile Include="Interfaces\INamespaceManager.cs" />
     <Compile Include="Interfaces\IServiceBusConfigurationFactory.cs" />
+    <Compile Include="Interfaces\IServiceBusSetupConfiguration.cs" />
     <Compile Include="Interfaces\IServiceBusTokenProvider.cs" />
     <Compile Include="Interfaces\ITopicClient.cs" />
     <Compile Include="Receiver\AzureBusReceiver.cs" />
@@ -85,7 +87,6 @@
     <Compile Include="BusConfigurationBuilder.cs" />
     <Compile Include="Container\IAzureBusContainer.cs" />
     <Compile Include="ExtensionMethods.cs" />
-    <Compile Include="Helpers\AzureConfigurationHelper.cs" />
     <Compile Include="Helpers\MD5Helper.cs" />
     <Compile Include="Interfaces\IAzureBusReceiver.cs" />
     <Compile Include="Interfaces\IAzureBusSender.cs" />
@@ -109,6 +110,7 @@
     <Compile Include="Serialization\ServiceBusSerializerBase.cs" />
     <Compile Include="Serialization\XmlServiceBusSerializer.cs" />
     <Compile Include="ServiceBusEnpointData.cs" />
+    <Compile Include="ServiceBusSetupConfiguration.cs" />
     <Compile Include="SingletonMessageHandlerAttribute.cs" />
     <Compile Include="AnonymousDisposable.cs" />
     <Compile Include="TransientFaultHandling.Core\ExponentialBackoff.cs" />

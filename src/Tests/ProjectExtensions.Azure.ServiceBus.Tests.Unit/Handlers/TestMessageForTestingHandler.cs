@@ -11,6 +11,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Handlers {
        
        public void Handle(IReceivedMessage<TestMessageForTesting> message) {
            Debug.WriteLine("Received:" + message.BrokeredMessage.MessageId + " Value:" + message.Message.Id + " counter:" + message.Message.Counter);
+           Console.WriteLine("Received:" + message.BrokeredMessage.MessageId + " Value:" + message.Message.Id + " counter:" + message.Message.Counter);
        }
    }
 }

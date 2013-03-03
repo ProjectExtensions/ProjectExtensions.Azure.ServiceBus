@@ -61,7 +61,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                     value.IsReusable,
                     value.AttributeData != null ? value.AttributeData.ToString() : string.Empty);
 
-                var helper = new AzureReceiverHelper(topic, configurationFactory, configuration, serializer, retryPolicy, value);
+                var helper = new AzureReceiverHelper(topic, configurationFactory, configuration, serializer, verifyRetryPolicy, retryPolicy, value);
                 mappings.Add(helper);
                 //helper.ProcessMessagesForSubscription();
 
@@ -88,7 +88,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
             var subscription = mappings.FirstOrDefault(item => item.Data.EndPointData.SubscriptionName.Equals(value.SubscriptionName, StringComparison.OrdinalIgnoreCase));
 
             if (subscription == null) {
-                logger.Info("CancelSubscription Does not exist {0}", value.SubscriptionName);
+                logger.Info("CancelSubscription Does not exist {0}", value.SubscriptionNameDebug);
                 return;
             }
 
@@ -96,7 +96,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
 
             Task t = Task.Factory.StartNew(() => {
                 //HACK find better way to wait for a cancel request so we are not blocking.
-                logger.Info("CancelSubscription Deleting {0}", value.SubscriptionName);
+                logger.Info("CancelSubscription Deleting {0}", value.SubscriptionNameDebug);
                 for (int i = 0; i < 100; i++) {
                     if (!subscription.Data.Cancelled) {
                         Thread.Sleep(1000);
@@ -109,7 +109,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                 if (configurationFactory.NamespaceManager.SubscriptionExists(topic.Path, value.SubscriptionName)) {
                     var filter = new SqlFilter(string.Format(TYPE_HEADER_NAME + " = '{0}'", value.MessageType.FullName.Replace('.', '_')));
                     retryPolicy.ExecuteAction(() => configurationFactory.NamespaceManager.DeleteSubscription(topic.Path, value.SubscriptionName));
-                    logger.Info("CancelSubscription Deleted {0}", value.SubscriptionName);
+                    logger.Info("CancelSubscription Deleted {0}", value.SubscriptionNameDebug);
                 }
             });
 

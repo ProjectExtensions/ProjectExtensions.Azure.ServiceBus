@@ -28,6 +28,10 @@ You can then either implement IAzureBusContainer for your IoC of choice or grab 
 
 If you have a favorite IoC container we don't support, let us know, or, better yet, contribute an implementation.
 
+##Setting up a Windows Azure Service Bus
+
+You may find step be step instructions [here](https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus/wiki/Setting-Up-Windows-Azure-Service-Bus) on how to create the namespace needed to send messages.
+
 ##Getting started
 
 1. Create a console application
@@ -52,6 +56,8 @@ public class TestMessage {
 
 5\. Create a Handler that will receive notifications when the message is placed on the bus. The custom attribute is optional but configures the Service Bus Subscription:
 
+Note: If your constructor for your message takes in parameters from your DI container that implement IDisposable, you must set Singleton = true or you will leak memory.
+
 ```csharp
 [MessageHandlerConfiguration(
     DefaultMessageTimeToLive = 240, //Time in minutes before your message is deleted from the subscription if you don't receive it.
@@ -63,6 +69,8 @@ public class TestMessage {
 public class TestMessageSubscriber : IHandleMessages<TestMessage> {
 
     static Logger logger = LogManager.GetCurrentClassLogger();
+
+    //You may optionally create a constructor that takes in parameters that can be resolved from your DI container.
 
     public void Handle(IReceivedMessage<TestMessage> message) {
         logger.Log(LogLevel.Info, "Message received: {0} {1}", message.Message.Value, message.Message.MessageId);
@@ -181,6 +189,30 @@ ProjectExtensions.Azure.ServiceBus.BusConfiguration.WithSettings()
     .Configure();
 ```
 
+Or if you prefer to configure everything and pass it in all at once you can use this method:
+
+```csharp
+
+//You can easily read your settings from Azure or a database and then pass them in.
+//The setup class can be configured anywhere. 
+//If you do not like the default implementation, just implement the interface.
+
+var setup = new ServiceBusSetupConfiguration() {
+    DefaultSerializer = new GZipXmlSerializer(),
+    ServiceBusIssuerKey = ConfigurationManager.AppSettings["ServiceBusIssuerKey"],
+    ServiceBusIssuerName = ConfigurationManager.AppSettings["ServiceBusIssuerName"],
+    ServiceBusNamespace = ConfigurationManager.AppSettings["ServiceBusNamespace"],
+    ServiceBusApplicationId = "AppName"
+};
+
+setup.AssembliesToRegister.Add(typeof(TestMessageSubscriber).Assembly);
+
+BusConfiguration.WithSettings()
+    .UseAutofacContainer()
+    .ReadFromConfigurationSettings(setup)
+    .Configure();
+```
+
 You may also download the repository and check out the Samples in the /src/samples folder.
 
 The Sample used to build this document can be found in the PubSubUsingConfiguration example.
@@ -210,3 +242,7 @@ Click on the "Zip" Icon at the top of the page to download the latest source cod
 
 * Added self healing of deleted topic during application execution. Error is still thrown since no subscribers will exist.
 * Added self healing of deleted subscriptions during application execution. Any messages sent to the topic while your client subscription is deleted will not be received. The sender does not understand how many receivers exist and therefor does not know that the message needs to be resent.
+
+###Version 0.9.3
+
+* Added the ability to pass in a Settings Provider instead of reading from the app/web.config file.

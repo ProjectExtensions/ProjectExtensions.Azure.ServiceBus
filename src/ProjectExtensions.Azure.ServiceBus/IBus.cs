@@ -13,6 +13,11 @@ namespace ProjectExtensions.Azure.ServiceBus {
     public interface IBus {
 
         /// <summary>
+        /// Called After we prime the bus so that any config needed can be initialized.
+        /// </summary>
+        void Initialize();
+
+        /// <summary>
         /// Auto discover all of the Subscribers in the assembly.
         /// </summary>
         /// <param name="assembly">The assembly to register</param>

@@ -8,15 +8,32 @@ using ProjectExtensions.Azure.ServiceBus.Interfaces;
 using Microsoft.Practices.TransientFaultHandling;
 using System.Threading;
 using System.Threading.Tasks;
+using ProjectExtensions.Azure.ServiceBus.Helpers;
+using System.Diagnostics;
 
 namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
 
     class MockServiceBus : IMockServiceBus {
 
+        IBusConfiguration config;
+        IAzureBusSender sender;
+        IAzureBusReceiver receiver;
         IDictionary<string, TopicDescription> _topics = new Dictionary<string, TopicDescription>(StringComparer.OrdinalIgnoreCase);
         IDictionary<string, ITopicClient> _topicClients = new Dictionary<string, ITopicClient>(StringComparer.OrdinalIgnoreCase);
         List<SubscriptionDescriptionState> _subscriptions = new List<SubscriptionDescriptionState>();
         IDictionary<IAsyncResult, SubscriptionDescriptionState> _messages = new Dictionary<IAsyncResult, SubscriptionDescriptionState>();
+        IDictionary<SubscriptionDescription, ServiceBusEnpointData> _endpointMap = new Dictionary<SubscriptionDescription, ServiceBusEnpointData>();
+
+        public MockServiceBus(IBusConfiguration config) {
+            Guard.ArgumentNotNull(config, "config");
+            this.config = config;
+        }
+
+        public void Initialize() {
+            receiver = config.Container.Resolve<IAzureBusReceiver>();
+            sender = config.Container.Resolve<IAzureBusSender>();
+            Configure();
+        }
 
         public SubscriptionDescription CreateSubscription(SubscriptionDescription description, Filter filter) {
             SqlFilter sf = filter as SqlFilter;
@@ -34,6 +51,14 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
                 Type = theType
             });
 
+            ServiceBusEnpointData endpoint = null;
+            if (_endpointMap.TryGetValue(description, out endpoint)) {
+                receiver.CreateSubscription(endpoint);
+            }
+            else {
+                throw new Exception("Endpoint error");
+            }
+
             return description;
         }
 
@@ -49,7 +74,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
         public ITopicClient CreateTopicClient(string path) {
             ITopicClient retVal = null;
             if (!_topicClients.TryGetValue(path, out retVal)) {
-                retVal = new MockTopicClient(this);
+                retVal = new MockTopicClient(this, path);
                 _topicClients[path] = retVal;
             }
             return retVal;
@@ -140,7 +165,9 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
 
             var subClient = _subscriptions.FirstOrDefault(item => item.Client == client);
 
-            _messages[retVal] = subClient;
+            if (subClient != null) {
+                _messages[retVal] = subClient;
+            }
             callback(retVal);
             return retVal;
         }
@@ -176,40 +203,144 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
 
             return retVal;
         }
-    }
 
-    class SubscriptionDescriptionState {
+        public void RegisterAssembly(System.Reflection.Assembly assembly) {
+            Guard.ArgumentNotNull(assembly, "assembly");
+            //logger.Info("RegisterAssembly={0}", assembly.FullName);
 
-        public SubscriptionDescriptionState() {
-            Messages = new List<IBrokeredMessage>();
+            foreach (var type in assembly.GetTypes()) {
+                var interfaces = type.GetInterfaces()
+                                .Where(i => i.IsGenericType && (i.GetGenericTypeDefinition() == typeof(IHandleMessages<>) || i.GetGenericTypeDefinition() == typeof(IHandleCompetingMessages<>)))
+                                .ToList();
+                if (interfaces.Count > 0) {
+                    Subscribe(type);
+                }
+            }
         }
 
-        public List<IBrokeredMessage> Messages {
-            get;
-            private set;
+        public void Publish<T>(T message) {
+            sender.Send<T>(message);
         }
 
-        public SubscriptionDescription Description {
-            get;
-            set;
+        public void Publish<T>(T message, IDictionary<string, object> metadata = null) {
+            sender.Send<T>(message, metadata);
         }
 
-        public Type Type {
-            get;
-            set;
+        public void PublishAsync<T>(T message, Action<IMessageSentResult<T>> resultCallBack, IDictionary<string, object> metadata = null) {
+            sender.SendAsync<T>(message, null, resultCallBack, metadata);
         }
 
-        public ISubscriptionClient Client {
-            get;
-            set;
+        public void PublishAsync<T>(T message, object state, Action<IMessageSentResult<T>> resultCallBack, IDictionary<string, object> metadata = null) {
+            sender.SendAsync<T>(message, state, resultCallBack, metadata);
         }
 
-        public void AddMessage(IBrokeredMessage message) {
-            Messages.Add(message);
+        /// <summary>
+        /// Subscribes to recieve published messages of type T.
+        /// This method is only necessary if you turned off auto-subscribe
+        /// </summary>
+        /// <typeparam name="T">The type of message to subscribe to.</typeparam>
+        public void Subscribe<T>() {
+            Subscribe(typeof(T));
         }
 
-        public void RemoveMessage(IBrokeredMessage message) {
-            Messages.Remove(message);
+        /// <summary>
+        /// Subscribes to recieve published messages of type T.
+        /// This method is only necessary if you turned off auto-subscribe
+        /// </summary>
+        /// <param name="type">The type to subscribe</param>
+        public void Subscribe(Type type) {
+            Guard.ArgumentNotNull(type, "type");
+
+            BusHelper.SubscribeOrUnsubscribeType((s) => { Debug.WriteLine(s); }, type, config, (info) => {
+
+                var filter = new SqlFilter(string.Format(AzureSenderReceiverBase.TYPE_HEADER_NAME + " = '{0}'", info.MessageType.FullName.Replace('.', '_')));
+
+                var desc = new SubscriptionDescription(config.TopicName, info.SubscriptionName);
+                _endpointMap[desc] = info;
+
+                CreateSubscription(desc, filter);
+
+                //TODO determine if we should and can call CreateSubscription on the receiver.
+                //receiver.CreateSubscription(info);
+            });
+        }
+
+        /// <summary>
+        /// Unsubscribes from receiving published messages of the specified type
+        /// </summary>
+        /// <typeparam name="T">The type of message to unsubscribe from</typeparam>
+        public void Unsubscribe<T>() {
+            Unsubscribe(typeof(T));
+        }
+
+        /// <summary>
+        /// Unsubscribes from receiving published messages of the specified type.
+        /// </summary>
+        /// <param name="type">The type of message to unsubscribe from</param>
+        public void Unsubscribe(Type type) {
+            Guard.ArgumentNotNull(type, "type");
+            //logger.Info("Unsubscribe={0}", type.FullName);
+
+            var subscription = _subscriptions.FirstOrDefault(item => item.Type == type);
+
+            if (subscription != null) {
+                _subscriptions.Remove(subscription);
+            }
+
+            //TODO determine if we need to call Cancel on the receiver.
+            //receiver.CancelSubscription(subscription.);
+        }
+
+        internal static bool IsCompetingHandler(Type type) {
+            return type.GetGenericTypeDefinition() == typeof(IHandleCompetingMessages<>);
+        }
+
+        private void Configure() {
+            //this fixes a bug in .net 4 that will be fixed in sp1
+            using (CloudEnvironment.EnsureSafeHttpContext()) {
+
+                foreach (var item in config.RegisteredAssemblies) {
+                    RegisterAssembly(item);
+                }
+                foreach (var item in config.RegisteredSubscribers) {
+                    Subscribe(item);
+                }
+            }
+        }
+
+        class SubscriptionDescriptionState {
+
+            public SubscriptionDescriptionState() {
+                Messages = new List<IBrokeredMessage>();
+            }
+
+            public List<IBrokeredMessage> Messages {
+                get;
+                private set;
+            }
+
+            public SubscriptionDescription Description {
+                get;
+                set;
+            }
+
+            public Type Type {
+                get;
+                set;
+            }
+
+            public ISubscriptionClient Client {
+                get;
+                set;
+            }
+
+            public void AddMessage(IBrokeredMessage message) {
+                Messages.Add(message);
+            }
+
+            public void RemoveMessage(IBrokeredMessage message) {
+                Messages.Remove(message);
+            }
         }
     }
 }

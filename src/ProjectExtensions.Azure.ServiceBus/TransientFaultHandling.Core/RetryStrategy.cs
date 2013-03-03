@@ -44,6 +44,16 @@ namespace Microsoft.Practices.TransientFaultHandling
         public static readonly TimeSpan DefaultMaxBackoff = TimeSpan.FromSeconds(30.0);
 
         /// <summary>
+        /// Low Client Backoff
+        /// </summary>
+        public static readonly TimeSpan LowClientBackoff = TimeSpan.FromSeconds(.25);
+
+        /// <summary>
+        /// Low min backoff.
+        /// </summary>
+        public static readonly TimeSpan LowMinBackoff = TimeSpan.FromSeconds(0.5);
+
+        /// <summary>
         /// The default minimum amount of time used when calculating the exponential delay between retries.
         /// </summary>
         public static readonly TimeSpan DefaultMinBackoff = TimeSpan.FromSeconds(1.0);

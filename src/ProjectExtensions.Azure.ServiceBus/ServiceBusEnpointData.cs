@@ -10,6 +10,8 @@ namespace ProjectExtensions.Azure.ServiceBus {
 
     class ServiceBusEnpointData {
 
+        string _subscriptionNameDebug;
+
         /// <summary>
         /// Custom attribute found on the class.
         /// </summary>
@@ -34,6 +36,15 @@ namespace ProjectExtensions.Azure.ServiceBus {
         public string SubscriptionName {
             get;
             set;
+        }
+
+        public string SubscriptionNameDebug {
+            get {
+                if (_subscriptionNameDebug == null) {
+                    _subscriptionNameDebug = DeclaredType.FullName.Replace("`1", "") + "<" + MessageType.FullName + "> - " + SubscriptionName; 
+                }
+                return _subscriptionNameDebug;
+            }
         }
 
         /// <summary>

@@ -37,6 +37,9 @@ namespace ProjectExtensions.Azure.ServiceBus {
             this.config = config;
             this.sender = sender;
             this.receiver = receiver;
+        }
+
+        public void Initialize() {
             Configure();
         }
 
@@ -123,7 +126,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
             Guard.ArgumentNotNull(type, "type");
             logger.Info("Subscribe={0}", type.FullName);
             subscribedTypes.Add(type);
-            SubscribeOrUnsubscribeType(type, config, receiver.CreateSubscription);
+            BusHelper.SubscribeOrUnsubscribeType((s) => { logger.Info(s); }, type, config, receiver.CreateSubscription);
         }
 
         /// <summary>
@@ -145,13 +148,13 @@ namespace ProjectExtensions.Azure.ServiceBus {
             if (subscribedTypes.Contains(type)) {
                 subscribedTypes.Remove(type);
             }
-            SubscribeOrUnsubscribeType(type, config, receiver.CancelSubscription);
+            BusHelper.SubscribeOrUnsubscribeType((s) => { logger.Info(s); }, type, config, receiver.CancelSubscription);
         }
 
         void Configure() {
             //this fixes a bug in .net 4 that will be fixed in sp1
             using (CloudEnvironment.EnsureSafeHttpContext()) {
- 
+
                 foreach (var item in config.RegisteredAssemblies) {
                     RegisterAssembly(item);
                 }
@@ -166,56 +169,6 @@ namespace ProjectExtensions.Azure.ServiceBus {
             foreach (var item in assemblies) {
                 RegisterAssembly(item);
             }
-        }
-
-        internal static bool IsCompetingHandler(Type type) {
-            return type.GetGenericTypeDefinition() == typeof(IHandleCompetingMessages<>);
-        }
-
-        internal static void SubscribeOrUnsubscribeType(Type type, IBusConfiguration config, Action<ServiceBusEnpointData> callback) {
-            Guard.ArgumentNotNull(type, "type");
-            Guard.ArgumentNotNull(callback, "callback");
-
-            logger.Info("SubscribeOrUnsubscribeType={0}", type.FullName);
-            var interfaces = type.GetInterfaces()
-                            .Where(i => i.IsGenericType && (i.GetGenericTypeDefinition() == typeof(IHandleMessages<>) || i.GetGenericTypeDefinition() == typeof(IHandleCompetingMessages<>)))
-                            .ToList();
-
-            if (interfaces.Count == 0) {
-                throw new ApplicationException(string.Format("Type {0} does not implement IHandleMessages or IHandleCompetingMessages", type.FullName));
-            }
-
-            //for each interface we find, we need to register it with the bus.
-            foreach (var foundInterface in interfaces) {
-
-                var implementedMessageType = foundInterface.GetGenericArguments()[0];
-                //due to the limits of 50 chars we will take the name and a MD5 for the name.
-                var hashName = implementedMessageType.FullName + "|" + type.FullName;
-
-                var hash = MD5Helper.CalculateMD5(hashName);
-                var fullName = (IsCompetingHandler(foundInterface) ? "C_" : config.ServiceBusApplicationId + "_") + hash;
-
-                var info = new ServiceBusEnpointData() {
-                    AttributeData = type.GetCustomAttributes(typeof(MessageHandlerConfigurationAttribute), false).FirstOrDefault() as MessageHandlerConfigurationAttribute,
-                    DeclaredType = type,
-                    MessageType = implementedMessageType,
-                    SubscriptionName = fullName,
-                    ServiceType = foundInterface
-                };
-
-                if (!config.Container.IsRegistered(type)) {
-                    if (info.IsReusable) {
-                        config.Container.Register(type, type);
-                    }
-                    else {
-                        config.Container.Register(type, type, true);
-                    }
-                }
-
-                callback(info);
-            }
-
-            config.Container.Build();
         }
     }
 }

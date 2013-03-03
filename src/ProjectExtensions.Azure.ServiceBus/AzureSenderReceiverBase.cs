@@ -25,9 +25,9 @@ namespace ProjectExtensions.Azure.ServiceBus {
         protected IServiceBusConfigurationFactory configurationFactory;
 
         protected RetryPolicy<ServiceBusTransientErrorDetectionStrategy> retryPolicy
-            = new RetryPolicy<ServiceBusTransientErrorDetectionStrategy>(20, RetryStrategy.DefaultMinBackoff, TimeSpan.FromSeconds(5.0), RetryStrategy.DefaultClientBackoff);
+            = new RetryPolicy<ServiceBusTransientErrorDetectionStrategy>(30, RetryStrategy.LowMinBackoff, TimeSpan.FromSeconds(5.0), RetryStrategy.LowClientBackoff);
         protected RetryPolicy<ServiceBusTransientErrorToDetermineExistanceDetectionStrategy> verifyRetryPolicy
-            = new RetryPolicy<ServiceBusTransientErrorToDetermineExistanceDetectionStrategy>(5, RetryStrategy.DefaultMinBackoff, TimeSpan.FromSeconds(2.0), RetryStrategy.DefaultClientBackoff);
+            = new RetryPolicy<ServiceBusTransientErrorToDetermineExistanceDetectionStrategy>(5, RetryStrategy.LowMinBackoff, TimeSpan.FromSeconds(2.0), RetryStrategy.LowClientBackoff);
         protected TopicDescription topic;
 
         /// <summary>

@@ -1,12 +1,14 @@
 Thanks for downloading this Windows Azure Service Bus Message Wrapper Project.
 
-*****Breaking change if you are upgrading from a version < 0.9.0 *****
+
+
+**Breaking change if you are upgrading from a version < 0.9.0 **
 
 If you are upgrading from a version that is < 0.9.0 and You are using ProjectExtensions.Azure.ServiceBus there are two References now. 
 If your project does not compile, make sure you have a reference to both ProjectExtensions.Azure.ServiceBus.dll and ProjectExtensions.Azure.ServiceBus.
 Nuget will update these references for you but if you have a project you are manually editing, you must add both references.
 
-Note You must add this namespace to the files that perform the configuration.
+Note: You must add this namespace to the files that perform the configuration.
 
 using ProjectExtensions.Azure.ServiceBus.Autofac.Container;
 
@@ -14,7 +16,15 @@ WithSettings no longer takes an overload
 
 You must add .UseAutofacContainer() passing in the optional container that used to be passed into WithSettings. This may also be left blank.
 
+
+
+**Information**
+
 The ServiceBusNamespace Is the namespace that you configure in the Azure Portal.
+
+You can read about how to set up the Windows Azure Namespace here:
+
+https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus/wiki/Setting-Up-Windows-Azure-Service-Bus
 
 It is the test1234 portion of sb://test1234.servicebus.windows.net
 
@@ -31,6 +41,37 @@ BusConfiguration.WithSettings()
     .RegisterAssembly(typeof(TestMessageSubscriber).Assembly)
     .Configure();
 
+//You can easily read your settings from Azure or a database and then pass them in.
+//The setup class can be configured anywhere. 
+//If you do not like the default implementation, just implement the interface.
+
+var setup = new ServiceBusSetupConfiguration() {
+    DefaultSerializer = new GZipXmlSerializer(),
+    ServiceBusIssuerKey = ConfigurationManager.AppSettings["ServiceBusIssuerKey"],
+    ServiceBusIssuerName = ConfigurationManager.AppSettings["ServiceBusIssuerName"],
+    ServiceBusNamespace = ConfigurationManager.AppSettings["ServiceBusNamespace"],
+    ServiceBusApplicationId = "AppName"
+};
+
+setup.AssembliesToRegister.Add(typeof(TestMessageSubscriber).Assembly);
+
+BusConfiguration.WithSettings()
+    .UseAutofacContainer()
+    .ReadFromConfigurationSettings(setup)
+    .Configure();
+
+
+**Warning if you are using IDisposable objects as parameters to your Handlers**
+
+We do not support Releasing of Transient objects from your container. This may cause a memory leak. 
+
+Set this property using this custom attribute on your message handler.
+
+[MessageHandlerConfiguration(
+    Singleton = true)] //If it is a singleton, the instance will be created once, otherwise it will be created for each message received. Recommended to set to true.
+
+
+
 **New Features**
 
 We now have support for addtional containers. If you wish to use AutoFac, Castle Windsor, NInject, StructureMap or Unity, 
@@ -46,7 +87,9 @@ The Sample used to build this document can be found in the PubSubUsingConfigurat
 
 https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus/archive/master.zip
 
-##Release Notes
+
+
+**Release Notes**
 
 ###Version 0.9.0
 
@@ -69,3 +112,7 @@ https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus/archive/
 
 * Added self healing of deleted topic during application execution. Error is still thrown since no subscribers will exist.
 * Added self healing of deleted subscriptions during application execution. Any messages sent to the topic while your client subscription is deleted will not be received. The sender does not understand how many receivers exist and therefor does not know that the message needs to be resent.
+
+###Version 0.9.3
+
+* Added the ability to pass in a Settings Provider instead of reading from the app/web.config file.

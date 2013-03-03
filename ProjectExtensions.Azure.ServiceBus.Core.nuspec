@@ -3,7 +3,7 @@
   <metadata>
     <id>ProjectExtensions.Azure.ServiceBus.Core</id>
     <title>Windows Azure Service Bus Message Wrapper by Project Extensions (Core)</title>
-    <version>0.9.2.0</version>
+    <version>0.9.3.0</version>
     <authors>Project Extensions, Joe Feser</authors>
     <owners>Project Extensions, Joe Feser</owners>
     <copyright>Copyright (C) Project Extensions and Joe Feser 2013</copyright>

@@ -14,15 +14,16 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
         object body;
         IMockServiceBus serviceBus;
 
-        public MockBrokeredMessage(IMockServiceBus serviceBus) {
-            Guard.ArgumentNotNull(serviceBus, "serviceBus");
-            this.serviceBus = serviceBus;
+        public MockBrokeredMessage(IBus serviceBus) {
+            this.serviceBus = serviceBus as IMockServiceBus;
+            Guard.ArgumentNotNull(this.serviceBus, "serviceBus");
         }
 
-        public MockBrokeredMessage(IMockServiceBus serviceBus, IBrokeredMessage original) {
+        public MockBrokeredMessage(IBus serviceBus, IBrokeredMessage original) {
             Guard.ArgumentNotNull(serviceBus, "serviceBus");
             Guard.ArgumentNotNull(original, "original");
-            this.serviceBus = serviceBus;
+            this.serviceBus = serviceBus as IMockServiceBus;
+            Guard.ArgumentNotNull(this.serviceBus, "serviceBus");
 
             //we only work with the MockBrokeredMessage at this time.  
 

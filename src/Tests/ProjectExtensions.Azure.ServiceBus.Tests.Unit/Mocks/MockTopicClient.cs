@@ -14,9 +14,16 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
 
         IMockServiceBus serviceBus;
 
-        public MockTopicClient(IMockServiceBus serviceBus) {
+        public string Path {
+            get;
+            private set;
+        }
+
+        public MockTopicClient(IBus serviceBus, string path) {
             Guard.ArgumentNotNull(serviceBus, "serviceBus");
-            this.serviceBus = serviceBus;
+            this.serviceBus = serviceBus as IMockServiceBus;
+            Guard.ArgumentNotNull(this.serviceBus, "serviceBus");
+            this.Path = path;
         }
 
         public IAsyncResult BeginSend(IBrokeredMessage message, AsyncCallback callback, object state) {

@@ -21,11 +21,11 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit {
 
             var builder = new ContainerBuilder();
             
-            //builder.RegisterType(typeof(MockSubscriptionClient)).As(typeof(ISubscriptionClient)).SingleInstance();
-            //builder.RegisterType(typeof(MockTopicClient)).As(typeof(ITopicClient)).SingleInstance();
+            builder.RegisterType(typeof(MockSubscriptionClient)).As(typeof(ISubscriptionClient)).SingleInstance();
+            builder.RegisterType(typeof(MockTopicClient)).As(typeof(ITopicClient)).SingleInstance();
             builder.RegisterType(typeof(MockNamespaceManager)).As(typeof(INamespaceManager)).SingleInstance();
             builder.RegisterType(typeof(MockMessagingFactory)).As(typeof(IMessagingFactory)).SingleInstance();
-            builder.RegisterType(typeof(MockServiceBus)).As(typeof(IMockServiceBus)).SingleInstance();
+            builder.RegisterType(typeof(MockServiceBus)).As(typeof(IBus)).SingleInstance();
 
             BusConfiguration.WithSettings()
                                         .UseAutofacContainer(builder.Build())
@@ -38,6 +38,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit {
 
             for (int i = 0; i < 10; i++) {
                 BusConfiguration.Instance.Bus.PublishAsync(new TestMessageForTesting(), (callback) => {
+                    Debug.WriteLine("Time Spent:" + callback.TimeSpent);
                     Console.WriteLine("Time Spent:" + callback.TimeSpent);
                 });                
             }
