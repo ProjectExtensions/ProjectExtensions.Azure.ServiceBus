@@ -37,6 +37,24 @@ BusConfiguration.WithSettings()
     .RegisterAssembly(typeof(TestMessageSubscriber).Assembly)
     .Configure();
 
+//You can easily read your settings from Azure or a database and then pass them in.
+//The setup class can be configured anywhere. 
+//If you do not like the default implementation, just implement the interface.
+
+var setup = new ServiceBusSetupConfiguration() {
+    DefaultSerializer = new GZipXmlSerializer(),
+    ServiceBusIssuerKey = ConfigurationManager.AppSettings["ServiceBusIssuerKey"],
+    ServiceBusIssuerName = ConfigurationManager.AppSettings["ServiceBusIssuerName"],
+    ServiceBusNamespace = ConfigurationManager.AppSettings["ServiceBusNamespace"],
+    ServiceBusApplicationId = "AppName"
+};
+
+setup.AssembliesToRegister.Add(typeof(TestMessageSubscriber).Assembly);
+
+BusConfiguration.WithSettings()
+    .UseAutofacContainer()
+    .ReadFromConfigurationSettings(setup)
+    .Configure();
 
 
 **Warning if you are using IDisposable objects as parameters to your Handlers**
@@ -90,3 +108,7 @@ https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus/archive/
 
 * Added self healing of deleted topic during application execution. Error is still thrown since no subscribers will exist.
 * Added self healing of deleted subscriptions during application execution. Any messages sent to the topic while your client subscription is deleted will not be received. The sender does not understand how many receivers exist and therefor does not know that the message needs to be resent.
+
+###Version 0.9.3
+
+* Added the ability to pass in a Settings Provider instead of reading from the app/web.config file.

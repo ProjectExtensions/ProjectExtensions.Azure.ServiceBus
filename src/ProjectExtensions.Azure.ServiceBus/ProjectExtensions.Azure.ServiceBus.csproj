@@ -87,7 +87,6 @@
     <Compile Include="BusConfigurationBuilder.cs" />
     <Compile Include="Container\IAzureBusContainer.cs" />
     <Compile Include="ExtensionMethods.cs" />
-    <Compile Include="Helpers\AzureConfigurationHelper.cs" />
     <Compile Include="Helpers\MD5Helper.cs" />
     <Compile Include="Interfaces\IAzureBusReceiver.cs" />
     <Compile Include="Interfaces\IAzureBusSender.cs" />

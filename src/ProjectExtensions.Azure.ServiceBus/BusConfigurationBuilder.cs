@@ -76,22 +76,22 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// </summary>
         /// <returns></returns>
         public BusConfigurationBuilder ReadFromConfigFile() {
-            var setting = AzureConfigurationHelper.GetConfig("ServiceBusApplicationId");
+            var setting = ConfigurationManager.AppSettings["ServiceBusApplicationId"];
             configuration.ServiceBusApplicationId = setting;
 
-            setting = AzureConfigurationHelper.GetConfig("ServiceBusIssuerKey");
+            setting = ConfigurationManager.AppSettings["ServiceBusIssuerKey"];
             if (string.IsNullOrWhiteSpace(setting)) {
                 throw new ArgumentNullException("ServiceBusIssuerKey", "The ServiceBusIssuerKey must be set.");
             }
             configuration.ServiceBusIssuerKey = setting;
 
-            setting = AzureConfigurationHelper.GetConfig("ServiceBusIssuerName");
+            setting = ConfigurationManager.AppSettings["ServiceBusIssuerName"];
             if (string.IsNullOrWhiteSpace(setting)) {
                 throw new ArgumentNullException("ServiceBusIssuerName", "The ServiceBusIssuerName must be set.");
             }
             configuration.ServiceBusIssuerName = setting;
 
-            setting = AzureConfigurationHelper.GetConfig("ServiceBusNamespace");
+            setting = ConfigurationManager.AppSettings["ServiceBusNamespace"];
             if (string.IsNullOrWhiteSpace(setting)) {
                 throw new ArgumentNullException("ServiceBusNamespace", "The ServiceBusNamespace must be set.");
             }
