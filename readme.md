@@ -76,6 +76,7 @@ public class TestMessageSubscriber : IHandleMessages<TestMessage> {
 
     public void Handle(IReceivedMessage<TestMessage> message) {
         logger.Log(LogLevel.Info, "Message received: {0} {1}", message.Message.Value, message.Message.MessageId);
+        //If you can't deal with the message and you would like to be called back, throw an exception.
     }
 }
 ```

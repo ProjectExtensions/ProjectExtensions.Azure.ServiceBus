@@ -86,7 +86,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         }
 
         /// <summary>
-        /// Gets or sets the number of maximum deliveries.
+        /// Gets or sets the number of maximum calls to your handler.
         /// </summary>
         public int MaxRetries {
             get {
