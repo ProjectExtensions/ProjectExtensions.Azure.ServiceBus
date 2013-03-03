@@ -34,7 +34,7 @@ You may find step be step instructions [here](https://github.com/ProjectExtensio
 
 ##Getting started
 
-Read more in teh Wiki [here](https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus/wiki/)
+Read more in the Wiki [here](https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus/wiki/)
 
 1. Create a console application
 2. Using NuGet, install the package ProjectExtensions.Azure.ServiceBus.
