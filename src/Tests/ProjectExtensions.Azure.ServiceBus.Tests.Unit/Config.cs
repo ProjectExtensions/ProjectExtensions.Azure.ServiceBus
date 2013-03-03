@@ -41,8 +41,6 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit {
                     Console.WriteLine("Time Spent:" + callback.TimeSpent);
                 });                
             }
-
-            Console.ReadLine();
         }
 
         [TearDown]
