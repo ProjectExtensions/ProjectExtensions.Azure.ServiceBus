@@ -16,14 +16,19 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
 
         IBusConfiguration config;
         IAzureBusSender sender;
+        IAzureBusReceiver receiver;
         IDictionary<string, TopicDescription> _topics = new Dictionary<string, TopicDescription>(StringComparer.OrdinalIgnoreCase);
         IDictionary<string, ITopicClient> _topicClients = new Dictionary<string, ITopicClient>(StringComparer.OrdinalIgnoreCase);
         List<SubscriptionDescriptionState> _subscriptions = new List<SubscriptionDescriptionState>();
         IDictionary<IAsyncResult, SubscriptionDescriptionState> _messages = new Dictionary<IAsyncResult, SubscriptionDescriptionState>();
+        IDictionary<SubscriptionDescription, ServiceBusEnpointData> _endpointMap = new Dictionary<SubscriptionDescription, ServiceBusEnpointData>();
 
         public MockServiceBus(IBusConfiguration config) {
             Guard.ArgumentNotNull(config, "config");
             this.config = config;
+        }
+
+        public void Initialize() {
             Configure();
         }
 
@@ -42,6 +47,18 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
                 Description = description,
                 Type = theType
             });
+
+            if (receiver == null) {
+                receiver = config.Container.Resolve<IAzureBusReceiver>();
+            }
+
+            ServiceBusEnpointData endpoint = null;
+            if (_endpointMap.TryGetValue(description, out endpoint)) {
+                receiver.CreateSubscription(endpoint);
+            }
+            else {
+                throw new Exception("Endpoint error");
+            }
 
             return description;
         }
@@ -201,30 +218,22 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
         }
 
         public void Publish<T>(T message) {
-            if (sender == null) {
-                sender = config.Container.Resolve<IAzureBusSender>();
-            }
+            EnsureSender();
             sender.Send<T>(message);
         }
 
         public void Publish<T>(T message, IDictionary<string, object> metadata = null) {
-            if (sender == null) {
-                sender = config.Container.Resolve<IAzureBusSender>();
-            }
+            EnsureSender();
             sender.Send<T>(message, metadata);
         }
 
         public void PublishAsync<T>(T message, Action<IMessageSentResult<T>> resultCallBack, IDictionary<string, object> metadata = null) {
-            if (sender == null) {
-                sender = config.Container.Resolve<IAzureBusSender>();
-            }
+            EnsureSender();
             sender.SendAsync<T>(message, null, resultCallBack, metadata);
         }
 
         public void PublishAsync<T>(T message, object state, Action<IMessageSentResult<T>> resultCallBack, IDictionary<string, object> metadata = null) {
-            if (sender == null) {
-                sender = config.Container.Resolve<IAzureBusSender>();
-            }
+            EnsureSender();
             sender.SendAsync<T>(message, state, resultCallBack, metadata);
         }
 
@@ -279,7 +288,10 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
                 //TODO verify if this is the correct subscription type
                 var filter = new SqlFilter(string.Format(AzureSenderReceiverBase.TYPE_HEADER_NAME + " = '{0}'", implementedMessageType.FullName.Replace('.', '_')));
 
-                CreateSubscription(new SubscriptionDescription(config.TopicName, fullName), filter);
+                var desc = new SubscriptionDescription(config.TopicName, fullName);
+                _endpointMap[desc] = info;
+
+                CreateSubscription(desc, filter);
             }
 
             config.Container.Build();
@@ -322,6 +334,12 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
                 foreach (var item in config.RegisteredSubscribers) {
                     Subscribe(item);
                 }
+            }
+        }
+
+        private void EnsureSender() {
+            if (sender == null) {
+                sender = config.Container.Resolve<IAzureBusSender>();
             }
         }
 
