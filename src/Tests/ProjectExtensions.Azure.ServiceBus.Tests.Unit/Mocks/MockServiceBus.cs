@@ -9,6 +9,7 @@ using Microsoft.Practices.TransientFaultHandling;
 using System.Threading;
 using System.Threading.Tasks;
 using ProjectExtensions.Azure.ServiceBus.Helpers;
+using System.Diagnostics;
 
 namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
 
@@ -164,7 +165,9 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
 
             var subClient = _subscriptions.FirstOrDefault(item => item.Client == client);
 
-            _messages[retVal] = subClient;
+            if (subClient != null) {
+                _messages[retVal] = subClient;
+            }
             callback(retVal);
             return retVal;
         }
@@ -248,47 +251,18 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
         public void Subscribe(Type type) {
             Guard.ArgumentNotNull(type, "type");
 
-            var interfaces = type.GetInterfaces()
-                .Where(i => i.IsGenericType && (i.GetGenericTypeDefinition() == typeof(IHandleMessages<>) || i.GetGenericTypeDefinition() == typeof(IHandleCompetingMessages<>)))
-                .ToList();
+            BusHelper.SubscribeOrUnsubscribeType((s) => { Debug.WriteLine(s); }, type, config, (info) => {
 
-            //for each interface we find, we need to register it with the bus.
-            foreach (var foundInterface in interfaces) {
+                var filter = new SqlFilter(string.Format(AzureSenderReceiverBase.TYPE_HEADER_NAME + " = '{0}'", info.MessageType.FullName.Replace('.', '_')));
 
-                var implementedMessageType = foundInterface.GetGenericArguments()[0];
-                //due to the limits of 50 chars we will take the name and a MD5 for the name.
-                var hashName = implementedMessageType.FullName + "|" + type.FullName;
-
-                var hash = MD5Helper.CalculateMD5(hashName);
-                var fullName = (IsCompetingHandler(foundInterface) ? "C_" : config.ServiceBusApplicationId + "_") + hash;
-
-                var info = new ServiceBusEnpointData() {
-                    AttributeData = type.GetCustomAttributes(typeof(MessageHandlerConfigurationAttribute), false).FirstOrDefault() as MessageHandlerConfigurationAttribute,
-                    DeclaredType = type,
-                    MessageType = implementedMessageType,
-                    SubscriptionName = fullName,
-                    ServiceType = foundInterface
-                };
-
-                if (!config.Container.IsRegistered(type)) {
-                    if (info.IsReusable) {
-                        config.Container.Register(type, type);
-                    }
-                    else {
-                        config.Container.Register(type, type, true);
-                    }
-                }
-
-                //TODO verify if this is the correct subscription type
-                var filter = new SqlFilter(string.Format(AzureSenderReceiverBase.TYPE_HEADER_NAME + " = '{0}'", implementedMessageType.FullName.Replace('.', '_')));
-
-                var desc = new SubscriptionDescription(config.TopicName, fullName);
+                var desc = new SubscriptionDescription(config.TopicName, info.SubscriptionName);
                 _endpointMap[desc] = info;
 
                 CreateSubscription(desc, filter);
-            }
 
-            config.Container.Build();
+                //TODO determine if we should and can call CreateSubscription on the receiver.
+                //receiver.CreateSubscription(info);
+            });
         }
 
         /// <summary>
@@ -312,6 +286,9 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
             if (subscription != null) {
                 _subscriptions.Remove(subscription);
             }
+
+            //TODO determine if we need to call Cancel on the receiver.
+            //receiver.CancelSubscription(subscription.);
         }
 
         internal static bool IsCompetingHandler(Type type) {
@@ -331,40 +308,39 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
             }
         }
 
-    }
+        class SubscriptionDescriptionState {
 
-    class SubscriptionDescriptionState {
+            public SubscriptionDescriptionState() {
+                Messages = new List<IBrokeredMessage>();
+            }
 
-        public SubscriptionDescriptionState() {
-            Messages = new List<IBrokeredMessage>();
-        }
+            public List<IBrokeredMessage> Messages {
+                get;
+                private set;
+            }
 
-        public List<IBrokeredMessage> Messages {
-            get;
-            private set;
-        }
+            public SubscriptionDescription Description {
+                get;
+                set;
+            }
 
-        public SubscriptionDescription Description {
-            get;
-            set;
-        }
+            public Type Type {
+                get;
+                set;
+            }
 
-        public Type Type {
-            get;
-            set;
-        }
+            public ISubscriptionClient Client {
+                get;
+                set;
+            }
 
-        public ISubscriptionClient Client {
-            get;
-            set;
-        }
+            public void AddMessage(IBrokeredMessage message) {
+                Messages.Add(message);
+            }
 
-        public void AddMessage(IBrokeredMessage message) {
-            Messages.Add(message);
-        }
-
-        public void RemoveMessage(IBrokeredMessage message) {
-            Messages.Remove(message);
+            public void RemoveMessage(IBrokeredMessage message) {
+                Messages.Remove(message);
+            }
         }
     }
 }
