@@ -58,6 +58,8 @@ public class TestMessage {
 
 Note: If your constructor for your message takes in parameters from your DI container that implement IDisposable, you must set Singleton = true or you will leak memory.
 
+Please see [this](https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus/wiki/Configuration-%22MessageHandlerConfiguration%22) for more information on the MessageHandlerConfiguration custom attribute
+
 ```csharp
 [MessageHandlerConfiguration(
     DefaultMessageTimeToLive = 240, //Time in minutes before your message is deleted from the subscription if you don't receive it.
