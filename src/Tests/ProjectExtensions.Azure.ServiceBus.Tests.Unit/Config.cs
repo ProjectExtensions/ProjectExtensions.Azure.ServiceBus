@@ -39,6 +39,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit {
             for (int i = 0; i < 10; i++) {
                 BusConfiguration.Instance.Bus.PublishAsync(new TestMessageForTesting(), (callback) => {
                     Debug.WriteLine("Time Spent:" + callback.TimeSpent);
+                    Console.WriteLine("Time Spent:" + callback.TimeSpent);
                 });                
             }
         }
