@@ -1,0 +1,4 @@
+BuildOutput/*
+packages/*
+*.suo
+src/*
