@@ -1,14 +1,14 @@
-#ProjectExtensions.Azure.ServiceBus
+# ProjectExtensions.Azure.ServiceBus
 
 An easier way to work with the Azure service bus.
 
 Follow me or tweet at me on Twitter: @joefeser.
 
-##Building 
+## Building 
 
 Use ClickToBuild.bat to build.  You will need to have the Azure SDK 1.5 installed in order to build.
 
-##Nuget Packages
+## Nuget Packages
 
 If you don't use an IoC container in your application or you are happy to use Autofac, download the default Nuget package:
 
@@ -28,11 +28,11 @@ You can then either implement IAzureBusContainer for your IoC of choice or grab 
 
 If you have a favorite IoC container we don't support, let us know, or, better yet, contribute an implementation.
 
-##Setting up a Windows Azure Service Bus
+## Setting up a Windows Azure Service Bus
 
 You may find step be step instructions [here](https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus/wiki/Setting-Up-Windows-Azure-Service-Bus) on how to create the namespace needed to send messages.
 
-##Getting started
+## Getting started
 
 Read more in the Wiki [here](https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus/wiki/)
 
@@ -216,9 +216,9 @@ The Sample used to build this document can be found in the PubSubUsingConfigurat
 
 Click on the "Zip" Icon at the top of the page to download the latest source code.
 
-##Release Notes
+## Release Notes
 
-###Version 0.9.0
+### Version 0.9.0
 
 * Allow support for other IoC containers to be added. Continue to support Autofac.
 * Support for Castle Windsor IoC.
@@ -229,17 +229,17 @@ Click on the "Zip" Icon at the top of the page to download the latest source cod
 * BREAKING CHANGE. WithSettings No longer accepts the AutoFac Container as a parameter. This change was made to support the other containers.
 * BREAKING CHANGE. You must add .UseAutofacContainer() after WithSettings(). If you wich to use your existing container, You would pass it into this method call.
 
-###Version 0.9.1
+### Version 0.9.1
 
 * Fixed bug in AutoFac registration of a Default Serializer.
 * Fixed bug in AutoFac registration of a any items internally registered on the default container.
 * Fixed bug in Publish method that ignored the serializer passed in and defaulted back to default serializer.
 
-###Version 0.9.2
+### Version 0.9.2
 
 * Added self healing of deleted topic during application execution. Error is still thrown since no subscribers will exist.
 * Added self healing of deleted subscriptions during application execution. Any messages sent to the topic while your client subscription is deleted will not be received. The sender does not understand how many receivers exist and therefor does not know that the message needs to be resent.
 
-###Version 0.9.3
+### Version 0.9.3
 
 * Added the ability to pass in a Settings Provider instead of reading from the app/web.config file.
