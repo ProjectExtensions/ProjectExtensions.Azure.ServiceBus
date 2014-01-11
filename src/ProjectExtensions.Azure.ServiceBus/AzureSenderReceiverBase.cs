@@ -40,10 +40,10 @@ namespace ProjectExtensions.Azure.ServiceBus {
             Guard.ArgumentNotNull(configurationFactory, "configurationFactory");
             this.configuration = configuration;
             this.configurationFactory = configurationFactory;
-            EnsureTopic(configuration.TopicName);
+            EnsureTopic(configuration.TopicName, configuration.EnablePartitioning);
         }
 
-        protected void EnsureTopic(string topicName) {
+        protected void EnsureTopic(string topicName, bool enablePartitioning) {
             Guard.ArgumentNotNull(topicName, "topicName");
             bool createNew = false;
 
@@ -60,6 +60,10 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 logger.Info("EnsureTopic Does Not Exist {0} ", topicName);
                 // Looks like the topic does not exist. We should create a new one.
                 createNew = true;
+            }
+
+            if (!createNew && defaultTopic != null && !defaultTopic.EnablePartitioning && enablePartitioning) {
+                throw new Exception("EnablePartitioning may not be changed on an existing Topic.");
             }
 
             // If a topic with the specified name doesn't exist, it will be auto-created.

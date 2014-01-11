@@ -6,7 +6,7 @@ using ProjectExtensions.Azure.ServiceBus.Serialization;
 
 //DO NOT Change the namespace.
 namespace ProjectExtensions.Azure.ServiceBus {
-    
+
     /// <summary>
     /// Interface for the Bus Configuration
     /// </summary>
@@ -23,6 +23,13 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// DefaultSerializer
         /// </summary>
         IServiceBusSerializer DefaultSerializer {
+            get;
+        }
+
+        /// <summary>
+        /// Enable Partitioning on the Topic
+        /// </summary>
+        bool EnablePartitioning {
             get;
         }
 

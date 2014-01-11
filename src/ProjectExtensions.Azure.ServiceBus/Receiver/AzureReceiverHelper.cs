@@ -35,7 +35,8 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
             }
         }
 
-        public AzureReceiverHelper(TopicDescription topic, IServiceBusConfigurationFactory configurationFactory, IBusConfiguration config, IServiceBusSerializer serializer, RetryPolicy verifyRetryPolicy, RetryPolicy retryPolicy, ServiceBusEnpointData endpoint) {
+        public AzureReceiverHelper(TopicDescription topic, IServiceBusConfigurationFactory configurationFactory, IBusConfiguration config,
+            IServiceBusSerializer serializer, RetryPolicy verifyRetryPolicy, RetryPolicy retryPolicy, ServiceBusEnpointData endpoint) {
             Guard.ArgumentNotNull(topic, "topic");
             Guard.ArgumentNotNull(configurationFactory, "configurationFactory");
             Guard.ArgumentNotNull(config, "config");
@@ -54,6 +55,10 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
         }
 
         public void ProcessMessagesForSubscription() {
+            ProcessMessagesForSubscriptionLegacy();
+        }
+
+        private void ProcessMessagesForSubscriptionLegacy() {
 
             try {
 
@@ -194,7 +199,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                                 data.EndPointData.DeclaredType.ToString(),
                                 data.EndPointData.MessageType.ToString(),
                                 data.EndPointData.IsReusable,
-                                ex.ToString()));                        
+                                ex.ToString()));
                         }
 
                         // Continue receiving and processing new messages until we are told to stop regardless of any exceptions.

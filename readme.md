@@ -172,6 +172,7 @@ ProjectExtensions.Azure.ServiceBus.BusConfiguration.WithSettings()
     .UseCastleWindsorContainer()
     .ReadFromConfigFile()
     .ServiceBusApplicationId("AppName")
+    .EnablePartitioning(true)
     .RegisterAssembly(typeof(TestMessageSubscriber).Assembly)
     .Configure();
 ```
@@ -185,6 +186,7 @@ ProjectExtensions.Azure.ServiceBus.BusConfiguration.WithSettings()
     .ServiceBusIssuerKey("[sb password]")
     .ServiceBusIssuerName("owner")
     .ServiceBusNamespace("[addresshere]")
+    .EnablePartitioning(true)
     .RegisterAssembly(typeof(TestMessageSubscriber).Assembly)
     .Configure();
 ```
@@ -243,3 +245,16 @@ Click on the "Zip" Icon at the top of the page to download the latest source cod
 ### Version 0.9.3 ###
 
 * Added the ability to pass in a Settings Provider instead of reading from the app/web.config file.
+
+
+###Version 0.9.4 ###
+
+* Updated references and set the Service Bus Requirement to v1.8. This is the last release that supports the v1.0 Service Bus Assembly.
+
+###Version 0.10.0 ###
+
+* Updated to use ServiceBus v2.2.2
+
+###Version 0.10.1 ###
+
+* Added EnablePartitioning Support to the Fluent Configuration.

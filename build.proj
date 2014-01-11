@@ -4,7 +4,7 @@
 
   <!-- Version Information -->
   <PropertyGroup>
-    <AppVersion>0.10.0</AppVersion>
+    <AppVersion>0.10.1</AppVersion>
     <SchemaVersion>0</SchemaVersion>
     <CompanyName>Extensions.io</CompanyName>
   </PropertyGroup>

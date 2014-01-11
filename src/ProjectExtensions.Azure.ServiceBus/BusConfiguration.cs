@@ -87,6 +87,14 @@ namespace ProjectExtensions.Azure.ServiceBus {
         }
 
         /// <summary>
+        /// Enable Partitioning
+        /// </summary>
+        public bool EnablePartitioning {
+            get;
+            internal set;
+        }
+
+        /// <summary>
         /// Max Threads to call the message handlers from the bus messages being received
         /// </summary>
         public byte MaxThreads {
@@ -222,6 +230,5 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 this.registeredSubscribers.Add(value);
             }
         }
-
     }
 }

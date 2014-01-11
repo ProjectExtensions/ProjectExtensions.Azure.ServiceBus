@@ -61,6 +61,16 @@ namespace ProjectExtensions.Azure.ServiceBus {
         }
 
         /// <summary>
+        /// Set the Enable Partitioning Flag on the Topic
+        /// </summary>
+        /// <param name="enablePartitioning"></param>
+        /// <returns></returns>
+        public BusConfigurationBuilder EnablePartitioning(bool enablePartitioning) {
+            configuration.EnablePartitioning = enablePartitioning;
+            return this;
+        }
+
+        /// <summary>
         /// Set the Max Threads that will pull from the bus. (Not Implemented)
         /// </summary>
         /// <param name="value"></param>

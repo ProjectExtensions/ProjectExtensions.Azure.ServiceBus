@@ -184,7 +184,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Sender {
                         var topicException = ex as MessagingEntityNotFoundException;
                         if (topicException != null && topicException.Detail != null && topicException.Detail.Message.IndexOf("40400") > -1) {
                             logger.Info("Topic was deleted. Attempting to Recreate.");
-                            EnsureTopic(this.configuration.TopicName);
+                            EnsureTopic(this.configuration.TopicName, this.configuration.EnablePartitioning);
                             failureException = new TopicDeletedException();
                             logger.Info("Topic was deleted. Recreate Complete.");
                         }

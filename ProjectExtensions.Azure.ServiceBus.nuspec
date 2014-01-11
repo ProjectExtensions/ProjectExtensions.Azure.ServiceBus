@@ -3,13 +3,13 @@
   <metadata>
     <id>ProjectExtensions.Azure.ServiceBus</id>
     <title>Windows Azure Service Bus Message Wrapper using the NServiceBus IHandleMessages&lt;T&gt; Pattern</title>
-    <version>0.10.0.1</version>
+    <version>0.10.1.0</version>
     <authors>Extensions.io, Joe Feser</authors>
     <owners>Extensions.io, Joe Feser</owners>
     <copyright>Copyright (C) Extensions.io and Joe Feser 2014</copyright>
     <projectUrl>https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <releaseNotes>Added support for multiple IOC Containers. Projects now require a reference to ProjectExtensions.Azure.ServiceBus.dll and ProjectExtensions.Azure.ServiceBus.Autofac.dll. Please add manually if your project does not upgrade correctly.</releaseNotes>
+    <releaseNotes>Added support for the EnablePartitioning Setting for a Topic.</releaseNotes>
     <description>Windows Azure Service Bus wrapper modeled after the NServiceBus pattern of IHandleMessages&lt;T&gt;</description>
     <summary>Windows Azure Service Bus Wrapper modeled after the NServiceBus pattern of IHandleMessages&lt;T&gt;. Includes Autofac IoC container support. 
     If you use a different IoC container, get ProjectExtensions.Azure.ServiceBus.Core and one of the IoC packages (ProjectExtensions.Azure.ServiceBus.IOC.[container])

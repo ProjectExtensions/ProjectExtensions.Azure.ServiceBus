@@ -128,3 +128,7 @@ You will want to Install the Package ProjectExtensions.Azure.ServiceBus.Core alo
 ###Version 0.10.0
 
 * Updated to use ServiceBus v2.2.2
+
+###Version 0.10.1
+
+* Added EnablePartitioning Support to the Fluent Configuration.
