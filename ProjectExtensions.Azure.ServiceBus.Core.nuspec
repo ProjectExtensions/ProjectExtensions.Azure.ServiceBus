@@ -4,8 +4,8 @@
     <id>ProjectExtensions.Azure.ServiceBus.Core</id>
     <title>Windows Azure Service Bus Message Wrapper using the NServiceBus IHandleMessages&lt;T&gt; Pattern (Core)</title>
     <version>0.10.0.0</version>
-    <authors>Project Extensions, Joe Feser</authors>
-    <owners>Project Extensions, Joe Feser</owners>
+    <authors>Extensions.io, Joe Feser</authors>
+    <owners>Extensions.io, Joe Feser</owners>
     <copyright>Copyright (C) Extensions.io and Joe Feser 2014</copyright>
     <projectUrl>https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>

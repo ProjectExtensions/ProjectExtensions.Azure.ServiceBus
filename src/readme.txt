@@ -120,3 +120,11 @@ You will want to Install the Package ProjectExtensions.Azure.ServiceBus.Core alo
 ###Version 0.9.3
 
 * Added the ability to pass in a Settings Provider instead of reading from the app/web.config file.
+
+###Version 0.9.4
+
+* Updated references and set the Service Bus Requirement to v1.8. This is the last release that supports the v1.0 Service Bus Assembly.
+
+###Version 0.10.0
+
+* Updated to use ServiceBus v2.2.2
