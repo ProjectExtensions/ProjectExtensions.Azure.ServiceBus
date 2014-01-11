@@ -2,11 +2,11 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>ProjectExtensions.Azure.ServiceBus.Core</id>
-    <title>Windows Azure Service Bus Message Wrapper by Project Extensions (Core)</title>
+    <title>Windows Azure Service Bus Message Wrapper using the NServiceBus IHandleMessages&lt;T&gt; Pattern (Core)</title>
     <version>0.10.0.0</version>
     <authors>Project Extensions, Joe Feser</authors>
     <owners>Project Extensions, Joe Feser</owners>
-    <copyright>Copyright (C) Project Extensions and Joe Feser 2013</copyright>
+    <copyright>Copyright (C) Extensions.io and Joe Feser 2014</copyright>
     <projectUrl>https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <releaseNotes>Added support for pausing after an error for a handler. Added ability to auto DeadLetter after MaxRetries.
@@ -16,9 +16,9 @@
     Either create your own implementation of IAzureBusContainer or get one of the IoC packages (ProjectExtensions.Azure.ServiceBus.IOC.[container])
     where container is Autofac, CastleWindsor, Ninject, StructureMap or Unity. (Debug)</summary>
     <dependencies>
-      <dependency id="Newtonsoft.Json" version="4.5.11" />
-      <dependency id="NLog" version="2.0.0.2000" />
-      <dependency id="WindowsAzure.ServiceBus" version="1.5.0.0" />
+      <dependency id="Newtonsoft.Json" version="5.0.8" />
+      <dependency id="NLog" version="2.1.0" />
+      <dependency id="WindowsAzure.ServiceBus" version="2.2.0.0" />
     </dependencies>
     <tags>ServiceBus Microsoft Azure AppFabric Messaging PubSub Publish Subscribe</tags>
   </metadata>

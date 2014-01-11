@@ -34,6 +34,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Info", "Info", "{5C4E4883-ACC5-4425-9BEB-B19FBF93A5F3}"
 	ProjectSection(SolutionItems) = preProject
 		build.proj = build.proj
+		ProjectExtensions.Azure.ServiceBus.Core.nuspec = ProjectExtensions.Azure.ServiceBus.Core.nuspec
 		ProjectExtensions.Azure.ServiceBus.IOC.Autofac.nuspec = ProjectExtensions.Azure.ServiceBus.IOC.Autofac.nuspec
 		ProjectExtensions.Azure.ServiceBus.IOC.CastleWindsor.nuspec = ProjectExtensions.Azure.ServiceBus.IOC.CastleWindsor.nuspec
 		ProjectExtensions.Azure.ServiceBus.IOC.Ninject.nuspec = ProjectExtensions.Azure.ServiceBus.IOC.Ninject.nuspec

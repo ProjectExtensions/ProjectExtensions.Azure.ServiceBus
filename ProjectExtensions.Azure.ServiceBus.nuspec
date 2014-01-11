@@ -6,7 +6,7 @@
     <version>0.10.0.0</version>
     <authors>Extensions.io, Joe Feser</authors>
     <owners>Extensions.io, Joe Feser</owners>
-    <copyright>Copyright (C) Extensions.io and Joe Feser 2013</copyright>
+    <copyright>Copyright (C) Extensions.io and Joe Feser 2014</copyright>
     <projectUrl>https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <releaseNotes>Added support for multiple IOC Containers. Projects now require a reference to ProjectExtensions.Azure.ServiceBus.dll and ProjectExtensions.Azure.ServiceBus.Autofac.dll. Please add manually if your project does not upgrade correctly.</releaseNotes>
