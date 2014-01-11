@@ -6,7 +6,7 @@
     <version>0.10.1.0</version>
     <authors>Extensions.io, Joe Feser</authors>
     <owners>Extensions.io, Joe Feser</owners>
-    <copyright>Copyright (C) Extensions.io and Joe Feser 2014</copyright>
+    <copyright>Copyright (c) Extensions.io and Joe Feser 2014</copyright>
     <projectUrl>https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Ninject support for Windows Azure Service Bus wrapper modeled after the NServiceBus pattern of IHandleMessages&lt;T&gt;</description>

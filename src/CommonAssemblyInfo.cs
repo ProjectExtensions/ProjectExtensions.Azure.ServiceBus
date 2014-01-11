@@ -17,7 +17,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 [assembly: AssemblyVersion("0.10.1.0")]
 [assembly: AssemblyFileVersion("0.10.1.0")]
-[assembly: AssemblyCopyright("Copyright (C) Extensions.io 2014")]
+[assembly: AssemblyCopyright("Copyright (c) Extensions.io 2014")]
 [assembly: AssemblyConfiguration("Debug")]
 [assembly: AssemblyCompany("Extensions.io")]
 [assembly: AssemblyProduct("Windows Azure Service Bus Wrapper modeled after the NServiceBus pattern of IHandl" +
