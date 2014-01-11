@@ -2,11 +2,11 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>ProjectExtensions.Azure.ServiceBus.IOC.Unity</id>
-    <title>Unity Support for Windows Azure Service Bus Message Wrapper by Project Extensions</title>
-    <version>0.9.4.0</version>
+    <title>Unity Support for Windows Azure Service Bus Message Wrapper using the NServiceBus IHandleMessages&lt;T&gt; Pattern</title>
+    <version>0.10.0.0</version>
     <authors>Extensions.io, Joe Feser</authors>
     <owners>Extensions.io, Joe Feser</owners>
-    <copyright>Copyright (C) Project Extensions and Joe Feser 2013</copyright>
+    <copyright>Copyright (C) Extensions.io and Joe Feser 2013</copyright>
     <projectUrl>https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Unity support for Windows Azure Service Bus wrapper modeled after the NServiceBus pattern of IHandleMessages&lt;T&gt;</description>
