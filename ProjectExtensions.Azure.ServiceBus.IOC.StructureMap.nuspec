@@ -3,14 +3,14 @@
   <metadata>
     <id>ProjectExtensions.Azure.ServiceBus.IOC.StructureMap</id>
     <title>StructureMap Support for Windows Azure Service Bus Message Wrapper by Project Extensions</title>
-    <version>0.9.3.0</version>
-    <authors>Project Extensions, Joe Feser</authors>
-    <owners>Project Extensions, Joe Feser</owners>
+    <version>0.9.4.0</version>
+    <authors>Extensions.io, Joe Feser</authors>
+    <owners>Extensions.io, Joe Feser</owners>
     <copyright>Copyright (C) Project Extensions and Joe Feser 2013</copyright>
     <projectUrl>https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>StructureMap support for Windows Azure Service Bus wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;</description>
-    <summary>StructureMap support for Windows Azure Service Bus Wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;. You will
+    <description>StructureMap support for Windows Azure Service Bus wrapper modeled after the NServiceBus pattern of IHandleMessages&lt;T&gt;</description>
+    <summary>StructureMap support for Windows Azure Service Bus Wrapper modeled after the NServiceBus pattern of IHandleMessages&lt;T&gt;. You will
     also need ProjectExtensions.Azure.ServiceBus.Core. (Debug)</summary>
     <dependencies>
       <dependency id="structuremap" version="2.6.4.0" />
