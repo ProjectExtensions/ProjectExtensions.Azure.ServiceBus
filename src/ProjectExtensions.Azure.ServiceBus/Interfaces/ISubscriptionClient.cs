@@ -16,6 +16,8 @@ namespace ProjectExtensions.Azure.ServiceBus.Interfaces {
         IAsyncResult BeginReceive(TimeSpan serverWaitTime, AsyncCallback callback, object state);
         IBrokeredMessage EndReceive(IAsyncResult result);
 
+        void OnMessage(Action<IBrokeredMessage> callback, OnMessageOptions onMessageOptions);
+
         void Close();
 
         ReceiveMode Mode {

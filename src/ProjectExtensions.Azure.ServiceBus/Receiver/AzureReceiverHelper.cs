@@ -55,7 +55,119 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
         }
 
         public void ProcessMessagesForSubscription() {
-            ProcessMessagesForSubscriptionLegacy();
+            //ProcessMessagesForSubscriptionLegacy();
+            ProcessMessagesForSubscriptionAzure();
+        }
+
+        private void ProcessMessagesForSubscriptionAzure() {
+            logger.Info("ProcessMessagesForSubscription Message Start {0} Declared {1} MessageTytpe {2}, IsReusable {3}", data.EndPointData.SubscriptionName,
+                         data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
+
+            var gt = typeof(IReceivedMessage<>).MakeGenericType(data.EndPointData.MessageType);
+            var methodInfo = data.EndPointData.DeclaredType.GetMethod("Handle", new Type[] { gt });
+
+            var waitTimeout = TimeSpan.FromSeconds(30);
+
+            // Declare an action implementing the main processing logic for received messages.
+            Action<AzureReceiveState> processMessage = ((receiveState) => {
+
+                //For this we must catch any exception
+                bool isError = false;
+                try {
+                    ProcessMessageCallBack(receiveState);
+                }
+                catch (Exception ex) {
+                    //TODO log and whatnot.
+                    isError = true;
+                }
+                finally {
+                    try {
+                        // With PeekLock mode, we should mark the failed message as abandoned.
+                        if (receiveState.Message != null) {
+                            if (data.Client.Mode == ReceiveMode.PeekLock) {
+                                if (isError) {
+                                    // Abandons a brokered message. This will cause Service Bus to unlock the message and make it available 
+                                    // to be received again, either by the same consumer or by another completing consumer.
+                                    SafeAbandon(receiveState.Message);
+                                }
+                                else {
+                                    // Mark brokered message as completed at which point it's removed from the queue.
+                                    SafeComplete(receiveState.Message);
+                                }
+                            }
+                            receiveState.Message.Dispose();
+                        }
+                    }
+                    catch {
+                        //Do not fail :)
+                    }
+                }
+            });
+
+            //This should just work
+
+            var options = new OnMessageOptions() {
+                AutoComplete = false,
+                MaxConcurrentCalls = 20 //Make the app webscale
+            };
+            options.ExceptionReceived += options_ExceptionReceived;
+
+            //TODO deal with pause when there is an error!!!
+
+            data.Client.OnMessage((msg) => {
+                //receive loop begin
+                if (msg != null) {
+                    // Make sure we are not told to stop receiving while we were waiting for a new message.
+                    if (!data.CancelToken.IsCancellationRequested) {
+                        // Process the received message.
+                        logger.Debug("ProcessMessagesForSubscription Start received new message: {0}", data.EndPointData.SubscriptionNameDebug);
+                        var receiveState = new AzureReceiveState(data, methodInfo, serializer, msg);
+                        processMessage(receiveState);
+                        logger.Debug("ProcessMessagesForSubscription End received new message: {0}", data.EndPointData.SubscriptionNameDebug);
+                    }
+                }
+
+                if (data.CancelToken.IsCancellationRequested) {
+                    //Cancel the message pump.
+                    data.SetMessageLoopCompleted();
+                    try {
+                        data.Client.Close();
+                    }
+                    catch {
+                    }
+                }
+                //receive loop end
+            }, options);
+        }
+
+        void options_ExceptionReceived(object sender, ExceptionReceivedEventArgs ex) {
+
+            if (!data.CancelToken.IsCancellationRequested && typeof(ThreadAbortException) != ex.GetType()) {
+
+                //The subscription may have been deleted. If it was, then we want to recreate it.
+                var subException = ex.Exception as MessagingEntityNotFoundException;
+
+                if (subException != null && subException.Detail != null && subException.Detail.Message.IndexOf("40400") > -1) {
+                    logger.Info("Subscription was deleted. Attempting to Recreate.");
+                    Configure(endpoint);
+                    logger.Info("Subscription was deleted. Recreated.");
+                }
+                else {
+                    logger.Error(string.Format("ProcessMessagesForSubscription Message Error={0} Declared={1} MessageTytpe={2} IsReusable={3} Error={4}",
+                        data.EndPointData.SubscriptionName,
+                        data.EndPointData.DeclaredType.ToString(),
+                        data.EndPointData.MessageType.ToString(),
+                        data.EndPointData.IsReusable,
+                        ex.ToString()));
+                }
+            }
+            else {
+                //data.SetMessageLoopCompleted();
+            }
+
+            //TODO do something with the error we just received.
+            logger.Error("Message Pump Error: Start {0} Declared {1} MessageTytpe {2}, Error {3}", data.EndPointData.SubscriptionName,
+                         data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), ex.Exception.ToString());
         }
 
         private void ProcessMessagesForSubscriptionLegacy() {

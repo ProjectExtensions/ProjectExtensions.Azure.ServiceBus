@@ -20,6 +20,8 @@ namespace PubSubUsingConfiguration {
             BusConfiguration.WithSettings()
                 .UseAutofacContainer()
                 .ReadFromConfigurationSettings(setup)
+                .EnablePartitioning(true)
+                .DefaultSerializer(new GZipXmlSerializer())
                 .Configure();
 
             /*

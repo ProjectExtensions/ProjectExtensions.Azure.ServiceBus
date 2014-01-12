@@ -44,8 +44,15 @@ namespace ProjectExtensions.Azure.ServiceBus.Wrappers {
             return null;
         }
 
+        public void OnMessage(Action<IBrokeredMessage> callback, OnMessageOptions onMessageOptions) {
+            client.OnMessage((msg) => {
+                callback(new BrokeredMessageWrapper(msg));
+            }, onMessageOptions);
+        }
+
         public void Close() {
             client.Close();
         }
+
     }
 }

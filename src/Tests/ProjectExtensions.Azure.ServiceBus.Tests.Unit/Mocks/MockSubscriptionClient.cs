@@ -40,6 +40,10 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
             return serviceBus.EndReceive(result);
         }
 
+        public void OnMessage(Action<IBrokeredMessage> callback, OnMessageOptions onMessageOptions) {
+            throw new NotImplementedException();
+        }
+
         public void Close() {
 
         }

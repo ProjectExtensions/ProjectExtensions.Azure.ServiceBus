@@ -70,7 +70,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
             if (createNew) {
                 try {
                     logger.Info("EnsureTopic CreateTopic {0} ", topicName);
-                    var newTopic = new TopicDescription(topicName);
+                    var newTopic = new TopicDescription(topicName) { EnablePartitioning = enablePartitioning };
 
                     defaultTopic = retryPolicy.ExecuteAction<TopicDescription>(() => {
                         return configurationFactory.NamespaceManager.CreateTopic(newTopic);
