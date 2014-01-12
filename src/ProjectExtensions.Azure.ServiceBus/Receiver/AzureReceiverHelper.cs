@@ -77,7 +77,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                 ProcessMessageCallBack(receiveState);
             }
             catch (Exception ex) {
-                //TODO log and whatnot.
+                logger.Error("OnReceiveProcess: Error while calling The registerd callback: {0}", ex);
                 retVal = true;
             }
             finally {

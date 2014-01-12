@@ -81,16 +81,21 @@ We do not support Releasing of Transient objects from your container. This may c
 
 Set this property using this custom attribute on your message handler.
 
+For a complete set of options, please see the github page.
+
 [MessageHandlerConfiguration(
-    Singleton = true)] //If it is a singleton, the instance will be created once, otherwise it will be created for each message received. Recommended to set to true.
-
-
+    LockDuration = 120, //Gets or sets the lock duration time span for the subscription. (in seconds)
+    MaxConcurrentCalls = 4, //Gets or sets the maximum number of concurrent calls to the callback the message pump should initiate.
+    MaxRetries = 2, //Gets or sets the number of maximum calls to your handler.
+    PrefetchCount = 20, //Gets or sets the number of messages that the message receiver can simultaneously request.
+    ReceiveMode = ReceiveMode.PeekLock, //This mode receives the message but keeps it peek-locked until the receiver abandons the message.
+    Singleton=true)] //If it is a singleton, the instance will be created once, otherwise it will be created for each message received. Recommended to set to true.
 
 **New Features**
 
 We now have support for addtional containers. If you wish to use AutoFac, Castle Windsor, NInject, StructureMap or Unity, 
 You will want to Install the Package ProjectExtensions.Azure.ServiceBus.Core along with the correct container.
-
+Added MaxConcurrentCalls Support. This will spin up multiple instances of your receiver, increasing performance.
 
 
 **Release Notes**
@@ -132,3 +137,7 @@ You will want to Install the Package ProjectExtensions.Azure.ServiceBus.Core alo
 ###Version 0.10.1
 
 * Added EnablePartitioning Support to the Fluent Configuration.
+
+###Version 0.10.2
+
+* Added MaxConcurrentCalls Support. This will spin up multiple instances of your receiver, increasing performance.

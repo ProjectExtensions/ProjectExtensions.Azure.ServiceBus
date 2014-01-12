@@ -3,13 +3,13 @@
   <metadata>
     <id>ProjectExtensions.Azure.ServiceBus.Core</id>
     <title>Windows Azure Service Bus Message Wrapper using the NServiceBus IHandleMessages&lt;T&gt; Pattern (Core)</title>
-    <version>0.10.1.0</version>
+    <version>0.10.2.0</version>
     <authors>Extensions.io, Joe Feser</authors>
     <owners>Extensions.io, Joe Feser</owners>
     <copyright>Copyright (c) Extensions.io and Joe Feser 2014</copyright>
     <projectUrl>https://github.com/ProjectExtensions/ProjectExtensions.Azure.ServiceBus</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <releaseNotes>Added support for the EnablePartitioning Setting for a Topic.</releaseNotes>
+    <releaseNotes>Added support for the EnablePartitioning Setting for a Topic. Added MaxConcurrentCalls Support. This will spin up multiple instances of your receiver, increasing performance.</releaseNotes>
     <description>Windows Azure Service Bus wrapper modeled after the NServiceBus pattern of IHandleMessage&lt;T&gt;. (Core)</description>
     <summary>Windows Azure Service Bus Wrapper modeled after the NServiceBus pattern of IHandleMessages&lt;T&gt;. Does not include IoC container support implementation. 
     Either create your own implementation of IAzureBusContainer or get one of the IoC packages (ProjectExtensions.Azure.ServiceBus.IOC.[container])

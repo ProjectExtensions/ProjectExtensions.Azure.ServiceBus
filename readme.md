@@ -258,3 +258,7 @@ Click on the "Zip" Icon at the top of the page to download the latest source cod
 ###Version 0.10.1 ###
 
 * Added EnablePartitioning Support to the Fluent Configuration.
+
+###Version 0.10.2 ###
+
+* Added MaxConcurrentCalls Support. This will spin up multiple instances of your receiver, increasing performance.

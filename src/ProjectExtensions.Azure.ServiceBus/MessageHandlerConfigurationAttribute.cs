@@ -22,7 +22,6 @@ namespace ProjectExtensions.Azure.ServiceBus {
         bool lockDurationSet;
 
         int maxConcurrentCalls;
-        bool maxConcurrentCallsSet;
 
         int maxDeliveryCount;
         bool maxDeliveryCountSet;
@@ -98,7 +97,6 @@ namespace ProjectExtensions.Azure.ServiceBus {
             set {
                 Guard.ArgumentNotZeroOrNegativeValue(value, "value");
                 maxConcurrentCalls = value;
-                maxConcurrentCallsSet = true;
             }
         }
 
