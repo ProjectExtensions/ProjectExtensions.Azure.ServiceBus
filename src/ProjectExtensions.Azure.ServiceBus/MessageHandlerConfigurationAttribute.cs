@@ -21,6 +21,9 @@ namespace ProjectExtensions.Azure.ServiceBus {
         int lockDuration;
         bool lockDurationSet;
 
+        int maxConcurrentCalls;
+        bool maxConcurrentCallsSet;
+
         int maxDeliveryCount;
         bool maxDeliveryCountSet;
 
@@ -82,6 +85,20 @@ namespace ProjectExtensions.Azure.ServiceBus {
             set {
                 lockDuration = value;
                 lockDurationSet = true;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the maximum number of concurrent calls to the callback the message pump should initiate.
+        /// </summary>
+        public int MaxConcurrentCalls {
+            get {
+                return maxDeliveryCount;
+            }
+            set {
+                Guard.ArgumentNotZeroOrNegativeValue(value, "value");
+                maxConcurrentCalls = value;
+                maxConcurrentCallsSet = true;
             }
         }
 
@@ -178,6 +195,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
             retVal.Append(" EnableBatchedOperations: ").Append(this.EnableBatchedOperations);
             retVal.Append(" EnableDeadLetteringOnMessageExpiration: ").Append(this.EnableDeadLetteringOnMessageExpiration);
             retVal.Append(" LockDuration: ").Append(this.LockDuration);
+            retVal.Append(" MaxConcurrentCalls: ").Append(this.MaxConcurrentCalls);
             retVal.Append(" MaxDeliveryCount: ").Append(this.MaxRetries);
             retVal.Append(" PrefetchCount: ").Append(this.PrefetchCount);
             retVal.Append(" ReceiveMode: ").Append(this.ReceiveMode);
@@ -187,7 +205,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         //todo look at RequiresSession and if we can support a session client in the future.
 
         //todo look at TopicPath for the future as an override for the subscription.
-        
+
         //TODO determine if we need a flag to blow away the subscription since we can't set the values otherwise.
     }
 }

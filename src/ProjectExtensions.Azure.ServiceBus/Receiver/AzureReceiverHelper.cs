@@ -63,7 +63,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
 
             options = new OnMessageOptions() {
                 AutoComplete = false,
-                MaxConcurrentCalls = 8 //Make the app webscale
+                MaxConcurrentCalls = Math.Max(1, data.EndPointData.AttributeData.MaxConcurrentCalls) //Make the app webscale
             };
             options.ExceptionReceived += options_ExceptionReceived;
 
