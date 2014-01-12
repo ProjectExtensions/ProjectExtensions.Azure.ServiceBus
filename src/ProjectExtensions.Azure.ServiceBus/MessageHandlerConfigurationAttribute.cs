@@ -93,7 +93,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// </summary>
         public int MaxConcurrentCalls {
             get {
-                return maxDeliveryCount;
+                return maxConcurrentCalls;
             }
             set {
                 Guard.ArgumentNotZeroOrNegativeValue(value, "value");
