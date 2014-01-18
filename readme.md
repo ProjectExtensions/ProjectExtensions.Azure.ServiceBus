@@ -64,6 +64,7 @@ Please see [this](https://github.com/ProjectExtensions/ProjectExtensions.Azure.S
 [MessageHandlerConfiguration(
     DefaultMessageTimeToLive = 240, //Time in minutes before your message is deleted from the subscription if you don't receive it.
     LockDuration = 120, //Time that you wish to lock the message before it is marked to be received by another subscriber.
+    MaxConcurrentCalls = 4, //Tells the library to spin up as many as 4 instances of your receiver at a time.
     MaxRetries = 2, //Number of times to retry calling your handler before the message is deleted or placed in the DeadLetterAfterMaxRetries if configured.
     PrefetchCount = 10, //Number of messages to pre-fetch. Used for high throughput 
     ReceiveMode = ReceiveMode.PeekLock, //PeekLock or Receive and Delete
