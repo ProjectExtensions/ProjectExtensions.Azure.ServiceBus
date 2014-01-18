@@ -17,6 +17,12 @@ namespace ProjectExtensions.Azure.ServiceBus.Wrappers {
             this.client = client;
         }
 
+        public bool IsClosed {
+            get {
+                return client.IsClosed;
+            }
+        }
+
         public ReceiveMode Mode {
             get {
                 return client.Mode;

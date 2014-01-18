@@ -27,6 +27,11 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
             this.receiveMode = receiveMode;
         }
 
+        public bool IsClosed {
+            get;
+            set;
+        }
+
         public int PrefetchCount {
             get;
             set;

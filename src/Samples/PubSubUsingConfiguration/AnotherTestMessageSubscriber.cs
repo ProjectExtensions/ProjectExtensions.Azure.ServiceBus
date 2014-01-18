@@ -15,6 +15,7 @@ namespace PubSubUsingConfiguration {
         MaxConcurrentCalls = 4,
         MaxRetries = 2, 
         PrefetchCount = 20, 
+        PauseTimeIfErrorWasThrown = 20000,
         ReceiveMode = ReceiveMode.PeekLock, 
         Singleton=true)]
     public class AnotherTestMessageSubscriber : IHandleCompetingMessages<AnotherTestMessage> {
@@ -32,6 +33,7 @@ namespace PubSubUsingConfiguration {
             }
 
             logger.Info("AnotherTestMessageSubscriber Message received: {0} {1} {2}", message.Message.Value, message.Message.MessageId, sw.ElapsedMilliseconds);
+            throw new Exception("Bad Day");
         }
     }
 }

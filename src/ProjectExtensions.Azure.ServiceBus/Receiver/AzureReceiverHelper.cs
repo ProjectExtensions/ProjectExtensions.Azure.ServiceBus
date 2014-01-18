@@ -19,14 +19,16 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
 
         static Logger logger = LogManager.GetCurrentClassLogger();
 
+        readonly object lockObject = new object();
         readonly TopicDescription topic;
         readonly IServiceBusConfigurationFactory configurationFactory;
         readonly IBusConfiguration config;
         readonly RetryPolicy retryPolicy;
         readonly RetryPolicy verifyRetryPolicy;
+        readonly IServiceBusSerializer serializer;
         AzureBusReceiverState data;
         ServiceBusEnpointData endpoint;
-        readonly IServiceBusSerializer serializer;
+        DateTime lastResetTime = DateTime.MinValue;
         MethodInfo methodInfo;
         OnMessageOptions options;
 
@@ -123,29 +125,43 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                 //Cancel the message pump.
                 data.SetMessageLoopCompleted();
                 try {
-                    data.Client.Close();
+                    if (!data.Client.IsClosed) {
+                        data.Client.Close();
+                    }
                 }
                 catch {
                 }
             }
             else if (failed) {
-                //close the pump.
-                data.Client.Close();
                 if (data.EndPointData.AttributeData.PauseTimeIfErrorWasThrown > 0) {
-                    Thread.Sleep(data.EndPointData.AttributeData.PauseTimeIfErrorWasThrown);
+                    lock (lockObject) {
+                        if (DateTime.Now.AddMilliseconds(-data.EndPointData.AttributeData.PauseTimeIfErrorWasThrown) >= lastResetTime) {
+                            retryPolicy.ExecuteAction(() => {
+                                if (!data.Client.IsClosed) {
+                                    data.Client.Close();
+                                }
+                            });
+                            Thread.Sleep(data.EndPointData.AttributeData.PauseTimeIfErrorWasThrown);
+                            lastResetTime = DateTime.Now;
+                            retryPolicy.ExecuteAction(() => {
+                                Configure(endpoint);
+                                data.Client.OnMessage(OnMessageHandler, options);
+                            });
+                        }
+                    }
                 }
                 else {
-                    Thread.Sleep(1000);
+                    Thread.Sleep(1000); //This has zero impact if the thread count is > 1
                 }
-                data.Client.OnMessage(OnMessageHandler, options);
             }
         }
 
         private void ProcessMessagesForSubscriptionAzure() {
             logger.Info("ProcessMessagesForSubscription Message Start {0} Declared {1} MessageTytpe {2}, IsReusable {3}", data.EndPointData.SubscriptionName,
                          data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
-
-            data.Client.OnMessage(OnMessageHandler, options);
+            retryPolicy.ExecuteAction(() => {
+                data.Client.OnMessage(OnMessageHandler, options);
+            });
         }
 
         void options_ExceptionReceived(object sender, ExceptionReceivedEventArgs ex) {
@@ -158,7 +174,9 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
                 if (subException != null && subException.Detail != null && subException.Detail.Message.IndexOf("40400") > -1) {
                     logger.Info("Subscription was deleted. Attempting to Recreate.");
                     Configure(endpoint);
-                    data.Client.OnMessage(OnMessageHandler, options);
+                    retryPolicy.ExecuteAction(() => {
+                        data.Client.OnMessage(OnMessageHandler, options);
+                    });
                     logger.Info("Subscription was deleted. Recreated.");
                 }
                 else {
@@ -428,14 +446,16 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
             }
             else {
                 //we need to clean up the deleted subscription
-                var oldClient = this.data.Client;
+                var oldClient = data.Client;
 
                 data.Client = subscriptionClient;
 
                 //now lets dispose the client.
                 ExtensionMethods.ExecuteAndReturn(() => {
                     if (oldClient != null) {
-                        oldClient.Close();
+                        if (!oldClient.IsClosed) {
+                            oldClient.Close();
+                        }
                     }
                 });
             }

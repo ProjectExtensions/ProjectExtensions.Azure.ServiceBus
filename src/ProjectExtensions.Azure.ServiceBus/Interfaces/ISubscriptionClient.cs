@@ -18,6 +18,8 @@ namespace ProjectExtensions.Azure.ServiceBus.Interfaces {
 
         void OnMessage(Action<IBrokeredMessage> callback, OnMessageOptions onMessageOptions);
 
+        bool IsClosed { get; }
+
         void Close();
 
         ReceiveMode Mode {
