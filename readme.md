@@ -267,3 +267,7 @@ Click on the "Zip" Icon at the top of the page to download the latest source cod
 ###Version 0.10.3 ###
 
 * Fixed a bug on how we reset the connection when a bad error happens. We now correctly pause when PauseTimeIfErrorWasThrown is set
+
+###Version 0.10.4 ###
+
+* Added the ability to return the number of messages for a Topic (subscription) by passing in the type of the receiver

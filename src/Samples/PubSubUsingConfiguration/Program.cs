@@ -75,6 +75,10 @@ namespace PubSubUsingConfiguration {
                 }, null); //Optional Dictionary of name value pairs to pass with the massage. Can be used for filtering
             }
 
+            //Determine how many message this message type has
+
+            var messageCount = BusConfiguration.Instance.Bus.MessageCountForType(typeof(AnotherTestMessageSubscriber));
+
             Console.WriteLine("You must wait for the messages to be processed");
 
             Console.WriteLine("Press any key to continue");

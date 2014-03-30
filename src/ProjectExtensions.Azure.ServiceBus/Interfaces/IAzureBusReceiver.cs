@@ -6,6 +6,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Interfaces {
         void CancelSubscription(ServiceBusEnpointData value);
         void CreateSubscription(ServiceBusEnpointData value);
         void Dispose(bool disposing);
+        long MessageCountForType(Type type);
     }
 
 }

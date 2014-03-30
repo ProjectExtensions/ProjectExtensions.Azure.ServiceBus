@@ -18,6 +18,13 @@ namespace ProjectExtensions.Azure.ServiceBus {
         void Initialize();
 
         /// <summary>
+        /// Get the Number of messages for the topic for a given type
+        /// </summary>
+        /// <param name="type">The end point message</param>
+        /// <returns></returns>
+        long MessageCountForType(Type type);
+
+        /// <summary>
         /// Auto discover all of the Subscribers in the assembly.
         /// </summary>
         /// <param name="assembly">The assembly to register</param>

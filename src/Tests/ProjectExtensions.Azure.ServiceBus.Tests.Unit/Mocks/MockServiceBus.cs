@@ -342,5 +342,10 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
                 Messages.Remove(message);
             }
         }
+
+
+        public long MessageCountForType(Type type) {
+            throw new NotImplementedException();
+        }
     }
 }

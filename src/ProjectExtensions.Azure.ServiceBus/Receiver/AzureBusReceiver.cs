@@ -126,6 +126,18 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
             }
         }
 
+        public long MessageCountForType(Type type) {
+            var found = mappings.FirstOrDefault(item => item.Data.EndPointData.DeclaredType == type);
+            if (found != null) {
+                var retVal = retryPolicy.ExecuteAction(() => {
+                    var desc = configurationFactory.NamespaceManager.GetSubscription(defaultTopic.Path, found.Data.EndPointData.SubscriptionName);
+                    return desc.MessageCount;
+                });
+                return retVal;
+            }
+            return 0;
+        }
+
         /// <summary>
         /// Dispose
         /// </summary>
@@ -145,5 +157,6 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
             }
             mappings.Clear();
         }
+
     }
 }

@@ -44,6 +44,15 @@ namespace ProjectExtensions.Azure.ServiceBus {
         }
 
         /// <summary>
+        /// Get the Number of messages for the topic for a given type
+        /// </summary>
+        /// <param name="type">The end point message</param>
+        /// <returns></returns>
+        public long MessageCountForType(Type type) {
+            return receiver.MessageCountForType(type);
+        }
+
+        /// <summary>
         /// Auto discover all of the Subscribers in the assembly.
         /// </summary>
         /// <param name="assembly">The assembly to register</param>
