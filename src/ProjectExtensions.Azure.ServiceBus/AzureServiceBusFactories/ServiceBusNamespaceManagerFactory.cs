@@ -6,15 +6,25 @@ using ProjectExtensions.Azure.ServiceBus.Interfaces;
 using Microsoft.ServiceBus.Messaging;
 using Microsoft.ServiceBus;
 using Microsoft.Practices.TransientFaultHandling;
+using NLog;
 
 namespace ProjectExtensions.Azure.ServiceBus.AzureServiceBusFactories {
 
     class ServiceBusNamespaceManagerFactory : INamespaceManager {
 
+        static Logger logger = LogManager.GetCurrentClassLogger();
+
         NamespaceManager namespaceManager;
 
         public ServiceBusNamespaceManagerFactory(IServiceBusTokenProvider tokenProvider) {
             Guard.ArgumentNotNull(tokenProvider, "tokenProvider");
+            try {
+                namespaceManager = NamespaceManager.Create();
+                return;
+            }
+            catch (Exception ex) {
+                logger.Warn("Attempted to parse app.config setting Microsoft.ServiceBus.ConnectionString and it failed. Falling Back to default app settings:" + ex.Message);
+            }
             namespaceManager = new NamespaceManager(tokenProvider.ServiceUri, tokenProvider.TokenProvider);
         }
 
