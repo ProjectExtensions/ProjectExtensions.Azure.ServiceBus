@@ -3,7 +3,7 @@
   <metadata>
     <id>ProjectExtensions.Azure.ServiceBus.IOC.Ninject</id>
     <title>Ninject Support for Windows Azure Service Bus Message Wrapper using the NServiceBus IHandleMessages&lt;T&gt; Pattern</title>
-    <version>0.10.5.0</version>
+    <version>0.10.6.0</version>
     <authors>Extensions.io, Joe Feser</authors>
     <owners>Extensions.io, Joe Feser</owners>
     <copyright>Copyright (c) Extensions.io and Joe Feser 2014</copyright>

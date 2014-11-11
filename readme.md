@@ -274,10 +274,10 @@ Click on the "Zip" Icon at the top of the page to download the latest source cod
 
 * Added the ability to return the number of messages for a Topic (subscription) by passing in the type of the receiver
 
-###Version 0.10.5.0 ###
+###Version 0.10.5 ###
 
 * Moved to SAS Authentication. Removed CAS Authentication.
 
-###Version 0.10.5.1 ###
+###Version 0.10.6 ###
 
 * Fixed bug that forced the user to use the Microsoft.ServiceBus.ConnectionString app key. This key is now ignored. We may add the ability in the future to parse this string. 

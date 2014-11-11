@@ -1,6 +1,6 @@
 Thanks for downloading this Windows Azure Service Bus Message Wrapper Project.
 
-**Breaking change if you are upgrading from a version < 1.5.0 **
+**Breaking change if you are upgrading from a version < 0.10.5 **
 
 We no longer support CAS Security. You must use an SAS Key.
 
@@ -159,10 +159,10 @@ Added MaxConcurrentCalls Support. This will spin up multiple instances of your r
 
 * Added the ability to return the number of messages for a Topic (subscription) by passing in the type of the receiver
 
-###Version 0.10.5.0 ###
+###Version 0.10.5 ###
 
 * Moved to SAS Authentication. Removed CAS Authentication.
 
-###Version 0.10.5.1 ###
+###Version 0.10.6 ###
 
 * Fixed bug that forced the user to use the Microsoft.ServiceBus.ConnectionString app key. This key is now ignored. We may add the ability in the future to parse this string. 
