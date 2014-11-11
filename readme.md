@@ -104,7 +104,8 @@ And configuration:
 <add key="ServiceBusIssuerKey" value="base64hash" />
 <add key="ServiceBusIssuerName" value="owner" />
 <!--https://addresshere.servicebus.windows.net/-->
-<add key="ServiceBusNamespace" value="namespace set up in service bus (addresshere) portion" />
+<add key="ServiceBusNamespace" value="namespace set up in service bus [your namespace] portion" />
+<add key="ServiceBusTopic" value="topicname" />
 ```
 
 Otherwise, you can configure everything in code:
@@ -113,9 +114,9 @@ Otherwise, you can configure everything in code:
 ProjectExtensions.Azure.ServiceBus.BusConfiguration.WithSettings()
     .UseAutofacContainer()
     .ServiceBusApplicationId("AppName")
-    .ServiceBusIssuerKey("[sb password]")
-    .ServiceBusIssuerName("owner")
-    .ServiceBusNamespace("[addresshere]")
+    .ServiceBusIssuerKey("[SharedAccessKey]")
+    .ServiceBusIssuerName("[SharedAccessKeyName]")
+    .ServiceBusNamespace("[your namespace]")
     .RegisterAssembly(typeof(TestMessageSubscriber).Assembly)
     .Configure();
 ```
@@ -184,9 +185,9 @@ Otherwise, you can configure everything in code:
 ProjectExtensions.Azure.ServiceBus.BusConfiguration.WithSettings()
     .UseCastleWindsorContainer()
     .ServiceBusApplicationId("AppName")
-    .ServiceBusIssuerKey("[sb password]")
-    .ServiceBusIssuerName("owner")
-    .ServiceBusNamespace("[addresshere]")
+    .ServiceBusIssuerKey("[SharedAccessKey]")
+    .ServiceBusIssuerName("[SharedAccessKeyName]")
+    .ServiceBusNamespace("[your namespace]")
     .EnablePartitioning(true)
     .RegisterAssembly(typeof(TestMessageSubscriber).Assembly)
     .Configure();
@@ -203,7 +204,8 @@ var setup = new ServiceBusSetupConfiguration() {
     ServiceBusIssuerKey = ConfigurationManager.AppSettings["ServiceBusIssuerKey"],
     ServiceBusIssuerName = ConfigurationManager.AppSettings["ServiceBusIssuerName"],
     ServiceBusNamespace = ConfigurationManager.AppSettings["ServiceBusNamespace"],
-    ServiceBusApplicationId = "AppName"
+    ServiceBusApplicationId = "AppName",
+    TopicName = ConfigurationManager.AppSettings["ServiceBusTopic"]
 };
 
 setup.AssembliesToRegister.Add(typeof(TestMessageSubscriber).Assembly);
@@ -271,3 +273,11 @@ Click on the "Zip" Icon at the top of the page to download the latest source cod
 ###Version 0.10.4 ###
 
 * Added the ability to return the number of messages for a Topic (subscription) by passing in the type of the receiver
+
+###Version 0.10.5.0 ###
+
+* Moved to SAS Authentication. Removed CAS Authentication.
+
+###Version 0.10.5.1 ###
+
+* Fixed bug that forced the user to use the Microsoft.ServiceBus.ConnectionString app key. This key is now ignored. We may add the ability in the future to parse this string. 

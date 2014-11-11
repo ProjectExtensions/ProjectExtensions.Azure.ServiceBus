@@ -106,7 +106,11 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 throw new ArgumentNullException("ServiceBusNamespace", "The ServiceBusNamespace must be set.");
             }
             configuration.ServiceBusNamespace = setting;
-
+            
+            setting = ConfigurationManager.AppSettings["ServiceBusTopic"];
+            if (!string.IsNullOrWhiteSpace(setting)) {
+                configuration.TopicName = setting;
+            }
             return this;
         }
 

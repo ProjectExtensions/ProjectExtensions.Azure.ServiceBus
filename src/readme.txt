@@ -1,6 +1,14 @@
 Thanks for downloading this Windows Azure Service Bus Message Wrapper Project.
 
+**Breaking change if you are upgrading from a version < 1.5.0 **
 
+We no longer support CAS Security. You must use an SAS Key.
+
+If you go to the portal and grab the connection string, it will be in this format
+
+Endpoint=sb://[your namespace].servicebus.windows.net;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=[your secret]
+
+Take the values from [your namespace], SharedAccessKeyName, and SharedAccessKey and set them in the config file or code as shown below.
 
 **Breaking change if you are upgrading from a version < 0.9.0 **
 
@@ -49,9 +57,9 @@ BusConfiguration.WithSettings()
     .ReadFromConfigFile()
     .ServiceBusApplicationId("AppName") //Multiple applications can be used in the same service bus namespace. It is converted to lower case.
     .DefaultSerializer(new GZipXmlSerializer())
-    //.ServiceBusIssuerKey("[sb password]")
-    //.ServiceBusIssuerName("owner")
-    //.ServiceBusNamespace("[addresshere]")
+    //.ServiceBusIssuerKey("[SharedAccessKey]")
+    //.ServiceBusIssuerName("[SharedAccessKeyName]")
+    //.ServiceBusNamespace("[your namespace]")
     .RegisterAssembly(typeof(TestMessageSubscriber).Assembly)
     .Configure();
 
@@ -64,7 +72,8 @@ var setup = new ServiceBusSetupConfiguration() {
     ServiceBusIssuerKey = ConfigurationManager.AppSettings["ServiceBusIssuerKey"],
     ServiceBusIssuerName = ConfigurationManager.AppSettings["ServiceBusIssuerName"],
     ServiceBusNamespace = ConfigurationManager.AppSettings["ServiceBusNamespace"],
-    ServiceBusApplicationId = "AppName"
+    ServiceBusApplicationId = "AppName",
+    TopicName = ConfigurationManager.AppSettings["ServiceBusTopic"]
 };
 
 setup.AssembliesToRegister.Add(typeof(TestMessageSubscriber).Assembly);
@@ -149,3 +158,11 @@ Added MaxConcurrentCalls Support. This will spin up multiple instances of your r
 ###Version 0.10.4 ###
 
 * Added the ability to return the number of messages for a Topic (subscription) by passing in the type of the receiver
+
+###Version 0.10.5.0 ###
+
+* Moved to SAS Authentication. Removed CAS Authentication.
+
+###Version 0.10.5.1 ###
+
+* Fixed bug that forced the user to use the Microsoft.ServiceBus.ConnectionString app key. This key is now ignored. We may add the ability in the future to parse this string. 
