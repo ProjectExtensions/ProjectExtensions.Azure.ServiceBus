@@ -19,13 +19,6 @@ namespace ProjectExtensions.Azure.ServiceBus.AzureServiceBusFactories {
 
         public ServiceBusMessagingFactoryFactory(IServiceBusTokenProvider tokenProvider) {
             Guard.ArgumentNotNull(tokenProvider, "tokenProvider");
-            try {
-                messagingFactory = MessagingFactory.Create();
-                return;
-            }
-            catch (Exception ex) {
-                logger.Warn("Attempted to parse app.config setting Microsoft.ServiceBus.ConnectionString and it failed. Falling Back to default app settings:" + ex.Message);
-            }
             messagingFactory = MessagingFactory.Create(tokenProvider.ServiceUri, tokenProvider.TokenProvider);
         }
 

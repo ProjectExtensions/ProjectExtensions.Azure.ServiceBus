@@ -18,13 +18,6 @@ namespace ProjectExtensions.Azure.ServiceBus.AzureServiceBusFactories {
 
         public ServiceBusNamespaceManagerFactory(IServiceBusTokenProvider tokenProvider) {
             Guard.ArgumentNotNull(tokenProvider, "tokenProvider");
-            try {
-                namespaceManager = NamespaceManager.Create();
-                return;
-            }
-            catch (Exception ex) {
-                logger.Warn("Attempted to parse app.config setting Microsoft.ServiceBus.ConnectionString and it failed. Falling Back to default app settings:" + ex.Message);
-            }
             namespaceManager = new NamespaceManager(tokenProvider.ServiceUri, tokenProvider.TokenProvider);
         }
 

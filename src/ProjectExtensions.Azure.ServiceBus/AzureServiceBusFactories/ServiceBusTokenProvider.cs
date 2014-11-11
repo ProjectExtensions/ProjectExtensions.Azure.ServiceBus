@@ -28,7 +28,7 @@ namespace ProjectExtensions.Azure.ServiceBus.AzureServiceBusFactories {
         public TokenProvider TokenProvider {
             get {
                 if (tokenProvider == null) {
-                    tokenProvider = TokenProvider.CreateSharedSecretTokenProvider(configuration.ServiceBusIssuerName, configuration.ServiceBusIssuerKey);
+                    tokenProvider = TokenProvider.CreateSharedAccessSignatureTokenProvider(configuration.ServiceBusIssuerName, configuration.ServiceBusIssuerKey);
                 }
                 return tokenProvider;
             }
