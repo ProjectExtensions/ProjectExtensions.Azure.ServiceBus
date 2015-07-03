@@ -39,7 +39,7 @@
   <PropertyGroup>
     <ZipQualifier>_$(AppVersion).$(BuildNumber)_$(Configuration).zip</ZipQualifier>
   </PropertyGroup>
- 
+
   <ItemGroup>
     <ProjectToBuild Include="$(MSBuildProjectDirectory)\$(ProductName).sln"></ProjectToBuild>
   </ItemGroup>
@@ -50,7 +50,7 @@
   <Target Name="Dist" DependsOnTargets="Clean;InstallPackages;Version;Build;Test;Document;Publish"/>
   <Target Name="TeamCityBuild" DependsOnTargets="Clean;InstallPackages;Version;Build;Test"/>
   <Target Name="TeamCityPublish" DependsOnTargets="Document;Publish"/>
-  
+
   <Target Name="Clean">
     <Message Importance="high" Text="Clean"/>
     <Message Importance="high" Text="======================================================="/>
@@ -83,10 +83,10 @@
     <ItemGroup>
       <ProjectWithPackages Include="%(Values.path)"/>
     </ItemGroup>
-    <Exec WorkingDirectory="$(PackageDir)" 
-          Command="$(NuGet) install %(ProjectWithPackages.Identity) -s https://go.microsoft.com/fwlink/?LinkID=206669 -o $(MSBuildProjectDirectory)\packages"/>
+    <Exec WorkingDirectory="$(PackageDir)"
+          Command="$(NuGet) install %(ProjectWithPackages.Identity) -source https://go.microsoft.com/fwlink/?LinkID=206669 -o $(MSBuildProjectDirectory)\packages"/>
   </Target>
-  
+
   <Target Name="Version">
     <Message Importance="high" Text="Version"/>
     <Time>
@@ -146,7 +146,7 @@
       <TestProjectDir>$(MSBuildProjectDirectory)\src\Tests\%(MSpecTestItem.Identity)</TestProjectDir>
       <TestDir>$(TestProjectDir)\bin\$(Configuration)</TestDir>
     </PropertyGroup>
-    
+
     <Message Importance="high" Text="Testing: $(TestDir)\%(MSpecTestItem.Identity)"/>
 
     <XmlRead XPath="//package[@id='Machine.Specifications']/@version"
@@ -165,7 +165,7 @@
       <MSpecConfigFiles Include="$(ToolsDir)\MSBuild\BuildSupport\MSpecConfig\*.*"/>
     </ItemGroup>
     <Copy SourceFiles="@(MSpecConfigFiles)" DestinationFolder="$(PackageDir)\Machine.Specifications.$(MSpecVersion)\tools"/>
-    
+
     <Exec WorkingDirectory="$(TestDir)"
           Command="$(MsBuildProjectDirectory)\mspec --html $(TestOutputDir)\%(MSpecTestItem.Identity).results.htm %(MSpecTestItem.Identity).dll" Condition="!$(InTeamCity)"/>
   </Target>
@@ -175,9 +175,9 @@
       <TestProjectDir>$(MSBuildProjectDirectory)\src\Tests\%(NUnitTestItem.Identity)</TestProjectDir>
       <TestDir>$(TestProjectDir)\bin\$(Configuration)</TestDir>
     </PropertyGroup>
-    
+
     <Message Importance="high" Text="Testing in NUnit: $(TestDir)\%(NUnitTestItem.Identity)"/>
-    
+
     <XmlRead XPath="//package[@id='NUnit']/@version"
              XmlFileName="$(TestProjectDir)\packages.config">
       <Output TaskParameter="Value" PropertyName="NUnitVersion"/>
@@ -219,7 +219,7 @@
 
   <Target Name="Publish">
     <Message Importance="high" Text="Publish"/>
-    
+
     <CallTarget Targets="PublishBin"/>
     <CallTarget Targets="PublishSource"/>
     <CallTarget Targets="PublishHelp"/>
@@ -234,7 +234,7 @@
     <CreateItem Include="$(BinInclude)" Exclude="$(BinExclude)">
       <Output TaskParameter="Include" ItemName="BinFiles"/>
     </CreateItem>
-    
+
     <Copy SourceFiles="@(BinFiles)" DestinationFolder="$(BinDir)"/>
 
     <ItemGroup>
@@ -293,5 +293,5 @@
     <Exec WorkingDirectory="$(NuGetPackageDir)" Command="$(NuGet) push %(NugetItem.NugetPackageId).$(AppVersion).$(BuildNumber).symbols.nupkg -source http://nuget.gw.symbolsource.org/Public/NuGet " Condition="%(NugetItem.NugetPublishSymbols)"/>
     -->
   </Target>
-  
+
 </Project>
