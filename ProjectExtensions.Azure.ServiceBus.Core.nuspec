@@ -3,7 +3,7 @@
   <metadata>
     <id>ProjectExtensions.Azure.ServiceBus.Core</id>
     <title>Windows Azure Service Bus Message Wrapper using the NServiceBus IHandleMessages&lt;T&gt; Pattern (Core)</title>
-    <version>0.10.6.0</version>
+    <version>0.10.7.0</version>
     <authors>Extensions.io, Joe Feser</authors>
     <owners>Extensions.io, Joe Feser</owners>
     <copyright>Copyright (c) Extensions.io and Joe Feser 2014</copyright>
@@ -15,9 +15,9 @@
     Either create your own implementation of IAzureBusContainer or get one of the IoC packages (ProjectExtensions.Azure.ServiceBus.IOC.[container])
     where container is Autofac, CastleWindsor, Ninject, StructureMap or Unity. (Debug)</summary>
     <dependencies>
-      <dependency id="Newtonsoft.Json" version="5.0.8" />
-      <dependency id="NLog" version="2.1.0" />
-      <dependency id="WindowsAzure.ServiceBus" version="2.4.9.0" />
+      <dependency id="Newtonsoft.Json" version="6.0.8" />
+      <dependency id="NLog" version="3.2.0" />
+      <dependency id="WindowsAzure.ServiceBus" version="2.7.0.0" />
     </dependencies>
     <tags>ServiceBus Microsoft Azure AppFabric Messaging PubSub Publish Subscribe Queue Topic</tags>
   </metadata>

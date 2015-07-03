@@ -3,7 +3,7 @@
   <metadata>
     <id>ProjectExtensions.Azure.ServiceBus.IOC.Autofac</id>
     <title>Autofac Support for Windows Azure Service Bus Message Wrapper using the NServiceBus IHandleMessages&lt;T&gt; Pattern</title>
-    <version>0.10.6.0</version>
+    <version>0.10.7.0</version>
     <authors>Extensions.io, Joe Feser</authors>
     <owners>Extensions.io, Joe Feser</owners>
     <copyright>Copyright (c) Extensions.io and Joe Feser 2014</copyright>
@@ -13,7 +13,7 @@
     <summary>Autofac support for Windows Azure Service Bus Wrapper modeled after the NServiceBus pattern of IHandleMessages&lt;T&gt;. You will
     also need ProjectExtensions.Azure.ServiceBus.Core. (Debug)</summary>
     <dependencies>
-      <dependency id="Autofac" version="3.3.0" />
+      <dependency id="Autofac" version="3.5.0" />
     </dependencies>
     <tags>ServiceBus Microsoft Azure AppFabric Messaging PubSub Publish Subscribe Queue Topic</tags>
   </metadata>
