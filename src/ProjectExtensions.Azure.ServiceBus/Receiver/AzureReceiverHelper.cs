@@ -134,21 +134,23 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
             }
             else if (failed) {
                 if (data.EndPointData.AttributeData.PauseTimeIfErrorWasThrown > 0) {
-                    lock (lockObject) {
-                        if (DateTime.Now.AddMilliseconds(-data.EndPointData.AttributeData.PauseTimeIfErrorWasThrown) >= lastResetTime) {
-                            retryPolicy.ExecuteAction(() => {
-                                if (!data.Client.IsClosed) {
-                                    data.Client.Close();
-                                }
-                            });
-                            Thread.Sleep(data.EndPointData.AttributeData.PauseTimeIfErrorWasThrown);
-                            lastResetTime = DateTime.Now;
-                            retryPolicy.ExecuteAction(() => {
-                                Configure(endpoint);
-                                data.Client.OnMessage(OnMessageHandler, options);
-                            });
-                        }
-                    }
+                    //For now, do not support pause time
+                    Thread.Sleep(1000); //This has zero impact if the thread count is > 1
+                    //lock (lockObject) {
+                    //    if (DateTime.Now.AddMilliseconds(-data.EndPointData.AttributeData.PauseTimeIfErrorWasThrown) >= lastResetTime) {
+                    //        retryPolicy.ExecuteAction(() => {
+                    //            if (!data.Client.IsClosed) {
+                    //                data.Client.Close();
+                    //            }
+                    //        });
+                    //        Thread.Sleep(data.EndPointData.AttributeData.PauseTimeIfErrorWasThrown);
+                    //        lastResetTime = DateTime.Now;
+                    //        retryPolicy.ExecuteAction(() => {
+                    //            Configure(endpoint);
+                    //            data.Client.OnMessage(OnMessageHandler, options);
+                    //        });
+                    //    }
+                    //}
                 }
                 else {
                     Thread.Sleep(1000); //This has zero impact if the thread count is > 1
@@ -160,7 +162,12 @@ namespace ProjectExtensions.Azure.ServiceBus.Receiver {
             logger.Info("ProcessMessagesForSubscription Message Start {0} Declared {1} MessageTytpe {2}, IsReusable {3}", data.EndPointData.SubscriptionName,
                          data.EndPointData.DeclaredType.ToString(), data.EndPointData.MessageType.ToString(), data.EndPointData.IsReusable);
             retryPolicy.ExecuteAction(() => {
-                data.Client.OnMessage(OnMessageHandler, options);
+                try {
+                    data.Client.OnMessage(OnMessageHandler, options);
+                }
+                catch (Exception ex) {
+                    logger.Error("Error Calling OnMessage {0}", ex.ToString());
+                }
             });
         }
 

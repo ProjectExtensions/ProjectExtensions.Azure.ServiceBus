@@ -13,9 +13,6 @@ namespace ProjectExtensions.Azure.ServiceBus.Interfaces {
             set;
         }
 
-        IAsyncResult BeginReceive(TimeSpan serverWaitTime, AsyncCallback callback, object state);
-        IBrokeredMessage EndReceive(IAsyncResult result);
-
         void OnMessage(Action<IBrokeredMessage> callback, OnMessageOptions onMessageOptions);
 
         bool IsClosed { get; }
