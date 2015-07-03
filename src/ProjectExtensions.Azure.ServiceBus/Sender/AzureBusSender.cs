@@ -47,21 +47,21 @@ namespace ProjectExtensions.Azure.ServiceBus.Sender {
             Guard.ArgumentNotNull(obj, "obj");
 
             // Declare a wait object that will be used for synchronization.
-            var waitObject = new ManualResetEvent(false);
-
-            // Declare a timeout value during which the messages are expected to be sent.
-            var sentTimeout = TimeSpan.FromSeconds(30);
-
             Exception failureException = null;
+            bool completed = false;
+            using (var waitObject = new ManualResetEvent(false)) {
 
-            SendAsync<T>(obj, null, (result) => {
-                waitObject.Set();
-                failureException = result.ThrownException;
-            }, serializer, metadata);
+                // Declare a timeout value during which the messages are expected to be sent.
+                var sentTimeout = TimeSpan.FromSeconds(30);
 
-            // Wait until the messaging operations are completed.
-            bool completed = waitObject.WaitOne(sentTimeout);
-            waitObject.Dispose();
+                SendAsync<T>(obj, null, (result) => {
+                    waitObject.Set();
+                    failureException = result.ThrownException;
+                }, serializer, metadata);
+
+                // Wait until the messaging operations are completed.
+                completed = waitObject.WaitOne(sentTimeout);
+            }
 
             if (failureException != null) {
                 throw failureException;
