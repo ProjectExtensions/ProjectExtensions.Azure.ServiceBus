@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Practices.Unity;
+using ProjectExtensions.Azure.ServiceBus;
 using ProjectExtensions.Azure.ServiceBus.Unity.Container;
 
-namespace ProjectExtensions.Azure.ServiceBus.StructureMap {
+namespace ProjectExtensions.Azure.ServiceBus.Unity.Container {
     /// <summary>
     /// Extensions to allow configuration to use the Unity IoC container.
     /// </summary>

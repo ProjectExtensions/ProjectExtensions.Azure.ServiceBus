@@ -1,5 +1,5 @@
 ﻿using ProjectExtensions.Azure.ServiceBus;
-using ProjectExtensions.Azure.ServiceBus.StructureMap;
+using ProjectExtensions.Azure.ServiceBus.Unity.Container;
 using PubSubUsingConfiguration;
 
 namespace PubSubUsingConfiguration {
