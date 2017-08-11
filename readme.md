@@ -135,7 +135,7 @@ for (int i = 0; i < 20; i++) {
 
 //Async calls
 for (int i = 0; i < 20; i++) {
-    var message1 = new TestMessage() {
+    var message2 = new TestMessage() {
         Value = i,
         MessageId = DateTime.Now.ToString()
     };
