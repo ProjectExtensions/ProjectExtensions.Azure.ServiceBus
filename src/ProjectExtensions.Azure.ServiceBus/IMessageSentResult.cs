@@ -1,6 +1,6 @@
-﻿using System;
+﻿//DO NOT Change the namespace.
+using System;
 
-//DO NOT Change the namespace.
 namespace ProjectExtensions.Azure.ServiceBus {
 
     /// <summary>

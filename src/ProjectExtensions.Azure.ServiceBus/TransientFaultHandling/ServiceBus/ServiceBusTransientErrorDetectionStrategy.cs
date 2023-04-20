@@ -9,8 +9,10 @@
 // FITNESS FOR A PARTICULAR PURPOSE.
 //===============================================================================
 
-namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling.ServiceBus
-{
+namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling.ServiceBus {
+    using Microsoft.Practices.TransientFaultHandling;
+    using Microsoft.ServiceBus;
+    using Microsoft.ServiceBus.Messaging;
     using System;
     using System.IdentityModel.Tokens;
     using System.Net;
@@ -18,15 +20,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandl
     using System.Security;
     using System.ServiceModel;
     using System.Text.RegularExpressions;
-    using Microsoft.Practices.TransientFaultHandling;
-    using Microsoft.ServiceBus;
-    using Microsoft.ServiceBus.Messaging;
 
     /// <summary> 
     /// Provides the transient error detection logic that can recognize transient faults when dealing with Windows Azure Service Bus. 
     /// </summary> 
-    public class ServiceBusTransientErrorDetectionStrategy : ITransientErrorDetectionStrategy
-    {
+    public class ServiceBusTransientErrorDetectionStrategy : ITransientErrorDetectionStrategy {
         /// <summary> 
         /// Provides a compiled regular expression used for extracting the error code from the message. 
         /// </summary> 
@@ -37,8 +35,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandl
         /// </summary> 
         /// <param name="ex">The exception object to be verified.</param> 
         /// <returns>True if the specified exception is considered as transient, otherwise false.</returns> 
-        public bool IsTransient(Exception ex)
-        {
+        public bool IsTransient(Exception ex) {
             return ex != null && (CheckIsTransientInternal(ex) || (ex.InnerException != null && CheckIsTransientInternal(ex.InnerException)));
         }
 
@@ -48,85 +45,67 @@ namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandl
         /// <param name="ex">The error to check.</param>
         /// <returns></returns>
         protected virtual bool CheckIsTransientInternal(Exception ex) {
-           return CheckIsTransient(ex);
+            return CheckIsTransient(ex);
         }
 
         // SecuritySafeCritical because it references MessageLockLostException, MessagingCommunicationException, 
         // MessagingEntityAlreadyExistsException, MessagingEntityNotFoundException, ServerBusyException, ServerErrorException
         [SecuritySafeCritical]
-        private static bool CheckIsTransient(Exception ex)
-        {
-            if (ex is FaultException)
-            {
+        private static bool CheckIsTransient(Exception ex) {
+            if (ex is FaultException) {
                 return false;
             }
-            else if (ex is MessagingEntityNotFoundException)
-            {
+            else if (ex is MessagingEntityNotFoundException) {
                 return false;
             }
-            else if (ex is MessagingEntityAlreadyExistsException)
-            {
+            else if (ex is MessagingEntityAlreadyExistsException) {
                 return false;
             }
-            else if (ex is MessageLockLostException)
-            {
+            else if (ex is MessageLockLostException) {
                 return false;
             }
-            else if (ex is CommunicationObjectFaultedException)
-            {
+            else if (ex is CommunicationObjectFaultedException) {
                 return false;
             }
-            else if (ex is MessagingCommunicationException)
-            {
+            else if (ex is MessagingCommunicationException) {
                 return true;
             }
-            else if (ex is TimeoutException)
-            {
+            else if (ex is TimeoutException) {
                 return true;
             }
-            else if (ex is WebException)
-            {
+            else if (ex is WebException) {
                 return true;
             }
-            else if (ex is SecurityTokenException)
-            {
+            else if (ex is SecurityTokenException) {
                 return true;
             }
-            else if (ex is ServerTooBusyException)
-            {
+            else if (ex is ServerTooBusyException) {
                 return true;
             }
-            else if (ex is ServerBusyException)
-            {
+            else if (ex is ServerBusyException) {
                 return true;
             }
-            else if (ex is ServerErrorException)
-            {
+            else if (ex is ServerErrorException) {
                 return true;
             }
-            else if (ex is ProtocolException)
-            {
+            else if (ex is ProtocolException) {
                 return true;
             }
-            else if (ex is EndpointNotFoundException)
-            {
+            else if (ex is EndpointNotFoundException) {
                 // This exception may occur when a listener and a consumer are being 
                 // initialized out of sync (e.g. consumer is reaching to a listener that 
                 // is still in the process of setting up the Service Host). 
                 return true;
             }
-            else if (ex is CommunicationException)
-            {
+            else if (ex is CommunicationException) {
                 return true;
             }
-            else if (ex is SocketException)
-            {
+            else if (ex is SocketException) {
                 var socketFault = ex as SocketException;
 
                 return socketFault.SocketErrorCode == SocketError.TimedOut;
             }
-            else if (ex is UnauthorizedAccessException)
-            {
+            else if (ex is UnauthorizedAccessException) {
                 // Need to provide some resilience against the following fault that was seen a few times: 
                 // System.UnauthorizedAccessException: The token provider was unable to provide a security token while accessing 'https://mysbns-sb.accesscontrol.windows.net/WRAPv0.9/'.  
                 // Token provider returned message: 'Error:Code:500:SubCode:T9002:Detail:An internal network error occured. Please try again.'.  
@@ -136,8 +115,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandl
                 var match = acsErrorCodeRegEx.Match(ex.Message);
                 var errorCode = 0;
 
-                if (match.Success && match.Groups.Count > 1 && int.TryParse(match.Groups[1].Value, out errorCode))
-                {
+                if (match.Success && match.Groups.Count > 1 && int.TryParse(match.Groups[1].Value, out errorCode)) {
                     return errorCode == (int)HttpStatusCode.InternalServerError;
                 }
             }

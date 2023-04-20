@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using NLog;
 using ProjectExtensions.Azure.ServiceBus.Serialization;
-using NLog;
+using System;
 using System.IO;
-using System.Xml.Serialization;
 using System.IO.Compression;
 using System.Xml;
+using System.Xml.Serialization;
 
 namespace Amazon.ServiceBus.DistributedMessages.Serializers {
 

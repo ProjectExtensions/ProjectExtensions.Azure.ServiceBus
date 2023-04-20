@@ -9,12 +9,9 @@
 // FITNESS FOR A PARTICULAR PURPOSE.
 //===============================================================================
 
-namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling.Configuration
-{
-    internal static class TransientFaultHandlingDesignTime
-    {
-        public static class ViewModelTypeNames
-        {
+namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling.Configuration {
+    internal static class TransientFaultHandlingDesignTime {
+        public static class ViewModelTypeNames {
             public const string RetryPolicyConfigurationSettingsViewModel =
                 "Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling.Configuration.Design.ViewModel.RetryPolicyConfigurationSettingsViewModel, Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling.Configuration";
 
@@ -25,16 +22,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandl
                 "Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling.Configuration.Design.ViewModel.TimeSpanElementConfigurationProperty, Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling.Configuration";
         }
 
-        public static class CommandTypeNames
-        {
+        public static class CommandTypeNames {
             public const string WellKnownRetryStrategyElementCollectionCommand = "Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling.Configuration.Design.ViewModel.Commands.WellKnownRetryStrategyElementCollectionCommand, Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling.Configuration";
         }
 
         /// <summary>
         /// Class that contains common editor types used by the designtime.
         /// </summary>
-        public static class EditorTypes
-        {
+        public static class EditorTypes {
             /// <summary>
             /// Type name of the TimeSpanEditor class, declared in the Microsoft.Practices.EnterpriseLibrary.WindowsAzure.Autoscaling.Configuration Assembly.
             /// </summary>
@@ -46,8 +41,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandl
             public const string FrameworkElement = "System.Windows.FrameworkElement, PresentationFramework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35";
         }
 
-        public static class ValidatorTypes
-        {
+        public static class ValidatorTypes {
             public const string NameValueCollectionValidator = "Microsoft.Practices.EnterpriseLibrary.Configuration.Design.Validation.NameValueCollectionValidator, Microsoft.Practices.EnterpriseLibrary.Configuration.DesignTime";
 
             public const string ExponentialBackoffValidator = "Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling.Configuration.Validation.ExponentialBackoffValidator, Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling.Configuration";

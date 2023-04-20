@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Practices.Unity;
-using ProjectExtensions.Azure.ServiceBus;
-using ProjectExtensions.Azure.ServiceBus.Unity.Container;
+﻿using Microsoft.Practices.Unity;
 
 namespace ProjectExtensions.Azure.ServiceBus.Unity.Container {
     /// <summary>
@@ -17,7 +11,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Unity.Container {
         /// <param name="builder"></param>
         /// <param name="container">Unity container used in your application.  This is optional.  A new container will be created if one is not provided</param>
         /// <returns></returns>
-        public static  BusConfigurationBuilder UseUnityContainer(this BusConfigurationBuilder builder, IUnityContainer container = null) {
+        public static BusConfigurationBuilder UseUnityContainer(this BusConfigurationBuilder builder, IUnityContainer container = null) {
             builder.Configuration.Container = new UnityAzureBusContainer(container);
             return builder;
         }

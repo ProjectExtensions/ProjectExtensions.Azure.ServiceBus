@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-//DO NOT Change the namespace.
+﻿//DO NOT Change the namespace.
 namespace ProjectExtensions.Azure.ServiceBus {
 
     /// <summary>

@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.Practices.TransientFaultHandling;
+using System;
 using System.Linq;
-using System.Text;
-using Microsoft.Practices.TransientFaultHandling;
-using NLog;
 
 namespace ProjectExtensions.Azure.ServiceBus.Helpers {
 

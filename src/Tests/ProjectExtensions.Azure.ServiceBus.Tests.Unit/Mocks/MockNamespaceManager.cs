@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using ProjectExtensions.Azure.ServiceBus.Interfaces;
+﻿using Microsoft.Practices.TransientFaultHandling;
 using Microsoft.ServiceBus.Messaging;
+using ProjectExtensions.Azure.ServiceBus.Interfaces;
 using ProjectExtensions.Azure.ServiceBus.Tests.Unit.Interfaces;
-using Microsoft.Practices.TransientFaultHandling;
 
 namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
 

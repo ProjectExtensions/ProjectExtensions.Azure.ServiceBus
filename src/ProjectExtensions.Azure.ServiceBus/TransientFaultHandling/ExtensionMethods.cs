@@ -9,17 +9,15 @@
 // FITNESS FOR A PARTICULAR PURPOSE.
 //===============================================================================
 
-namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling
-{
+namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling {
     #region Using statements
     using System;
     #endregion
-    
+
     /// <summary>
     /// Provides a set of extension methods that supplement various .NET Framework classes with value-add functionality.
     /// </summary>
-    public static class ExtensionMethods
-    {
+    public static class ExtensionMethods {
         /// <summary>
         /// Verifies whether the specified exception object contains an inner exception of the specified type <typeparamref name="T"/>.
         /// </summary>
@@ -27,15 +25,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandl
         /// <param name="ex">The exception object to be inspected.</param>
         /// <returns>The instance of the inner exception of the specified type <typeparamref name="T"/> if found, otherwise null.</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "As designed")]
-        public static Exception GetInnerException<T>(this Exception ex)
-        {
+        public static Exception GetInnerException<T>(this Exception ex) {
             var innerEx = ex != null ? ex.InnerException : null;
             var exceptionType = typeof(T);
 
-            while (innerEx != null)
-            {
-                if (exceptionType.IsAssignableFrom(innerEx.GetType()))
-                {
+            while (innerEx != null) {
+                if (exceptionType.IsAssignableFrom(innerEx.GetType())) {
                     return innerEx;
                 }
 

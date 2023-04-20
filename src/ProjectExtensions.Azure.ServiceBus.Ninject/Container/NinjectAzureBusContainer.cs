@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Ninject;
-using Ninject.Activation;
+﻿using Ninject;
 using Ninject.Parameters;
 using ProjectExtensions.Azure.ServiceBus.Container;
+using System;
+using System.Collections.Generic;
 
 namespace ProjectExtensions.Azure.ServiceBus.Ninject.Container {
-    
+
     /// <summary>
     /// Implementation of <see cref="IAzureBusContainer"/> for Ninject.
     /// </summary>

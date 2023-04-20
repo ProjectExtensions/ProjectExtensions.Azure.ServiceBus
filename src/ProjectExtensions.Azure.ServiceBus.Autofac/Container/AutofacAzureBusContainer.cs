@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Autofac;
+﻿using Autofac;
 using ProjectExtensions.Azure.ServiceBus.Container;
+using System;
+using System.Collections.Generic;
 
 namespace ProjectExtensions.Azure.ServiceBus.Autofac.Container {
     /// <summary>

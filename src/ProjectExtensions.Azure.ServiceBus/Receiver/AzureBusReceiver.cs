@@ -1,19 +1,13 @@
-﻿using System;
+﻿using Microsoft.Practices.TransientFaultHandling;
+using Microsoft.ServiceBus.Messaging;
+using NLog;
+using ProjectExtensions.Azure.ServiceBus.Interfaces;
+using ProjectExtensions.Azure.ServiceBus.Serialization;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Microsoft.ServiceBus;
-using Microsoft.ServiceBus.Messaging;
-using System.Threading.Tasks;
-using System.IO;
-using ProjectExtensions.Azure.ServiceBus.Serialization;
 using System.Threading;
-using System.Reflection;
-using NLog;
-using Microsoft.Practices.TransientFaultHandling;
-using System.Net;
-using ProjectExtensions.Azure.ServiceBus.Interfaces;
-using ProjectExtensions.Azure.ServiceBus.Wrappers;
+using System.Threading.Tasks;
 
 namespace ProjectExtensions.Azure.ServiceBus.Receiver {
 

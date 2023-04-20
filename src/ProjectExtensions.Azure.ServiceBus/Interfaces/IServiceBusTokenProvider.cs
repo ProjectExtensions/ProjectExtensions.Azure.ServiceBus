@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.ServiceBus;
+﻿using Microsoft.ServiceBus;
+using System;
 
 namespace ProjectExtensions.Azure.ServiceBus.Interfaces {
-    
+
     interface IServiceBusTokenProvider {
-        
+
         TokenProvider TokenProvider {
             get;
         }

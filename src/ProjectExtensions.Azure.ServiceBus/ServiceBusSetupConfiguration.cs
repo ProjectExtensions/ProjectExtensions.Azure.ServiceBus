@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using ProjectExtensions.Azure.ServiceBus.Interfaces;
+﻿using ProjectExtensions.Azure.ServiceBus.Interfaces;
 using ProjectExtensions.Azure.ServiceBus.Serialization;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 
@@ -82,7 +80,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// </summary>
         public string ServicePath {
             get;
-            set;
+            set;    
         }
 
         /// <summary>

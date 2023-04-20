@@ -9,16 +9,14 @@
 // FITNESS FOR A PARTICULAR PURPOSE.
 //===============================================================================
 
-namespace Microsoft.Practices.TransientFaultHandling
-{
+namespace Microsoft.Practices.TransientFaultHandling {
     using System;
     using System.Threading;
 
     /// <summary>
     /// Provides the base implementation of the retry mechanism for unreliable actions and transient conditions.
     /// </summary>
-    public class RetryPolicy
-    {
+    public class RetryPolicy {
         /// <summary>
         /// Returns a default policy that does no retries, it just invokes action exactly once.
         /// </summary>
@@ -47,15 +45,13 @@ namespace Microsoft.Practices.TransientFaultHandling
         /// </summary>
         /// <param name="errorDetectionStrategy">The <see cref="ITransientErrorDetectionStrategy"/> that is responsible for detecting transient conditions.</param>
         /// <param name="retryStrategy">The retry strategy to use for this retry policy.</param>
-        public RetryPolicy(ITransientErrorDetectionStrategy errorDetectionStrategy, RetryStrategy retryStrategy)
-        {
+        public RetryPolicy(ITransientErrorDetectionStrategy errorDetectionStrategy, RetryStrategy retryStrategy) {
             Guard.ArgumentNotNull(errorDetectionStrategy, "errorDetectionStrategy");
             Guard.ArgumentNotNull(retryStrategy, "retryPolicy");
 
             this.ErrorDetectionStrategy = errorDetectionStrategy;
 
-            if (errorDetectionStrategy == null)
-            {
+            if (errorDetectionStrategy == null) {
                 throw new InvalidOperationException("The error detection strategy type must implement the ITransientErrorDetectionStrategy interface.");
             }
 
@@ -68,8 +64,7 @@ namespace Microsoft.Practices.TransientFaultHandling
         /// <param name="errorDetectionStrategy">The <see cref="ITransientErrorDetectionStrategy"/> that is responsible for detecting transient conditions.</param>
         /// <param name="retryCount">The number of retry attempts.</param>
         public RetryPolicy(ITransientErrorDetectionStrategy errorDetectionStrategy, int retryCount)
-            : this(errorDetectionStrategy, new FixedInterval(retryCount))
-        {
+            : this(errorDetectionStrategy, new FixedInterval(retryCount)) {
         }
 
         /// <summary>
@@ -79,8 +74,7 @@ namespace Microsoft.Practices.TransientFaultHandling
         /// <param name="retryCount">The number of retry attempts.</param>
         /// <param name="retryInterval">The interval between retries.</param>
         public RetryPolicy(ITransientErrorDetectionStrategy errorDetectionStrategy, int retryCount, TimeSpan retryInterval)
-            : this(errorDetectionStrategy, new FixedInterval(retryCount, retryInterval))
-        {
+            : this(errorDetectionStrategy, new FixedInterval(retryCount, retryInterval)) {
         }
 
         /// <summary>
@@ -92,8 +86,7 @@ namespace Microsoft.Practices.TransientFaultHandling
         /// <param name="maxBackoff">The maximum back-off time.</param>
         /// <param name="deltaBackoff">The time value that will be used for calculating a random delta in the exponential delay between retries.</param>
         public RetryPolicy(ITransientErrorDetectionStrategy errorDetectionStrategy, int retryCount, TimeSpan minBackoff, TimeSpan maxBackoff, TimeSpan deltaBackoff)
-            : this(errorDetectionStrategy, new ExponentialBackoff(retryCount, minBackoff, maxBackoff, deltaBackoff))
-        {
+            : this(errorDetectionStrategy, new ExponentialBackoff(retryCount, minBackoff, maxBackoff, deltaBackoff)) {
         }
 
         /// <summary>
@@ -104,8 +97,7 @@ namespace Microsoft.Practices.TransientFaultHandling
         /// <param name="initialInterval">The initial interval that will apply for the first retry.</param>
         /// <param name="increment">The incremental time value that will be used for calculating the progressive delay between retries.</param>
         public RetryPolicy(ITransientErrorDetectionStrategy errorDetectionStrategy, int retryCount, TimeSpan initialInterval, TimeSpan increment)
-            : this(errorDetectionStrategy, new Incremental(retryCount, initialInterval, increment))
-        {
+            : this(errorDetectionStrategy, new Incremental(retryCount, initialInterval, increment)) {
         }
 
         /// <summary>
@@ -127,8 +119,7 @@ namespace Microsoft.Practices.TransientFaultHandling
         /// Repetitively executes the specified action while it satisfies the current retry policy.
         /// </summary>
         /// <param name="action">A delegate representing the executable action which doesn't return any results.</param>
-        public virtual void ExecuteAction(Action action)
-        {
+        public virtual void ExecuteAction(Action action) {
             Guard.ArgumentNotNull(action, "action");
 
             this.ExecuteAction(() => { action(); return default(object); });
@@ -141,8 +132,7 @@ namespace Microsoft.Practices.TransientFaultHandling
         /// <param name="func">A delegate representing the executable action which returns the result of type R.</param>
         /// <returns>The result from the action.</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Validated with Guard")]
-        public virtual TResult ExecuteAction<TResult>(Func<TResult> func)
-        {
+        public virtual TResult ExecuteAction<TResult>(Func<TResult> func) {
             Guard.ArgumentNotNull(func, "func");
 
             int retryCount = 0;
@@ -151,49 +141,41 @@ namespace Microsoft.Practices.TransientFaultHandling
 
             var shouldRetry = this.RetryStrategy.GetShouldRetry();
 
-            for (;;)
+            for (; ; )
             {
                 lastError = null;
 
-                try
-                {
+                try {
                     return func();
                 }
-                catch (RetryLimitExceededException limitExceededEx)
-                {
+                catch (RetryLimitExceededException limitExceededEx) {
                     // The user code can throw a RetryLimitExceededException to force the exit from the retry loop.
                     // The RetryLimitExceeded exception can have an inner exception attached to it. This is the exception
                     // which we will have to throw up the stack so that callers can handle it.
-                    if (limitExceededEx.InnerException != null)
-                    {
+                    if (limitExceededEx.InnerException != null) {
                         throw limitExceededEx.InnerException;
                     }
-                    else
-                    {
+                    else {
                         return default(TResult);
                     }
                 }
-                catch (Exception ex)
-                {
+                catch (Exception ex) {
                     lastError = ex;
 
-                    if (!(this.ErrorDetectionStrategy.IsTransient(lastError) && shouldRetry(retryCount++, lastError, out delay)))
-                    {
+                    if (!(this.ErrorDetectionStrategy.IsTransient(lastError) && shouldRetry(retryCount++, lastError, out delay))) {
                         throw;
                     }
                 }
 
                 // Perform an extra check in the delay interval. Should prevent from accidentally ending up with the value of -1 that will block a thread indefinitely. 
                 // In addition, any other negative numbers will cause an ArgumentOutOfRangeException fault that will be thrown by Thread.Sleep.
-                if (delay.TotalMilliseconds < 0)
-                {
+                if (delay.TotalMilliseconds < 0) {
                     delay = TimeSpan.Zero;
                 }
 
                 this.OnRetrying(retryCount, lastError, delay);
 
-                if (retryCount > 1 || !this.RetryStrategy.FastFirstRetry)
-                {
+                if (retryCount > 1 || !this.RetryStrategy.FastFirstRetry) {
                     Thread.Sleep(delay);
                 }
             }
@@ -206,8 +188,7 @@ namespace Microsoft.Practices.TransientFaultHandling
         /// <param name="endAction">The end method of the async pattern.</param>
         /// <param name="successHandler">The action to perform when the async operation is done.</param>
         /// <param name="faultHandler">The fault handler delegate that will be triggered if the operation cannot be successfully invoked despite retry attempts.</param>
-        public virtual void ExecuteAction(Action<AsyncCallback> beginAction, Action<IAsyncResult> endAction, Action successHandler, Action<Exception> faultHandler)
-        {
+        public virtual void ExecuteAction(Action<AsyncCallback> beginAction, Action<IAsyncResult> endAction, Action successHandler, Action<Exception> faultHandler) {
             Guard.ArgumentNotNull(endAction, "endAction");
             successHandler = successHandler ?? (() => { });
 
@@ -227,8 +208,7 @@ namespace Microsoft.Practices.TransientFaultHandling
         /// <param name="successHandler">The action to perform when the async operation is done.</param>
         /// <param name="faultHandler">The fault handler delegate that will be triggered if the operation cannot be successfully invoked despite retry attempts.</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Needs to catch all exceptions to test them.")]
-        public virtual void ExecuteAction<TResult>(Action<AsyncCallback> beginAction, Func<IAsyncResult, TResult> endAction, Action<TResult> successHandler, Action<Exception> faultHandler)
-        {
+        public virtual void ExecuteAction<TResult>(Action<AsyncCallback> beginAction, Func<IAsyncResult, TResult> endAction, Action<TResult> successHandler, Action<Exception> faultHandler) {
             Guard.ArgumentNotNull(beginAction, "beginAction");
             Guard.ArgumentNotNull(endAction, "endAction");
             successHandler = successHandler ?? (_ => { });
@@ -242,12 +222,10 @@ namespace Microsoft.Practices.TransientFaultHandling
 
             // Configure a custom callback delegate that invokes the end operation and the success handler if the operation succeedes
             endInvoke =
-                ar =>
-                {
+                ar => {
                     var result = default(TResult);
 
-                    if (executeWithRetry(() => result = endAction(ar)))
-                    {
+                    if (executeWithRetry(() => result = endAction(ar))) {
                         successHandler(result);
                     }
                 };
@@ -256,42 +234,33 @@ namespace Microsoft.Practices.TransientFaultHandling
             // If the action succeeds (i.e. does not throw an exception) it returns true.
             // If the action throws, it analizes it for retries. If a retry is required, it restarts the async operation; otherwise, it invokes the fault handler.
             executeWithRetry =
-                a =>
-                {
-                    try
-                    {
+                a => {
+                    try {
                         // Invoke the callback delegate which can throw an exception if the main async operation has completed with a fault.
                         a();
                         return true;
                     }
-                    catch (Exception ex)
-                    {
+                    catch (Exception ex) {
                         // Capture the original exception for analysis.
                         var lastError = ex;
 
                         // Handling of RetryLimitExceededException needs to be done separately. This exception type indicates the application's intent to exit from the retry loop.
-                        if (lastError is RetryLimitExceededException)
-                        {
-                            if (lastError.InnerException != null)
-                            {
+                        if (lastError is RetryLimitExceededException) {
+                            if (lastError.InnerException != null) {
                                 faultHandler(lastError.InnerException);
                             }
-                            else
-                            {
+                            else {
                                 faultHandler(lastError);
                             }
                         }
-                        else
-                        {
+                        else {
                             var delay = TimeSpan.Zero;
 
                             // Check if we should continue retrying on this exception. If not, invoke the fault handler so that user code can take control.
-                            if (!(this.ErrorDetectionStrategy.IsTransient(lastError) && shouldRetry(retryCount++, lastError, out delay)))
-                            {
+                            if (!(this.ErrorDetectionStrategy.IsTransient(lastError) && shouldRetry(retryCount++, lastError, out delay))) {
                                 faultHandler(lastError);
                             }
-                            else
-                            {
+                            else {
 
                                 // Perform an extra check in the delay interval. Should prevent from accidentally ending up with the value of -1 that will block a thread indefinitely. 
                                 // In addition, any other negative numbers will cause an ArgumentOutOfRangeException fault that will be thrown by Thread.Sleep.
@@ -303,8 +272,7 @@ namespace Microsoft.Practices.TransientFaultHandling
                                 this.OnRetrying(retryCount, lastError, delay);
 
                                 // Sleep for the defined interval before repetitively executing the main async operation.
-                                if (retryCount > 1 || !this.RetryStrategy.FastFirstRetry)
-                                {
+                                if (retryCount > 1 || !this.RetryStrategy.FastFirstRetry) {
                                     Thread.Sleep(delay);
                                 }
 
@@ -326,10 +294,8 @@ namespace Microsoft.Practices.TransientFaultHandling
         /// <param name="retryCount">The current retry attempt count.</param>
         /// <param name="lastError">The exception which caused the retry conditions to occur.</param>
         /// <param name="delay">The delay indicating how long the current thread will be suspended for before the next iteration will be invoked.</param>
-        protected virtual void OnRetrying(int retryCount, Exception lastError, TimeSpan delay)
-        {
-            if (this.Retrying != null)
-            {
+        protected virtual void OnRetrying(int retryCount, Exception lastError, TimeSpan delay) {
+            if (this.Retrying != null) {
                 this.Retrying(this, new RetryingEventArgs(retryCount, delay, lastError));
             }
         }
@@ -339,15 +305,13 @@ namespace Microsoft.Practices.TransientFaultHandling
         /// Implements a strategy that ignores any transient errors.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Instantiated through generics")]
-        private sealed class TransientErrorIgnoreStrategy : ITransientErrorDetectionStrategy
-        {
+        private sealed class TransientErrorIgnoreStrategy : ITransientErrorDetectionStrategy {
             /// <summary>
             /// Always return false.
             /// </summary>
             /// <param name="ex">The exception.</param>
             /// <returns>Returns false.</returns>
-            public bool IsTransient(Exception ex)
-            {
+            public bool IsTransient(Exception ex) {
                 return false;
             }
         }
@@ -356,15 +320,13 @@ namespace Microsoft.Practices.TransientFaultHandling
         /// Implements a strategy that treats all exceptions as transient errors.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Instantiated through generics")]
-        private sealed class TransientErrorCatchAllStrategy : ITransientErrorDetectionStrategy
-        {
+        private sealed class TransientErrorCatchAllStrategy : ITransientErrorDetectionStrategy {
             /// <summary>
             /// Always return true.
             /// </summary>
             /// <param name="ex">The exception.</param>
             /// <returns>Returns true.</returns>
-            public bool IsTransient(Exception ex)
-            {
+            public bool IsTransient(Exception ex) {
                 return true;
             }
         }

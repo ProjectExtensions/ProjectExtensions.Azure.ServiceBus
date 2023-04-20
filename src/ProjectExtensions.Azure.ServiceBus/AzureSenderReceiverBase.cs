@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.ServiceBus.Messaging;
-using Microsoft.ServiceBus;
-using NLog;
+﻿using Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling.ServiceBus;
 using Microsoft.Practices.TransientFaultHandling;
-using Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling.ServiceBus;
-using ProjectExtensions.Azure.ServiceBus.TransientFaultHandling.ServiceBus;
-using System.Net;
+using Microsoft.ServiceBus.Messaging;
+using NLog;
 using ProjectExtensions.Azure.ServiceBus.Interfaces;
+using ProjectExtensions.Azure.ServiceBus.TransientFaultHandling.ServiceBus;
+using System;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 

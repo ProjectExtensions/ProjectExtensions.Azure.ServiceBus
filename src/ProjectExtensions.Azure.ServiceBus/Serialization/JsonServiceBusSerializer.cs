@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using NLog;
+using System;
+using System.IO;
 
 namespace ProjectExtensions.Azure.ServiceBus.Serialization {
 

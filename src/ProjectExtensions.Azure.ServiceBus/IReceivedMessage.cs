@@ -1,11 +1,8 @@
-﻿using System;
+﻿//DO NOT Change the namespace.
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-//DO NOT Change the namespace.
 namespace ProjectExtensions.Azure.ServiceBus {
-    
+
     /// <summary>
     /// Main interface that is passed to the Handlers.
     /// </summary>

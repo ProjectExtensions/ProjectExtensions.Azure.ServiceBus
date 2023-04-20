@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling.ServiceBus;
-using System.Net;
+﻿using Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
+using System;
+using System.Net;
 
 namespace ProjectExtensions.Azure.ServiceBus.TransientFaultHandling.ServiceBus {
-    
+
     /// <summary>
     /// When we verify if an item exits, we consider a 404 to NOT be Transient.
     /// </summary>
@@ -23,7 +20,7 @@ namespace ProjectExtensions.Azure.ServiceBus.TransientFaultHandling.ServiceBus {
                     return false;
                 }
             }
-            
+
             return base.CheckIsTransientInternal(ex);
         }
 

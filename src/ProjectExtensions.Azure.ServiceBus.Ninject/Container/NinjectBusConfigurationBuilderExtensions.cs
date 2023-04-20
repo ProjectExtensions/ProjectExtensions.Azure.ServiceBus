@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Ninject;
+﻿using Ninject;
 
 namespace ProjectExtensions.Azure.ServiceBus.Ninject.Container {
     /// <summary>

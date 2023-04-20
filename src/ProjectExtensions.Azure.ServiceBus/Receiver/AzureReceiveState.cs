@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Reflection;
-using Microsoft.ServiceBus.Messaging;
+﻿using Microsoft.Practices.TransientFaultHandling;
 using ProjectExtensions.Azure.ServiceBus.Serialization;
-using Microsoft.Practices.TransientFaultHandling;
+using System.Reflection;
 
 namespace ProjectExtensions.Azure.ServiceBus.Receiver {
-    
+
     class AzureReceiveState {
 
         public AzureReceiveState(AzureBusReceiverState data, MethodInfo methodInfo,

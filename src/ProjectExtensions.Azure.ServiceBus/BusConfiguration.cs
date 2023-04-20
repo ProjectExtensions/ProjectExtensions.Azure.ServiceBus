@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Reflection;
+﻿using Microsoft.Practices.TransientFaultHandling;
+using ProjectExtensions.Azure.ServiceBus.AzureServiceBusFactories;
 using ProjectExtensions.Azure.ServiceBus.Container;
-using ProjectExtensions.Azure.ServiceBus.Serialization;
-using Microsoft.Practices.TransientFaultHandling;
+using ProjectExtensions.Azure.ServiceBus.Factories;
+using ProjectExtensions.Azure.ServiceBus.Interfaces;
 using ProjectExtensions.Azure.ServiceBus.Receiver;
 using ProjectExtensions.Azure.ServiceBus.Sender;
-using ProjectExtensions.Azure.ServiceBus.Interfaces;
-using ProjectExtensions.Azure.ServiceBus.AzureServiceBusFactories;
-using ProjectExtensions.Azure.ServiceBus.Factories;
+using ProjectExtensions.Azure.ServiceBus.Serialization;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 
@@ -19,7 +17,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
     /// </summary>
     public class BusConfiguration : IBusConfiguration {
         static readonly BusConfiguration configuration = new BusConfiguration();
-        
+
         IAzureBusContainer container;
         List<Assembly> registeredAssemblies = new List<Assembly>();
         List<Type> registeredSubscribers = new List<Type>();
@@ -41,8 +39,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// Gets the singleton instance
         /// </summary>
         public static IBusConfiguration Instance {
-            get
-            {
+            get {
                 return configuration;
             }
         }
@@ -68,7 +65,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 return container;
             }
             set {
-                 if (container != null) {
+                if (container != null) {
                     throw new NotSupportedException("The container can only be set once.");
                 }
                 Guard.ArgumentNotNull(value, "Container");
@@ -76,7 +73,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
             }
         }
 
-        
+
         /// <summary>
         /// DefaultSerializer
         /// </summary>
@@ -203,7 +200,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 container.Register(typeof(IServiceBusSerializer), typeof(JsonServiceBusSerializer));
             }
             container.Build();
-            
+
             //Set the Bus property so that the receiver will register the end points
             this.Bus = container.Bus;
             this.Bus.Initialize();

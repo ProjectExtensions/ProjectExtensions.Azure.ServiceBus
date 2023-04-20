@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using ProjectExtensions.Azure.ServiceBus.Interfaces;
+﻿using Microsoft.Practices.TransientFaultHandling;
 using Microsoft.ServiceBus.Messaging;
-using Microsoft.Practices.TransientFaultHandling;
+using ProjectExtensions.Azure.ServiceBus.Interfaces;
+using System;
 
 namespace ProjectExtensions.Azure.ServiceBus.Wrappers {
-    
+
     class TopicClientWrapper : ITopicClient {
 
         TopicClient topicClient;

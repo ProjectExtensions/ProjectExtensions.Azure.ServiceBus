@@ -9,8 +9,7 @@
 // FITNESS FOR A PARTICULAR PURPOSE.
 //===============================================================================
 
-namespace Microsoft.Practices.TransientFaultHandling
-{
+namespace Microsoft.Practices.TransientFaultHandling {
     using System;
 
     /// <summary>
@@ -25,8 +24,7 @@ namespace Microsoft.Practices.TransientFaultHandling
     /// <summary>
     /// Base Abstract RetryStrategy
     /// </summary>
-    public abstract class RetryStrategy
-    {
+    public abstract class RetryStrategy {
         #region Public members
         /// <summary>
         /// The default number of retry attempts.
@@ -105,8 +103,7 @@ namespace Microsoft.Practices.TransientFaultHandling
         /// <param name="name">The name of the retry strategy.</param>
         /// <param name="firstFastRetry">a value indicating whether or not the very first retry attempt will be made immediately
         /// whereas the subsequent retries will remain subject to retry interval.</param>
-        protected RetryStrategy(string name, bool firstFastRetry)
-        {
+        protected RetryStrategy(string name, bool firstFastRetry) {
             this.Name = name;
             this.FastFirstRetry = firstFastRetry;
         }
@@ -116,7 +113,7 @@ namespace Microsoft.Practices.TransientFaultHandling
         /// whereas the subsequent retries will remain subject to retry interval.
         /// </summary>
         public bool FastFirstRetry { get; set; }
-       
+
         /// <summary>
         /// Gets the name of the retry strategy.
         /// </summary>

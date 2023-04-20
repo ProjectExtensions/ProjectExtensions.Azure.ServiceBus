@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using NLog;
+using System;
 using System.Threading;
-using NLog;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 

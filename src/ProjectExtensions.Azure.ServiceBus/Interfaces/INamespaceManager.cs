@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.ServiceBus.Messaging;
-using Microsoft.ServiceBus;
+﻿using Microsoft.ServiceBus.Messaging;
 
 namespace ProjectExtensions.Azure.ServiceBus.Interfaces {
-    
+
     /// <summary>
     /// Interface used to abstract the NamespaceManager
     /// </summary>

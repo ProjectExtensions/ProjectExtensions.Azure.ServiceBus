@@ -9,8 +9,7 @@
 // FITNESS FOR A PARTICULAR PURPOSE.
 //===============================================================================
 
-namespace Microsoft.Practices.TransientFaultHandling
-{
+namespace Microsoft.Practices.TransientFaultHandling {
     #region Using statements
     using System;
     using System.Globalization;
@@ -21,8 +20,7 @@ namespace Microsoft.Practices.TransientFaultHandling
     /// <summary>
     /// Implements the common guard methods.
     /// </summary>
-    public static class Guard
-    {
+    public static class Guard {
         /// <summary>
         /// Checks a string argument to ensure it isn't null or empty.
         /// </summary>
@@ -30,12 +28,10 @@ namespace Microsoft.Practices.TransientFaultHandling
         /// <param name="argumentName">The name of the argument.</param>
         /// <returns>The return value should be ignored. It is intended to be used only when validating arguments during instance creation (e.g. when calling base constructor).</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Validated with method.")]
-        public static bool ArgumentNotNullOrEmptyString(string argumentValue, string argumentName)
-        {
+        public static bool ArgumentNotNullOrEmptyString(string argumentValue, string argumentName) {
             ArgumentNotNull(argumentValue, argumentName);
 
-            if (argumentValue.Length == 0)
-            {
+            if (argumentValue.Length == 0) {
                 throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, ExceptionMessages.StringCannotBeEmpty, argumentName));
             }
 
@@ -48,10 +44,8 @@ namespace Microsoft.Practices.TransientFaultHandling
         /// <param name="argumentValue">The argument value to check.</param>
         /// <param name="argumentName">The name of the argument.</param>
         /// /// <returns>The return value should be ignored. It is intended to be used only when validating arguments during instance creation (e.g. when calling base constructor).</returns>
-        public static bool ArgumentNotNull(object argumentValue, string argumentName)
-        {
-            if (argumentValue == null)
-            {
+        public static bool ArgumentNotNull(object argumentValue, string argumentName) {
+            if (argumentValue == null) {
                 throw new ArgumentNullException(argumentName);
             }
 
@@ -64,10 +58,8 @@ namespace Microsoft.Practices.TransientFaultHandling
         /// <typeparam name="T">The type of the argument.</typeparam>
         /// <param name="argumentValue">The value of the argument.</param>
         /// <param name="argumentName">The name of the argument for diagnostic purposes.</param>
-        public static void ArgumentNotDefaultValue<T>(T argumentValue, string argumentName)
-        {
-            if (!IsValueDefined<T>(argumentValue))
-            {
+        public static void ArgumentNotDefaultValue<T>(T argumentValue, string argumentName) {
+            if (!IsValueDefined<T>(argumentValue)) {
                 throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, ExceptionMessages.ArgumentCannotBeDefault, argumentName));
             }
         }
@@ -77,10 +69,8 @@ namespace Microsoft.Practices.TransientFaultHandling
         /// </summary>
         /// <param name="argumentValue">The value of the argument.</param>
         /// <param name="argumentName">The name of the argument for diagnostic purposes.</param>
-        public static void ArgumentNotZeroOrNegativeValue(int argumentValue, string argumentName)
-        {
-            if (argumentValue <= 0)
-            {
+        public static void ArgumentNotZeroOrNegativeValue(int argumentValue, string argumentName) {
+            if (argumentValue <= 0) {
                 throw new ArgumentOutOfRangeException(argumentName, argumentValue, string.Format(CultureInfo.CurrentCulture, ExceptionMessages.ArgumentCannotBeZeroOrNegative, argumentName));
             }
         }
@@ -90,10 +80,8 @@ namespace Microsoft.Practices.TransientFaultHandling
         /// </summary>
         /// <param name="argumentValue">The <see cref="System.Int32"/> value of the argument.</param>
         /// <param name="argumentName">The name of the argument for diagnostic purposes.</param>
-        public static void ArgumentNotNegativeValue(int argumentValue, string argumentName)
-        {
-            if (argumentValue < 0)
-            {
+        public static void ArgumentNotNegativeValue(int argumentValue, string argumentName) {
+            if (argumentValue < 0) {
                 throw new ArgumentOutOfRangeException(argumentName, argumentValue, string.Format(CultureInfo.CurrentCulture, ExceptionMessages.ArgumentCannotBeNegative, argumentName));
             }
         }
@@ -103,10 +91,8 @@ namespace Microsoft.Practices.TransientFaultHandling
         /// </summary>
         /// <param name="argumentValue">The <see cref="System.Int64"/> value of the argument.</param>
         /// <param name="argumentName">The name of the argument for diagnostic purposes.</param>
-        public static void ArgumentNotNegativeValue(long argumentValue, string argumentName)
-        {
-            if (argumentValue < 0)
-            {
+        public static void ArgumentNotNegativeValue(long argumentValue, string argumentName) {
+            if (argumentValue < 0) {
                 throw new ArgumentOutOfRangeException(argumentName, argumentValue, string.Format(CultureInfo.CurrentCulture, ExceptionMessages.ArgumentCannotBeNegative, argumentName));
             }
         }
@@ -117,10 +103,8 @@ namespace Microsoft.Practices.TransientFaultHandling
         /// <param name="argumentValue">The <see cref="System.Double"/> value of the argument.</param>
         /// <param name="ceilingValue">The <see cref="System.Double"/> ceiling value of the argument.</param>
         /// <param name="argumentName">The name of the argument for diagnostic purposes.</param>
-        public static void ArgumentNotGreaterThan(double argumentValue, double ceilingValue, string argumentName)
-        {
-            if (argumentValue > ceilingValue)
-            {
+        public static void ArgumentNotGreaterThan(double argumentValue, double ceilingValue, string argumentName) {
+            if (argumentValue > ceilingValue) {
                 throw new ArgumentOutOfRangeException(argumentName, argumentValue, string.Format(CultureInfo.CurrentCulture, ExceptionMessages.ArgumentCannotBeGreaterThanBaseline, argumentName, ceilingValue));
             }
         }
@@ -131,10 +115,8 @@ namespace Microsoft.Practices.TransientFaultHandling
         /// <param name="enumType">The Enum type the value should correspond to.</param>
         /// <param name="value">The value to check for.</param>
         /// <param name="argumentName">The name of the argument holding the value.</param>
-        public static void EnumValueIsDefined(Type enumType, object value, string argumentName)
-        {
-            if (Enum.IsDefined(enumType, value) == false)
-            {
+        public static void EnumValueIsDefined(Type enumType, object value, string argumentName) {
+            if (Enum.IsDefined(enumType, value) == false) {
                 throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, ExceptionMessages.InvalidEnumValue, argumentName, enumType));
             }
         }
@@ -146,10 +128,8 @@ namespace Microsoft.Practices.TransientFaultHandling
         /// <param name="assignee">The argument type.</param>
         /// <param name="providedType">The type it must be assignable from.</param>
         /// <param name="argumentName">The argument name.</param>
-        public static void TypeIsAssignableFromType(Type assignee, Type providedType, string argumentName)
-        {
-            if (providedType != null && !providedType.IsAssignableFrom(assignee))
-            {
+        public static void TypeIsAssignableFromType(Type assignee, Type providedType, string argumentName) {
+            if (providedType != null && !providedType.IsAssignableFrom(assignee)) {
                 throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, ExceptionMessages.TypeNotCompatible, assignee, providedType), argumentName);
             }
         }
@@ -161,14 +141,11 @@ namespace Microsoft.Practices.TransientFaultHandling
         /// <typeparam name="T">The type of the value to be checked.</typeparam>
         /// <param name="value">The value to be checked.</param>
         /// <returns>True if the value is defined or false if it's null or represents a default value for its type.</returns>
-        private static bool IsValueDefined<T>(T value)
-        {
-            if (typeof(T).IsValueType)
-            {
+        private static bool IsValueDefined<T>(T value) {
+            if (typeof(T).IsValueType) {
                 return !value.Equals(default(T));
             }
-            else
-            {
+            else {
                 return value != null;
             }
         }

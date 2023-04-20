@@ -9,8 +9,7 @@
 // FITNESS FOR A PARTICULAR PURPOSE.
 //===============================================================================
 
-namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling
-{
+namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling {
     using System;
     using System.Runtime.Serialization;
 
@@ -18,13 +17,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandl
     /// Represents an error that occurs while using the Transient Fault Handling Application Block.
     /// </summary>
     [Serializable]
-    public class RetryPolicyException : Exception
-    {
+    public class RetryPolicyException : Exception {
         /// <summary>
         /// Initializes a new instance of the <see cref="RetryPolicyException"/> class.
         /// </summary>
-        public RetryPolicyException()
-        {
+        public RetryPolicyException() {
         }
 
         /// <summary>
@@ -32,8 +29,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandl
         /// </summary>
         /// <param name="message">The message that describes the error.</param>
         public RetryPolicyException(string message)
-            : base(message)
-        {
+            : base(message) {
         }
 
         /// <summary>
@@ -42,8 +38,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandl
         /// </summary>
         /// <param name="message">The message that describes the error.</param>
         /// <param name="inner">The inner exception reference.</param>
-        public RetryPolicyException(string message, Exception inner) : base(message, inner)
-        {
+        public RetryPolicyException(string message, Exception inner) : base(message, inner) {
         }
 
         /// <summary>
@@ -53,8 +48,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandl
         /// <param name="context">The <see cref="StreamingContext"/> that contains contextual information about the source or destination.</param>
         protected RetryPolicyException(
             SerializationInfo info,
-            StreamingContext context) : base(info, context)
-        {
+            StreamingContext context) : base(info, context) {
         }
     }
 }

@@ -11,7 +11,7 @@ namespace ProjectExtensions.Azure.ServiceBus.StructureMap.Container {
         /// <param name="builder"></param>
         /// <param name="container">Structure Map container used in your application.  This is optional.  A new container will be created if one is not provided</param>
         /// <returns></returns>
-        public static  BusConfigurationBuilder UseStructureMapContainer(this BusConfigurationBuilder builder, IContainer container = null) {
+        public static BusConfigurationBuilder UseStructureMapContainer(this BusConfigurationBuilder builder, IContainer container = null) {
             builder.Configuration.Container = new StructureMapAzureBusContainer(container);
             return builder;
         }

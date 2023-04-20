@@ -1,8 +1,8 @@
-﻿using System;
+﻿using ProjectExtensions.Azure.ServiceBus.Container;
+using ProjectExtensions.Azure.ServiceBus.Serialization;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
-using ProjectExtensions.Azure.ServiceBus.Container;
-using ProjectExtensions.Azure.ServiceBus.Serialization;
 
 //DO NOT Change the namespace.
 namespace ProjectExtensions.Azure.ServiceBus {

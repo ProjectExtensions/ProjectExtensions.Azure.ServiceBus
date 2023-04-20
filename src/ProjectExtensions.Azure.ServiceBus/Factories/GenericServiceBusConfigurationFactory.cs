@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Microsoft.Practices.TransientFaultHandling;
 using ProjectExtensions.Azure.ServiceBus.Interfaces;
-using Microsoft.Practices.TransientFaultHandling;
-using Microsoft.ServiceBus;
-using Microsoft.ServiceBus.Messaging;
 
 namespace ProjectExtensions.Azure.ServiceBus.Factories {
 

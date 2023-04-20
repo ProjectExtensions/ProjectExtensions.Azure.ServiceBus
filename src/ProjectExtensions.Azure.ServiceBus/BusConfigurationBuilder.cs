@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Reflection;
-using ProjectExtensions.Azure.ServiceBus.Serialization;
-using System.Configuration;
-using Microsoft.Practices.TransientFaultHandling;
-using ProjectExtensions.Azure.ServiceBus.Helpers;
+﻿using Microsoft.Practices.TransientFaultHandling;
 using ProjectExtensions.Azure.ServiceBus.Interfaces;
+using ProjectExtensions.Azure.ServiceBus.Serialization;
+using System;
+using System.Configuration;
+using System.Reflection;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 
@@ -106,7 +102,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
                 throw new ArgumentNullException("ServiceBusNamespace", "The ServiceBusNamespace must be set.");
             }
             configuration.ServiceBusNamespace = setting;
-            
+
             setting = ConfigurationManager.AppSettings["ServiceBusTopic"];
             if (!string.IsNullOrWhiteSpace(setting)) {
                 configuration.TopicName = setting;

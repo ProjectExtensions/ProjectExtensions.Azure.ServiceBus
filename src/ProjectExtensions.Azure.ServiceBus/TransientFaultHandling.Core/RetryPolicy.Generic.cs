@@ -9,23 +9,20 @@
 // FITNESS FOR A PARTICULAR PURPOSE.
 //===============================================================================
 
-namespace Microsoft.Practices.TransientFaultHandling
-{
+namespace Microsoft.Practices.TransientFaultHandling {
     using System;
 
     /// <summary>
     /// Provides a generic version of the <see cref="RetryPolicy"/> class.
     /// </summary>
     /// <typeparam name="T">The type implementing the <see cref="ITransientErrorDetectionStrategy"/> interface that is responsible for detecting transient conditions.</typeparam>
-    public class RetryPolicy<T> : RetryPolicy where T : ITransientErrorDetectionStrategy, new()
-    {
+    public class RetryPolicy<T> : RetryPolicy where T : ITransientErrorDetectionStrategy, new() {
         /// <summary>
         /// Initializes a new instance of the RetryPolicy class with the specified number of retry attempts and parameters defining the progressive delay between retries.
         /// </summary>
         /// <param name="retryStrategy">The retry strategy to use for this retry policy.</param>
         public RetryPolicy(RetryStrategy retryStrategy)
-            : base(new T(), retryStrategy)
-        {
+            : base(new T(), retryStrategy) {
         }
 
         /// <summary>
@@ -33,8 +30,7 @@ namespace Microsoft.Practices.TransientFaultHandling
         /// </summary>
         /// <param name="retryCount">The number of retry attempts.</param>
         public RetryPolicy(int retryCount)
-            : base(new T(), retryCount)
-        {
+            : base(new T(), retryCount) {
         }
 
         /// <summary>
@@ -43,8 +39,7 @@ namespace Microsoft.Practices.TransientFaultHandling
         /// <param name="retryCount">The number of retry attempts.</param>
         /// <param name="retryInterval">The interval between retries.</param>
         public RetryPolicy(int retryCount, TimeSpan retryInterval)
-            : base(new T(), retryCount, retryInterval)
-        {
+            : base(new T(), retryCount, retryInterval) {
         }
 
         /// <summary>
@@ -55,8 +50,7 @@ namespace Microsoft.Practices.TransientFaultHandling
         /// <param name="maxBackoff">The maximum back-off time.</param>
         /// <param name="deltaBackoff">The time value that will be used for calculating a random delta in the exponential delay between retries.</param>
         public RetryPolicy(int retryCount, TimeSpan minBackoff, TimeSpan maxBackoff, TimeSpan deltaBackoff)
-            : base(new T(), retryCount, minBackoff, maxBackoff, deltaBackoff)
-        {
+            : base(new T(), retryCount, minBackoff, maxBackoff, deltaBackoff) {
         }
 
         /// <summary>
@@ -66,8 +60,7 @@ namespace Microsoft.Practices.TransientFaultHandling
         /// <param name="initialInterval">The initial interval that will apply for the first retry.</param>
         /// <param name="increment">The incremental time value that will be used for calculating the progressive delay between retries.</param>
         public RetryPolicy(int retryCount, TimeSpan initialInterval, TimeSpan increment)
-            : base(new T(), retryCount, initialInterval, increment)
-        {
+            : base(new T(), retryCount, initialInterval, increment) {
         }
     }
 }

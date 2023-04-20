@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Castle.MicroKernel.Registration;
+﻿using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using ProjectExtensions.Azure.ServiceBus.Container;
+using System;
 
 namespace ProjectExtensions.Azure.ServiceBus.CastleWindsor.Container {
     /// <summary>
@@ -12,7 +9,7 @@ namespace ProjectExtensions.Azure.ServiceBus.CastleWindsor.Container {
     /// </summary>
     public class CastleWindsorBusContainer : AzureBusContainerBase {
         IWindsorContainer container;
-  
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -26,7 +23,7 @@ namespace ProjectExtensions.Azure.ServiceBus.CastleWindsor.Container {
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public override T Resolve<T>()  {
+        public override T Resolve<T>() {
             return container.Resolve<T>();
         }
 
@@ -48,7 +45,8 @@ namespace ProjectExtensions.Azure.ServiceBus.CastleWindsor.Container {
         public override void Register(Type serviceType, Type implementationType, bool perInstance = false) {
             if (perInstance) {
                 container.Register(Component.For(serviceType).ImplementedBy(implementationType).LifestyleTransient());
-            } else {
+            }
+            else {
                 container.Register(Component.For(serviceType).ImplementedBy(implementationType).LifestyleSingleton());
             }
         }

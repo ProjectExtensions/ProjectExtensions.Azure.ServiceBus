@@ -1,9 +1,7 @@
-﻿using System;
+﻿using ProjectExtensions.Azure.ServiceBus.Serialization;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using ProjectExtensions.Azure.ServiceBus.Serialization;
 
 namespace ProjectExtensions.Azure.ServiceBus.Interfaces {
 

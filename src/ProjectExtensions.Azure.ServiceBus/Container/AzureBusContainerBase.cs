@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using ProjectExtensions.Azure.ServiceBus.Serialization;
+﻿using ProjectExtensions.Azure.ServiceBus.Serialization;
+using System;
 
 namespace ProjectExtensions.Azure.ServiceBus.Container {
-    
+
     /// <summary>
     /// Base class for all Containers.
     /// </summary>

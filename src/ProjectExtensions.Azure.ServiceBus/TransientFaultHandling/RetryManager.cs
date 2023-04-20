@@ -9,8 +9,7 @@
 // FITNESS FOR A PARTICULAR PURPOSE.
 //===============================================================================
 
-namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling
-{
+namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling {
     using Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling.AzureStorage;
     using Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling.ServiceBus;
     using Microsoft.Practices.TransientFaultHandling;
@@ -18,8 +17,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandl
     /// <summary>
     /// Non-static entry point to the retry functionality.
     /// </summary>
-    public abstract class RetryManager
-    {
+    public abstract class RetryManager {
         /// <summary>
         /// Initializes a new instance of the <see cref="RetryManager"/> class.
         /// </summary>
@@ -29,8 +27,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandl
         /// <param name="defaultAzureServiceBusStrategyName">The default retry strategy for Windows Azure Service Bus.</param>
         /// <param name="defaultAzureCachingStrategyName">The default retry strategy for Windows Azure Caching.</param>
         /// <param name="defaultAzureStorageStrategyName">The default retry strategy for Windows Azure Storage.</param>
-        protected RetryManager(string defaultRetryStrategyName, string defaultSqlConnectionStrategyName, string defaultSqlCommandStrategyName, string defaultAzureServiceBusStrategyName, string defaultAzureCachingStrategyName, string defaultAzureStorageStrategyName)
-        {
+        protected RetryManager(string defaultRetryStrategyName, string defaultSqlConnectionStrategyName, string defaultSqlCommandStrategyName, string defaultAzureServiceBusStrategyName, string defaultAzureCachingStrategyName, string defaultAzureStorageStrategyName) {
             this.DefaultRetryStrategyName = defaultRetryStrategyName;
             this.DefaultSqlConnectionStrategyName = string.IsNullOrEmpty(defaultSqlConnectionStrategyName) ? this.DefaultRetryStrategyName : defaultSqlConnectionStrategyName;
             this.DefaultSqlCommandStrategyName = string.IsNullOrEmpty(defaultSqlCommandStrategyName) ? this.DefaultRetryStrategyName : defaultSqlCommandStrategyName;
@@ -75,8 +72,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandl
         /// <typeparam name="T">The type implementing the <see cref="ITransientErrorDetectionStrategy"/> interface that is responsible for detecting transient conditions.</typeparam>
         /// <returns>A new retry policy with the specified error detection strategy and the default retry strategy defined in the config</returns>
         public virtual RetryPolicy<T> GetRetryPolicy<T>()
-            where T : ITransientErrorDetectionStrategy, new()
-        {
+            where T : ITransientErrorDetectionStrategy, new() {
             return new RetryPolicy<T>(this.GetRetryStrategy());
         }
 
@@ -87,8 +83,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandl
         /// <param name="retryStrategyName">The retry strategy name as defined in the config.</param>
         /// <returns>A new retry policy with the specified error detection strategy and the default retry strategy defined in the config</returns>
         public virtual RetryPolicy<T> GetRetryPolicy<T>(string retryStrategyName)
-            where T : ITransientErrorDetectionStrategy, new()
-        {
+            where T : ITransientErrorDetectionStrategy, new() {
             return new RetryPolicy<T>(this.GetRetryStrategy(retryStrategyName));
         }
 
@@ -96,8 +91,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandl
         /// Return the default retry strategy defined in the config.
         /// </summary>
         /// <returns>The retry strategy matching the default strategy.</returns>
-        public RetryStrategy GetRetryStrategy()
-        {
+        public RetryStrategy GetRetryStrategy() {
             return this.GetRetryStrategy(this.DefaultRetryStrategyName);
         }
 
@@ -113,8 +107,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandl
         /// </summary>
         /// <returns>The default SqlConnection retry strategy (or the default strategy if no default could be found).</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "As designed")]
-        public RetryStrategy GetDefaultSqlConnectionRetryStrategy()
-        {
+        public RetryStrategy GetDefaultSqlConnectionRetryStrategy() {
             return GetRetryStrategy(this.DefaultSqlConnectionStrategyName);
         }
 
@@ -123,8 +116,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandl
         /// </summary>
         /// <returns>The default SqlConnection retry strategy (or the default strategy if no default could be found).</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "As designed")]
-        public virtual RetryStrategy GetDefaultSqlCommandRetryStrategy()
-        {
+        public virtual RetryStrategy GetDefaultSqlCommandRetryStrategy() {
             return GetRetryStrategy(this.DefaultSqlCommandStrategyName);
         }
 
@@ -133,8 +125,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandl
         /// </summary>
         /// <returns>The default Windows Azure Service retry strategy (or the default strategy if no default could be found).</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "As designed")]
-        public virtual RetryStrategy GetDefaultAzureServiceBusRetryStrategy()
-        {
+        public virtual RetryStrategy GetDefaultAzureServiceBusRetryStrategy() {
             return GetRetryStrategy(this.DefaultAzureServiceBusStrategyName);
         }
 
@@ -143,8 +134,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandl
         /// </summary>
         /// <returns>The default Windows Azure Caching retry strategy (or the default strategy if no default could be found).</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "As designed")]
-        public virtual RetryStrategy GetDefaultAzureCachingRetryStrategy()
-        {
+        public virtual RetryStrategy GetDefaultAzureCachingRetryStrategy() {
             return GetRetryStrategy(this.DefaultAzureCachingStrategyName);
         }
 
@@ -153,8 +143,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandl
         /// </summary>
         /// <returns>The default Windows Azure Storage retry strategy (or the default strategy if no default could be found).</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "As designed")]
-        public virtual RetryStrategy GetDefaultAzureStorageRetryStrategy()
-        {
+        public virtual RetryStrategy GetDefaultAzureStorageRetryStrategy() {
             return GetRetryStrategy(this.DefaultAzureStorageStrategyName);
         }
 
@@ -163,8 +152,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandl
         /// </summary>
         /// <returns>The retry policy for Windows Azure Service Bus with the corresponding default strategy (or the default strategy if no retry strategy definition assigned to Windows Azure Service Bus was found).</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "As designed")]
-        public virtual RetryPolicy GetDefaultAzureServiceBusRetryPolicy()
-        {
+        public virtual RetryPolicy GetDefaultAzureServiceBusRetryPolicy() {
             return new RetryPolicy<ServiceBusTransientErrorDetectionStrategy>(this.GetDefaultAzureServiceBusRetryStrategy());
         }
 
@@ -173,8 +161,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandl
         /// </summary>
         /// <returns>The retry policy for Windows Azure Storage with the corresponding default strategy (or the default strategy if no retry strategy definition assigned to Windows Azure Storage was found).</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "As designed")]
-        public virtual RetryPolicy GetDefaultAzureStorageRetryPolicy()
-        {
+        public virtual RetryPolicy GetDefaultAzureStorageRetryPolicy() {
             return new RetryPolicy<StorageTransientErrorDetectionStrategy>(this.GetDefaultAzureStorageRetryStrategy());
         }
     }

@@ -15,6 +15,6 @@ namespace ProjectExtensions.Azure.ServiceBus.Autofac.Container {
             builder.Configuration.Container = new AutofacAzureBusContainer(container);
             return builder;
         }
-        
+
     }
 }

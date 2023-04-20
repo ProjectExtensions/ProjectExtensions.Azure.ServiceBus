@@ -9,8 +9,7 @@
 // FITNESS FOR A PARTICULAR PURPOSE.
 //===============================================================================
 
-namespace Microsoft.Practices.TransientFaultHandling
-{
+namespace Microsoft.Practices.TransientFaultHandling {
     #region Using statements
     using System;
     #endregion
@@ -18,8 +17,7 @@ namespace Microsoft.Practices.TransientFaultHandling
     /// <summary>
     /// Defines an interface which must be implemented by custom components responsible for detecting specific transient conditions.
     /// </summary>
-    public interface ITransientErrorDetectionStrategy
-    {
+    public interface ITransientErrorDetectionStrategy {
         /// <summary>
         /// Determines whether the specified exception represents a transient failure that can be compensated by a retry.
         /// </summary>

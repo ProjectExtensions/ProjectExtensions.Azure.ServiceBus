@@ -1,7 +1,7 @@
-using System.Configuration;
 using Amazon.ServiceBus.DistributedMessages.Serializers;
 using ProjectExtensions.Azure.ServiceBus;
 using ProjectExtensions.Azure.ServiceBus.Autofac.Container;
+using System.Configuration;
 
 namespace PubSubUsingConfiguration {
     static internal class Bootstrapper {

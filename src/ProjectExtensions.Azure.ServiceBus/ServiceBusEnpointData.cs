@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Reflection;
-using ProjectExtensions.Azure.ServiceBus.Helpers;
+﻿using ProjectExtensions.Azure.ServiceBus.Helpers;
 using ProjectExtensions.Azure.ServiceBus.Receiver;
+using System;
+using System.Linq;
+using System.Reflection;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 
@@ -41,7 +39,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         public string SubscriptionNameDebug {
             get {
                 if (_subscriptionNameDebug == null) {
-                    _subscriptionNameDebug = DeclaredType.FullName.Replace("`1", "") + "<" + MessageType.FullName + "> - " + SubscriptionName; 
+                    _subscriptionNameDebug = DeclaredType.FullName.Replace("`1", "") + "<" + MessageType.FullName + "> - " + SubscriptionName;
                 }
                 return _subscriptionNameDebug;
             }

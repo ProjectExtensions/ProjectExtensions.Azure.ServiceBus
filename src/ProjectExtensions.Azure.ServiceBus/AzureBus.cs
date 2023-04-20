@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Reflection;
+﻿using Microsoft.Practices.TransientFaultHandling;
 using NLog;
-using System.Linq.Expressions;
-using Microsoft.Practices.TransientFaultHandling;
 using ProjectExtensions.Azure.ServiceBus.Helpers;
 using ProjectExtensions.Azure.ServiceBus.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 
@@ -76,7 +74,7 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// <typeparam name="T"></typeparam>
         /// <param name="message">The message to publish.</param>
         public void Publish<T>(T message) {
-            sender.Send<T>(message, default(IDictionary<string, object>));
+            sender.Send<T>(message, default);
         }
 
         /// <summary>

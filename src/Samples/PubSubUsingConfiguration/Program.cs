@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using ProjectExtensions.Azure.ServiceBus;
+﻿using NLog;
 using NLog.Config;
 using NLog.Targets;
-using NLog;
+using ProjectExtensions.Azure.ServiceBus;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Transactions;
 
@@ -67,7 +67,7 @@ namespace PubSubUsingConfiguration {
                     MessageId = DateTime.Now.ToString()
                 };
                 BusConfiguration.Instance.Bus.PublishAsync(message2, (result) => {
-                    if (!result.IsSuccess) { 
+                    if (!result.IsSuccess) {
                         //message failed.
                     }
                     Debug.WriteLine("async:" + result.TimeSpent);

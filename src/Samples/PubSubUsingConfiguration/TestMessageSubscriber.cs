@@ -1,14 +1,78 @@
-﻿using System;
+﻿
+/* Unmerged change from project 'PubSubUsingCastleWindsor'
+Before:
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ProjectExtensions.Azure.ServiceBus;
 using NLog;
+After:
+using NLog;
+using ProjectExtensions.Azure.ServiceBus;
+using System;
+using System.Collections.Generic;
+using System.Azure.ServiceBus;
+using System.Text;
+*/
+
+/* Unmerged change from project 'PubSubUsingStructureMap'
+Before:
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using ProjectExtensions.Azure.ServiceBus;
+using NLog;
+After:
+using NLog;
+using ProjectExtensions.Azure.ServiceBus;
+using System;
+using System.Collections.Generic;
+using System.Azure.ServiceBus;
+using System.Text;
+*/
+
+/* Unmerged change from project 'PubSubUsingUnity'
+Before:
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using ProjectExtensions.Azure.ServiceBus;
+using NLog;
+After:
+using NLog;
+using ProjectExtensions.Azure.ServiceBus;
+using System;
+using System.Collections.Generic;
+using System.Azure.ServiceBus;
+using System.Text;
+*/
+
+/* Unmerged change from project 'PubSubUsingNinject'
+Before:
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using ProjectExtensions.Azure.ServiceBus;
+using NLog;
+After:
+using NLog;
+using ProjectExtensions.Azure.ServiceBus;
+using System;
+using System.Collections.Generic;
+using System.Azure.ServiceBus;
+using System.Text;
+*/
+using NLog;
+using ProjectExtensions.Azure.ServiceBus;
 
 namespace PubSubUsingConfiguration {
 
     [MessageHandlerConfiguration(
-        DeadLetterAfterMaxRetries=true, 
+        DeadLetterAfterMaxRetries = true,
         MaxRetries = 2,
         PauseTimeIfErrorWasThrown = 15000,
         Singleton = true)]

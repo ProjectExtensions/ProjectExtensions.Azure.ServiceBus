@@ -1,6 +1,5 @@
 ﻿using ProjectExtensions.Azure.ServiceBus;
 using ProjectExtensions.Azure.ServiceBus.StructureMap.Container;
-using PubSubUsingConfiguration;
 
 namespace PubSubUsingConfiguration {
     public static class Bootstrapper {

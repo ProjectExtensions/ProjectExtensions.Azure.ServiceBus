@@ -1,7 +1,7 @@
-﻿using System;
-using ProjectExtensions.Azure.ServiceBus.Container;
+﻿using ProjectExtensions.Azure.ServiceBus.Container;
 using StructureMap;
 using StructureMap.Pipeline;
+using System;
 
 namespace ProjectExtensions.Azure.ServiceBus.StructureMap.Container {
     /// <summary>
