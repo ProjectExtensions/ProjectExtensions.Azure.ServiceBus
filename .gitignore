@@ -30,3 +30,4 @@ _ReSharper*/
 .hg/
 BuildOutput/*
 packages/*
+/.vs/
