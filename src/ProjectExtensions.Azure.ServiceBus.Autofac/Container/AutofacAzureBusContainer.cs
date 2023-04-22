@@ -69,12 +69,14 @@ namespace ProjectExtensions.Azure.ServiceBus.Autofac.Container {
         /// Build the container if needed.
         /// </summary>
         public override void Build() {
-            if (container == null) {
-                container = builder.Build();
-            }
-            else {
-                builder.Update(container);
-            }
+            //NOTE: Determine if we need to rebuild the container.  This is a workaround for a bug in Autofac.
+            container = builder.Build();
+            //if (container == null) {
+            //    container = builder.Build();
+            //}
+            //else {
+            //    builder.Update(container);
+            //}
             builder = new ContainerBuilder();
             registeredTypes.Clear();
         }
