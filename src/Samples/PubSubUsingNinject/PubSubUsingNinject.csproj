@@ -91,7 +91,7 @@
       <Version>13.0.3</Version>
     </PackageReference>
     <PackageReference Include="Ninject">
-      <Version>3.0.1.10</Version>
+      <Version>3.3.6</Version>
     </PackageReference>
     <PackageReference Include="NLog">
       <Version>2.1.0</Version>
