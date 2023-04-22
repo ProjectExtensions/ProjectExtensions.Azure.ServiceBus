@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33530.505
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectExtensions.Azure.ServiceBus", "src\ProjectExtensions.Azure.ServiceBus\ProjectExtensions.Azure.ServiceBus.csproj", "{8C8A8531-95AE-41CD-B2AC-6651F104245E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectExtensions.Azure.ServiceBus.Tests.Unit", "src\Tests\ProjectExtensions.Azure.ServiceBus.Tests.Unit\ProjectExtensions.Azure.ServiceBus.Tests.Unit.csproj", "{7B5EB3D2-771D-467C-B467-60BF2065890D}"
