@@ -82,7 +82,7 @@
       <Version>3.6.1</Version>
     </PackageReference>
     <PackageReference Include="WindowsAzure.ServiceBus">
-      <Version>2.4.9</Version>
+      <Version>6.2.2</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

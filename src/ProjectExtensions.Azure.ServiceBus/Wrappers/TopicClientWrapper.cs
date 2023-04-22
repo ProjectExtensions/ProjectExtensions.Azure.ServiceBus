@@ -14,15 +14,11 @@ namespace ProjectExtensions.Azure.ServiceBus.Wrappers {
             this.topicClient = topicClient;
         }
 
-        public IAsyncResult BeginSend(IBrokeredMessage message, AsyncCallback callback, object state) {
+        public void Send(IBrokeredMessage message) {
             if (!(message is BrokeredMessageWrapper)) {
                 throw new ArgumentOutOfRangeException("message", "message must be BrokeredMessage for Azure use");
             }
-            return topicClient.BeginSend((message as BrokeredMessageWrapper).GetMessage(), callback, state);
-        }
-
-        public void EndSend(IAsyncResult result) {
-            topicClient.EndSend(result);
+            topicClient.Send((message as BrokeredMessageWrapper).GetMessage());
         }
 
         public void Close() {

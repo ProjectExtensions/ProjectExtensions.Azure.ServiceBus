@@ -24,21 +24,11 @@ namespace ProjectExtensions.Azure.ServiceBus.Tests.Unit.Mocks {
             this.Path = path;
         }
 
-        public IAsyncResult BeginSend(IBrokeredMessage message, AsyncCallback callback, object state) {
+        public void Send(IBrokeredMessage message) {
             var retVal = new MockIAsyncResult() {
-                AsyncState = state
+                AsyncState = null
             };
             _messages[retVal] = message;
-            callback(retVal);
-            return retVal;
-        }
-
-        public void EndSend(IAsyncResult result) {
-            IBrokeredMessage message = null;
-            if (!_messages.TryGetValue(result, out message)) {
-                throw new ApplicationException("You must call EndSend with a valid IAsyncResult. Duplicate Calls are not allowed.");
-            }
-            serviceBus.SendMessage(message);
         }
 
         public void Close() {

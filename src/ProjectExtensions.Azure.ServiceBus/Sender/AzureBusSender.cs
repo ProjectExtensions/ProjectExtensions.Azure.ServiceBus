@@ -118,7 +118,7 @@ namespace ProjectExtensions.Azure.ServiceBus.Sender {
                             logger.Debug("sendAction BeginSend Type={0} Serializer={1} MessageId={2}", obj.GetType().FullName, serializer.GetType().FullName, message.MessageId);
 
                             // Send the event asynchronously.
-                            defaultClient.BeginSend(message, cb, null);
+                            defaultClient.Send(message);
                         }
                         catch (Exception ex) {
                             failureException = ex;
@@ -127,11 +127,12 @@ namespace ProjectExtensions.Azure.ServiceBus.Sender {
                     },
                     (ar) => {
                         try {
+                            //NOTE: Refactor to no longer call the end action
                             failureException = null; //we may retry so we must null out the error.
                             // Complete the asynchronous operation. This may throw an exception that will be handled internally by the retry policy.
-                            logger.Debug("sendAction EndSend Begin Type={0} Serializer={1} MessageId={2}", obj.GetType().FullName, serializer.GetType().FullName, message.MessageId);
-                            defaultClient.EndSend(ar);
-                            logger.Debug("sendAction EndSend End Type={0} Serializer={1} MessageId={2}", obj.GetType().FullName, serializer.GetType().FullName, message.MessageId);
+                            //logger.Debug("sendAction EndSend Begin Type={0} Serializer={1} MessageId={2}", obj.GetType().FullName, serializer.GetType().FullName, message.MessageId);
+                            //defaultClient.EndSend(ar);
+                            //logger.Debug("sendAction EndSend End Type={0} Serializer={1} MessageId={2}", obj.GetType().FullName, serializer.GetType().FullName, message.MessageId);
                         }
                         catch (Exception ex) {
                             failureException = ex;
