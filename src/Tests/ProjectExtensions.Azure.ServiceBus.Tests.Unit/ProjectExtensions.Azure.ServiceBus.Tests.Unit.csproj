@@ -76,7 +76,7 @@
       <Version>4.18.4</Version>
     </PackageReference>
     <PackageReference Include="NUnit">
-      <Version>2.6.3</Version>
+      <Version>3.13.3</Version>
     </PackageReference>
     <PackageReference Include="RhinoMocks">
       <Version>3.6.1</Version>
