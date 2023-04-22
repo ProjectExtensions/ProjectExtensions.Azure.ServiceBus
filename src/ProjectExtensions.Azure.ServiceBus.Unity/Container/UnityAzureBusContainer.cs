@@ -1,6 +1,7 @@
-﻿using Microsoft.Practices.Unity;
-using ProjectExtensions.Azure.ServiceBus.Container;
+﻿using ProjectExtensions.Azure.ServiceBus.Container;
 using System;
+using Unity;
+using Unity.Lifetime;
 
 namespace ProjectExtensions.Azure.ServiceBus.Unity.Container {
     /// <summary>

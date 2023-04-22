@@ -1,4 +1,4 @@
-﻿using Microsoft.Practices.Unity;
+﻿using Unity;
 
 namespace ProjectExtensions.Azure.ServiceBus.Unity.Container {
     /// <summary>
