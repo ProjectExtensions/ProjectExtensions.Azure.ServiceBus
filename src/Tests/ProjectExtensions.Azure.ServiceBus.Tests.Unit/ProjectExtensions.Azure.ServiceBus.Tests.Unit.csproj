@@ -1,74 +1,19 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{7B5EB3D2-771D-467C-B467-60BF2065890D}</ProjectGuid>
+    <TargetFramework>net7.0</TargetFramework>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ProjectExtensions.Azure.ServiceBus.Tests.Unit</RootNamespace>
-    <AssemblyName>ProjectExtensions.Azure.ServiceBus.Tests.Unit</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Config.cs" />
-    <Compile Include="Handlers\TestMessageForTestingHandler.cs" />
-    <Compile Include="Interfaces\IMockServiceBus.cs" />
-    <Compile Include="Messages\TestMessageForTesting.cs" />
-    <Compile Include="Mocks\MockBrokeredMessage.cs" />
-    <Compile Include="Mocks\MockIAsyncResult.cs" />
-    <Compile Include="Mocks\MockMessagingFactory.cs" />
-    <Compile Include="Mocks\MockNamespaceManager.cs" />
-    <Compile Include="Mocks\MockServiceBus.cs" />
-    <Compile Include="Mocks\MockSubscriptionClient.cs" />
-    <Compile Include="Mocks\MockTopicClient.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SampleTest.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Autofac">
       <Version>7.0.1</Version>
     </PackageReference>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Microsoft.WindowsAzure.ConfigurationManager">
       <Version>3.2.3</Version>
     </PackageReference>
@@ -81,26 +26,19 @@
     <PackageReference Include="RhinoMocks">
       <Version>3.6.1</Version>
     </PackageReference>
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="WindowsAzure.ServiceBus">
       <Version>6.2.2</Version>
     </PackageReference>
+    <PackageReference Include="System.ServiceModel.Duplex" Version="4.8.1" />
+    <PackageReference Include="System.ServiceModel.NetTcp" Version="4.8.1" />
+    <PackageReference Include="System.ServiceModel.Federation" Version="4.8.1" />
+    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.421302">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ProjectExtensions.Azure.ServiceBus.Autofac\ProjectExtensions.Azure.ServiceBus.Autofac.csproj">
-      <Project>{11192756-9ABB-4C2B-8FE5-2DBD4DC0DC36}</Project>
-      <Name>ProjectExtensions.Azure.ServiceBus.Autofac</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\ProjectExtensions.Azure.ServiceBus\ProjectExtensions.Azure.ServiceBus.csproj">
-      <Project>{8C8A8531-95AE-41CD-B2AC-6651F104245E}</Project>
-      <Name>ProjectExtensions.Azure.ServiceBus</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\..\ProjectExtensions.Azure.ServiceBus.Autofac\ProjectExtensions.Azure.ServiceBus.Autofac.csproj" />
+    <ProjectReference Include="..\..\ProjectExtensions.Azure.ServiceBus\ProjectExtensions.Azure.ServiceBus.csproj" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>
