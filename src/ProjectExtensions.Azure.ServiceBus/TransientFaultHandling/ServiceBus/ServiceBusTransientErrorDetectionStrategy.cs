@@ -76,9 +76,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandl
             else if (ex is WebException) {
                 return true;
             }
-            else if (ex is SecurityTokenException) {
-                return true;
-            }
+            //else if (ex is SecurityTokenException) {
+            //    return true;
+            //}
             else if (ex is ServerTooBusyException) {
                 return true;
             }

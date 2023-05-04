@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Web;
+using ProjectExtensions.Azure.ServiceBus;
 
 namespace ProjectExtensions.Azure.ServiceBus {
 
@@ -10,11 +10,11 @@ namespace ProjectExtensions.Azure.ServiceBus {
         /// </summary>
         /// <returns>An object that needs to be explicitly disposed so that HttpContext can return back to its original state.</returns>
         public static IDisposable EnsureSafeHttpContext() {
-            HttpContext oldHttpContext = HttpContext.Current;
-            HttpContext.Current = null;
+            var oldHttpContext = HttpContextHelper.Current;
+            //HttpContextHelper.Current = null;
 
             return new AnonymousDisposable(() => {
-                HttpContext.Current = oldHttpContext;
+                //HttpContextHelper.Current = oldHttpContext;
             });
         }
     }

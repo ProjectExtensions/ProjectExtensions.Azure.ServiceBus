@@ -1,157 +1,36 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{8C8A8531-95AE-41CD-B2AC-6651F104245E}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ProjectExtensions.Azure.ServiceBus</RootNamespace>
-    <AssemblyName>ProjectExtensions.Azure.ServiceBus</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\ProjectExtensions.Azure.ServiceBus.XML</DocumentationFile>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\ProjectExtensions.Azure.ServiceBus.XML</DocumentationFile>
-    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.WindowsAzure.StorageClient, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\lib\Microsoft.WindowsAzure.StorageClient.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Core" />
     <Reference Include="System.Data.Services.Client" />
     <Reference Include="System.IdentityModel" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="AzureBus.cs" />
-    <Compile Include="Exceptions\TopicDeletedException.cs" />
-    <Compile Include="Factories\GenericServiceBusConfigurationFactory.cs" />
-    <Compile Include="AzureServiceBusFactories\ServiceBusMessagingFactoryFactory.cs" />
-    <Compile Include="AzureServiceBusFactories\ServiceBusNamespaceManagerFactory.cs" />
-    <Compile Include="AzureServiceBusFactories\ServiceBusTokenProvider.cs" />
-    <Compile Include="Container\AzureBusContainerBase.cs" />
-    <Compile Include="Helpers\BusHelper.cs" />
-    <Compile Include="Interfaces\IMessagingFactory.cs" />
-    <Compile Include="Interfaces\INamespaceManager.cs" />
-    <Compile Include="Interfaces\IServiceBusConfigurationFactory.cs" />
-    <Compile Include="Interfaces\IServiceBusSetupConfiguration.cs" />
-    <Compile Include="Interfaces\IServiceBusTokenProvider.cs" />
-    <Compile Include="Interfaces\ITopicClient.cs" />
-    <Compile Include="Receiver\AzureBusReceiver.cs" />
-    <Compile Include="Sender\AzureBusSender.cs" />
-    <Compile Include="AzureSenderReceiverBase.cs" />
-    <Compile Include="BrokeredMessageWrapper.cs" />
-    <Compile Include="BusConfiguration.cs" />
-    <Compile Include="BusConfigurationBuilder.cs" />
-    <Compile Include="Container\IAzureBusContainer.cs" />
-    <Compile Include="ExtensionMethods.cs" />
-    <Compile Include="Helpers\MD5Helper.cs" />
-    <Compile Include="Interfaces\IAzureBusReceiver.cs" />
-    <Compile Include="Interfaces\IAzureBusSender.cs" />
-    <Compile Include="IBrokeredMessage.cs" />
-    <Compile Include="IBusConfiguration.cs" />
-    <Compile Include="IMessageHandler.cs" />
-    <Compile Include="IBus.cs" />
-    <Compile Include="IMessageSentResult.cs" />
-    <Compile Include="Interfaces\ISubscriptionClient.cs" />
-    <Compile Include="IReceivedMessage.cs" />
-    <Compile Include="MessageHandlerConfigurationAttribute.cs" />
-    <Compile Include="Sender\MessageSentResult.cs" />
-    <Compile Include="Helpers\ReflectionHelper.cs" />
-    <Compile Include="Receiver\ReceivedMessage.cs" />
-    <Compile Include="Receiver\AzureBusReceiverState.cs" />
-    <Compile Include="Receiver\AzureReceiverHelper.cs" />
-    <Compile Include="Receiver\AzureReceiveState.cs" />
-    <Compile Include="Serialization\IServiceBusSerializer.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Serialization\JsonServiceBusSerializer.cs" />
-    <Compile Include="Serialization\ServiceBusSerializerBase.cs" />
-    <Compile Include="Serialization\XmlServiceBusSerializer.cs" />
-    <Compile Include="ServiceBusEnpointData.cs" />
-    <Compile Include="ServiceBusSetupConfiguration.cs" />
-    <Compile Include="SingletonMessageHandlerAttribute.cs" />
-    <Compile Include="AnonymousDisposable.cs" />
-    <Compile Include="TransientFaultHandling.Core\ExponentialBackoff.cs" />
-    <Compile Include="TransientFaultHandling.Core\FixedInterval.cs" />
-    <Compile Include="TransientFaultHandling.Core\GlobalSuppressions.cs" />
-    <Compile Include="TransientFaultHandling.Core\Incremental.cs" />
-    <Compile Include="TransientFaultHandling.Core\Properties\ExceptionMessages.Designer.cs" />
-    <Compile Include="TransientFaultHandling.Core\Properties\Resources.Designer.cs" />
-    <Compile Include="TransientFaultHandling.Core\RetryingEventArgs.cs" />
-    <Compile Include="TransientFaultHandling.Core\RetryPolicy.Generic.cs" />
-    <Compile Include="TransientFaultHandling.Core\RetryStrategy.cs" />
-    <Compile Include="TransientFaultHandling\AzureStorage\AzureStorageExtensions.cs" />
-    <Compile Include="TransientFaultHandling\AzureStorage\StorageTransientErrorDetectionStrategy.cs" />
-    <Compile Include="CloudEnvironment.cs" />
-    <Compile Include="TransientFaultHandling\Configuration\DesignResources.Designer.cs" />
-    <Compile Include="TransientFaultHandling\Configuration\TransientFaultHandlingDesignTime.cs" />
-    <Compile Include="TransientFaultHandling\ExtensionMethods.cs" />
-    <Compile Include="TransientFaultHandling.Core\Guard.cs" />
-    <Compile Include="TransientFaultHandling.Core\ITransientErrorDetectionStrategy.cs" />
-    <Compile Include="Properties\ExceptionMessages.Designer.cs" />
-    <Compile Include="Properties\Resources.Designer.cs" />
-    <Compile Include="TransientFaultHandling.Core\RetryLimitExceededException.cs" />
-    <Compile Include="TransientFaultHandling.Core\RetryPolicy.cs" />
-    <Compile Include="TransientFaultHandling\GlobalSuppressions.cs" />
-    <Compile Include="TransientFaultHandling\Properties\Resources.Designer.cs" />
-    <Compile Include="TransientFaultHandling\Properties\SqlCommandResources.Designer.cs" />
-    <Compile Include="TransientFaultHandling\RetryManager.cs" />
-    <Compile Include="TransientFaultHandling\RetryManagerImpl.cs" />
-    <Compile Include="TransientFaultHandling\RetryPolicyException.cs" />
-    <Compile Include="TransientFaultHandling\ServiceBus\ServiceBusTransientErrorDetectionStrategy.cs" />
-    <Compile Include="TransientFaultHandling\ServiceBus\ServiceBusTransientErrorToDetermineExistanceDetectionStrategy.cs" />
-    <Compile Include="Wrappers\SubscriptionClientWrapper.cs" />
-    <Compile Include="Wrappers\TopicClientWrapper.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Properties\ExceptionMessages.resx">
+    <EmbeddedResource Update="Properties\ExceptionMessages.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx" />
-    <EmbeddedResource Include="TransientFaultHandling.Core\Properties\ExceptionMessages.resx" />
-    <EmbeddedResource Include="TransientFaultHandling.Core\Properties\Resources.resx" />
-    <EmbeddedResource Include="TransientFaultHandling\Configuration\DesignResources.resx" />
-    <EmbeddedResource Include="TransientFaultHandling\Properties\Resources.resx" />
-    <EmbeddedResource Include="TransientFaultHandling\Properties\SqlCommandResources.resx" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Microsoft.WindowsAzure.ConfigurationManager">
       <Version>3.2.3</Version>
     </PackageReference>
@@ -161,16 +40,19 @@
     <PackageReference Include="NLog">
       <Version>5.1.3</Version>
     </PackageReference>
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="WindowsAzure.ServiceBus">
       <Version>6.2.2</Version>
     </PackageReference>
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
+    <PackageReference Include="System.ServiceModel.Duplex" Version="4.8.1" />
+    <PackageReference Include="System.ServiceModel.NetTcp" Version="4.8.1" />
+    <PackageReference Include="System.ServiceModel.Federation" Version="4.8.1" />
+    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.421302">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
 </Project>

@@ -16,7 +16,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandl
     using Microsoft.Practices.TransientFaultHandling;
     using Microsoft.WindowsAzure.StorageClient;
     using System;
-    using System.Data.Services.Client;
     using System.Linq;
     using System.Net;
     using System.Text.RegularExpressions;
@@ -43,13 +42,13 @@ namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandl
                 return true;
             }
 
-            var dataServiceException = ex as DataServiceRequestException;
+            //var dataServiceException = ex as DataServiceRequestException;
 
-            if (dataServiceException != null) {
-                if (IsErrorStringMatch(GetErrorCode(dataServiceException), StorageErrorCodeStrings.InternalError, StorageErrorCodeStrings.ServerBusy, StorageErrorCodeStrings.OperationTimedOut, TableErrorCodeStrings.TableServerOutOfMemory)) {
-                    return true;
-                }
-            }
+            //if (dataServiceException != null) {
+            //    if (IsErrorStringMatch(GetErrorCode(dataServiceException), StorageErrorCodeStrings.InternalError, StorageErrorCodeStrings.ServerBusy, StorageErrorCodeStrings.OperationTimedOut, TableErrorCodeStrings.TableServerOutOfMemory)) {
+            //        return true;
+            //    }
+            //}
 
             var serverException = ex as StorageServerException;
 
@@ -79,17 +78,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandl
         }
 
         #region Private members
-        private static string GetErrorCode(DataServiceRequestException ex) {
-            if (ex != null && ex.InnerException != null) {
-                var regEx = new Regex(Resources.GetErrorCodeRegEx, RegexOptions.IgnoreCase);
-                var match = regEx.Match(ex.InnerException.Message);
+        //private static string GetErrorCode(DataServiceRequestException ex) {
+        //    if (ex != null && ex.InnerException != null) {
+        //        var regEx = new Regex(Resources.GetErrorCodeRegEx, RegexOptions.IgnoreCase);
+        //        var match = regEx.Match(ex.InnerException.Message);
 
-                return match.Groups[1].Value;
-            }
-            else {
-                return null;
-            }
-        }
+        //        return match.Groups[1].Value;
+        //    }
+        //    else {
+        //        return null;
+        //    }
+        //}
 
         private static bool IsErrorCodeMatch(StorageException ex, params StorageErrorCode[] codes) {
             return ex != null && codes.Contains(ex.ErrorCode);
